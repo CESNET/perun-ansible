@@ -1,0 +1,14 @@
+---
+- hosts: perun-server
+  roles:
+  - common
+  remote_user: root
+  tasks:
+  - name: Create user perun
+    user:
+      # These variables are stored in file "roles/common/vars/main.yml"
+      name: "{{ perun_login }}"
+      comment: "{{ perun_name }}"
+      password: "{{ perun_password }}"
+      update_password: always # Or change to on_create only?
+
