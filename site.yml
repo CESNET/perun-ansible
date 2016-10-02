@@ -1,3 +1,8 @@
 ---
-- include: create_perun_user.yml # Creation of user perun
-- include: apache.yml # Apache installation and configuration
+# Main perun orchestration playbook
+- hosts: perun-servers
+  roles:
+    - perun-user
+    - common
+    - apache-perun
+    - perun-server
