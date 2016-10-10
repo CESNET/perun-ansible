@@ -3,7 +3,6 @@
 - hosts: localhost
   strategy: debug
   roles:
-    # - perun-user
-    # - common
     - apache-perun
     - perun
+    - tomcat-perun

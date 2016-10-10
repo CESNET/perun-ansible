@@ -1,0 +1,39 @@
+---
+# tasks file for tomcat-perun
+
+- name: Install Tomcat
+  apt:
+    name: tomcat7
+    state: present
+
+- name: Install Tomcat7-Admin
+  apt:
+    name: tomcat7-admin
+    state: present
+
+- name: Install Tomcat7-User
+  apt:
+    name: tomcat7-user
+    state: present
+
+- name: Create an instance of tomcat in home as user perun
+  command: tomcat7-instance-create -p 8080 -c 8005 "/home/{{ perun_login }}/tomcat" creates="/home/{{ perun_login }}/tomcat/webapps/"
+    
+
+# Root permission needed
+- name: Disable autostart of system-wide tomcat when machine is rebooted
+  command: update-rc.d tomcat7 disable
+
+- name: Copy application tomcat-admin for easier remote deployment
+  command: cp -r /usr/share/tomcat7-admin/manager/ "/home/{{ perun_login }}/tomcat/webapps/"
+
+- name: Export certificate of machine (Apache) into format .p12 (in case of change restart of tomcat is necessary!)
+  command: openssl pkcs12 -export -out /etc/ssl/p12/ssl-cert-snakeoil.p12 -in /etc/ssl/certs/ssl-cert-snakeoil.pem -inkey /etc/ssl/private/ssl-cert-snakeoil.key
+
+# If Perun will contact other servers, which are consider as credible
+- name: Set into start-up script of tomcat JAVA_OPTS with reference to .truststore
+  command: JAVA_OPTS="-XX:MaxPermSize=512m -Xmx512m -XX:+UseConcMarkSweepGC -d64 -Dfile.encoding=UTF8 -Djavax.net.ssl.trustStore=/home/perun/.truststore -Djavax.net.ssl.trustStorePassword={{ password }} -Djavax.net.ssl.trustStoreType=JKS"
+
+- name: Import certificates of server to the truststore
+  command: keytool -keystore /home/perun/.truststore -importcert -trustcacerts -file /tmp/file_with_cert -alias [cert alias, e.g. rt4.cesnet.cz]
+
