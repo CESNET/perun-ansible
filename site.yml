@@ -1,8 +1,8 @@
 ---
 # Main perun orchestration playbook
-- hosts: perun-servers
+- hosts: localhost
   roles:
-    - perun-user
-    - common
+    # - perun-user
+    # - common
     - apache-perun
-    - perun-server
+    # - perun-server
