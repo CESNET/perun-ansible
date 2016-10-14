@@ -15,7 +15,7 @@
 
 3) Edit configuration files:
 ----------------------------
-- You need to edit configuration files in downloaded Ansible repository.
+- You need to edit configuration files in downloaded Ansible repository. See [the Ansible Documentation](http://docs.ansible.com/ansible/playbooks_variables.html) on where to put variables
 - Configuration files are in folders:
   - ./group_vars/
   - ./host_vars/
