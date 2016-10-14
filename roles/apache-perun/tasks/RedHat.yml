@@ -1,0 +1,20 @@
+# tasks file for apache-perun
+- name: Install Apache
+  package:
+    name: "{{ apache_package[ansible_os_family ]}}"
+    state: present
+
+# These are packages that need to be installed for RedHat 
+- name: Ensure SSL is available for Apache
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache_modules[ansible_os_family]}}"
+
+- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
+  template:
+    src: "{{ perun_conf_file }}"
+    dest: /etc/apache2/sites-enabled/perun.conf
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
