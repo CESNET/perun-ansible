@@ -14,3 +14,6 @@ apache_modules:
     - mod_proxy
     - mod_proxy_ajp
     - mod_rewrite
+apache_service:
+  Debian: apache2
+  RedHat: httpd
