@@ -3,3 +3,14 @@
 apache_package:
   RedHat: httpd
   Debian: apache2
+apache_modules:
+  Debian:
+    - ssl
+    - proxy
+    - proxy_ajp
+    - rewrite
+  RedHat:
+    - mod_ssl
+    - mod_proxy
+    - mod_proxy_ajp
+    - mod_rewrite

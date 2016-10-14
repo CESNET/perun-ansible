@@ -1,2 +1,10 @@
 ---
 # tasks file for perun
+
+- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
+  template:
+    src: "{{ perun_conf_file }}"
+    dest: /etc/apache2/sites-enabled/perun.conf
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
