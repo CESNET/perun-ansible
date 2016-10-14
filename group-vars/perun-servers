@@ -1,4 +1,19 @@
 ---
-perun_login: perun
-perun_name: Mr. Perun
-perun_password: hahanoway
+# vars file for apache-perun
+apache_package:
+  RedHat: httpd
+  Debian: apache2
+apache_modules:
+  Debian:
+    - ssl
+    - proxy
+    - proxy_ajp
+    - rewrite
+  RedHat:
+    - mod_ssl
+    - mod_proxy
+    - mod_proxy_ajp
+    - mod_rewrite
+apache_service:
+  Debian: apache2
+  RedHat: httpd
