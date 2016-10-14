@@ -1,2 +1,6 @@
 ---
 # vars file for perun
+perun_login: perun
+perun_group: perun
+perun_name: Mr. Perun
+perun_password: hahanoway
