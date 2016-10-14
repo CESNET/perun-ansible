@@ -1,2 +1,5 @@
 ---
 # vars file for apache-perun
+apache_package:
+  RedHat: httpd
+  Debian: apache2
