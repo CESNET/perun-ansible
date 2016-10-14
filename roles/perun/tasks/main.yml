@@ -11,8 +11,9 @@
 - name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
   template:
     src: "{{ perun_apache_conf[ansible_os_family] }}"
-    dest: "{{ apache_conf_dir }}/perun.conf"
+    dest: "{{ perun_apache_dir[ansible_os_family] }}/perun.conf"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
   when: ansible_os_family == 'Debian'
+  notify: restart Apache
