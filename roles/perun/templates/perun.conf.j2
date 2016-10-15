@@ -1,0 +1,161 @@
+<IfModule mod_ssl.c>
+ <VirtualHost _default_:443>
+
+  ServerAdmin {{ perun_admin }}
+
+  DocumentRoot /var/www
+
+  RewriteEngine on
+  RewriteRule /cert/rpc/(.*)$ ajp://localhost:8009/perun-rpc/$1 [P,QSA,E=AJP_SSL_CLIENT_VERIFY:%{SSL:SSL_CLIENT_VERIFY},E=AJP_SSL_CLIENT_I_DN:%{SSL:SSL_CLIENT_I_DN},E=AJP_SSL_CLIENT_S_DN:%{SSL:SSL_CLIENT_S_DN},E=AJP_SSL_CLIENT_CERT:%{SSL:SSL_CLIENT_CERT},E=AJP_EXTSOURCELOA:2]
+  RewriteRule /ba/rpc/(.*)$ ajp://localhost:8009/perun-rpc/$1 [P,QSA]
+  RewriteRule /non/rpc/(.*)$ ajp://localhost:8009/perun-rpc/$1 [P,QSA]
+
+  # Protection from Proxy Attacks
+  RewriteRule .* - [E=AJP_APACHE_REQUEST_URI:%{REQUEST_URI}]
+
+  # make root redirect to cert-gui
+  RewriteRule ^/$ /cert/gui/ [R]
+
+  # Non-authz for missing certificate page error
+  Alias /notice/ /srv/www/
+  <Location /notice/>
+    Options -Indexes -FollowSymLinks
+    Allow from all
+    Order allow,deny
+    SSLVerifyClient none
+    DirectoryIndex certneeded.html
+  </Location>
+
+  # Pwd-reset over NON-AUTHZ
+  Alias /non/pwd-reset/ /var/www/
+  <Location "/non/pwd-reset/">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient none
+
+    DirectoryIndex PasswordReset.html
+  </Location>
+
+  # RPC over NON-AUTHZ
+  <Location "/non/rpc/">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient none
+
+    # Definice externiho overeni uzivatelu
+    SetEnvIf _ .* AJP_EXTSOURCE=LOCAL
+    SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceInternal
+    SetEnvIf _ .* AJP_EXTSOURCELOA=0
+  </Location>
+
+  ## GUI over X.509
+  Alias /cert/gui/ /var/www/
+  Alias /gui/ /var/www/
+  <LocationMatch "^(/cert/gui/|/gui/)$">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient optional
+    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS"
+    ErrorDocument 403 /notice/certneeded.html
+    SSLOptions +StdEnvVars +ExportCertData
+    DirectoryIndex PerunWebCert.html
+  </LocationMatch>
+
+  ## REGISTRAR over X.509
+  Alias /cert/registrar/ /var/www/
+  Alias /registrar/ /var/www/
+  <LocationMatch "^(/cert/registrar/|/registrar/)$">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient optional
+    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS"
+    ErrorDocument 403 /notice/certneeded.html
+
+    SSLOptions +StdEnvVars +ExportCertData
+    DirectoryIndex ApplicationFormCert.html
+  </LocationMatch>
+
+  ## PWD-RESET over X.509
+  Alias /cert/pwd-reset/ /var/www/
+  Alias /pwd-reset/ /var/www/
+  <LocationMatch "^(/cert/pwd-reset/|/pwd-reset/)$">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient require
+    ErrorDocument 403 /notice/certneeded.html
+    SSLOptions +StdEnvVars +ExportCertData
+    DirectoryIndex PasswordResetCert.html
+  </LocationMatch>
+
+  ## RPC over X.509
+  <Location "/cert/rpc/">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient optional
+    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS"
+    SSLOptions +StdEnvVars +ExportCertData
+  </Location>
+
+  ## RPC over basic auth
+  <Location "/ba/rpc/">
+     Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient none
+    AuthType basic
+    AuthName "Perun RPC"
+    Require valid-user
+    AuthUserFile /etc/apache2/perun.passwd
+
+    SetEnvIf _ .* AJP_EXTSOURCE=INTERNAL
+    SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceInternal
+    SetEnvIf _ .* AJP_EXTSOURCELOA=0
+  </Location>
+
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+
+  LogLevel warn
+
+  CustomLog ${APACHE_LOG_DIR}/ssl_access.log combined
+
+  # SSL options
+
+  SSLEngine on
+
+  # Allow large queries
+  SSLProxyEngine On
+  ProxyIOBufferSize 32192
+  # Note: sometimes, buffer size must be set also in Tomcat and must be lower then this value.
+
+  # Block old SSL with security issues
+  SSLProtocol All -SSLv2 -SSLv3
+
+  SSLCertificateFile    /etc/ssl/certs/ssl-cert-snakeoil.pem
+  SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+  SSLCACertificatePath /etc/grid-security/certificates/
+
+  ## THIS MUST BE CHANGED AGAINST DEFAULT CONFIGURATION
+  SSLVerifyClient optional
+  SSLVerifyDepth  10
+
+  BrowserMatch "MSIE [2-6]" \
+  nokeepalive ssl-unclean-shutdown \
+  downgrade-1.0 force-response-1.0
+  # MSIE 7 and newer should be able to use keepalive
+  BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+
+ </VirtualHost>
+</IfModule>

@@ -1,0 +1,13 @@
+# tasks file for apache-perun
+- name: Install Apache
+  package:
+    name: "{{ apache_package[ansible_os_family ]}}"
+    state: present
+
+# Debian just enables modules.
+
+- name: Enable modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache_modules[ansible_os_family] }}"

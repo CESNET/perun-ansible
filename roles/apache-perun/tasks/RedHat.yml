@@ -1,0 +1,5 @@
+# tasks file for apache-perun
+- name: Install Apache
+  package:
+    name: "{{ apache_package[ansible_os_family ]}}"
+    state: present
