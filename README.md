@@ -28,7 +28,7 @@ This repsitory contains the playbooks and roles necessary to deploy a Perun serv
 - Configuration files are in folders:
   - ./group_vars/
   - ./host_vars/
-  - ./roles/common/vars/
+  - ./roles/*/vars/
 
 ## Install prerequisite roles
 

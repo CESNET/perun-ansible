@@ -1,7 +1,7 @@
 ---
 # Main perun orchestration playbook
-- hosts: localhost
-  strategy: debug
+- hosts: perun-servers
+  remote_user: root
   roles:
     - apache-perun
     - perun
