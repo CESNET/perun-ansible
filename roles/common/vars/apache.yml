@@ -1,3 +1,0 @@
----
-# File with configuration of site
-perun_conf_file: roles/common/files/perun.conf 
