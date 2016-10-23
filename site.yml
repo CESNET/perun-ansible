@@ -1,8 +1,9 @@
 ---
 # Main perun orchestration playbook
 - hosts: perun-servers
-  remote_user: root
   roles:
-    - apache-perun
     - perun
+    - apache-perun
     - tomcat-perun
+  pre_tasks:
+    - include_vars: ./group-vars/passwords.yml
