@@ -1,13 +1,82 @@
 # tasks file for apache-perun
 - name: Install Apache
   package:
-    name: "{{ apache_package[ansible_os_family ]}}"
+    name: "{{ apache_package[ansible_os_family] }}"
     state: present
 
 # Debian just enables modules.
-
 - name: Enable modules
   apache2_module:
     name: "{{ item }}"
     state: present
   with_items: "{{ apache_modules[ansible_os_family] }}"
+
+# Install ssl-cert for making certificate
+- name: Install ssl-cert package
+  package:
+    name: "{{ ssl_cert_package[ansible_os_family] }}"
+    state: present
+  when: SSLCertificateFile == ""
+
+# Fake Snake Oil if SSLCertificateFile variable is not filled
+- name: Make fake Snake Oil certificate for testing purposes
+  command: make-ssl-cert generate-default-snakeoil --force-overwrite
+  when: SSLCertificateFile == ""
+
+- name: Make /etc/ssl/p12 directory
+  file:
+    path: /etc/ssl/p12
+    state: directory
+    mode: 0755
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+# Set Default values if variables are not filled
+- name: Set default value of SSLCertificateFile
+  set_fact: SSLCertificateFile=/etc/ssl/certs/ssl-cert-snakeoil.pem
+  when: SSLCertificateFile == ''
+
+- name: Set default value of SSLCertificateKeyFile
+  set_fact: SSLCertificateKeyFile=/etc/ssl/certs/ssl-cert-snakeoil.key
+  when: SSLCertificateKeyFile == ''
+
+# Copy apache configuration file for Perun
+- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
+  template:
+    src: "{{ apache_conf[ansible_os_family] }}"
+    dest: "{{ apache_dir[ansible_os_family] }}/perun.conf"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+  notify: restart Apache
+
+# Rehash certificates for user identification
+- name: Use c_rehash to your certificates
+  command: c_rehash .
+  args:
+    chdir: "{{ SSLCACertificatePath }}"
+
+- name: Enable JSON data comprimation in Apache
+  lineinfile:
+    dest: /etc/apache2/mods-available/deflate.conf
+    insertafter: "<IfModule mod_filter.c>\n"
+    line: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
+    regexp: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
+    backrefs: yes
+
+- name: Ensures /srv/www/ directory exists
+  file: 
+    path: /srv/www
+    state: directory
+    mode: 0755
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+# HTML website with warning
+- name: Create file /srv/www/certneeded.html
+  template:
+    src: "{{ apache_certneeded[ansible_os_family] }}"
+    dest: "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
