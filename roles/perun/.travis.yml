@@ -2,8 +2,7 @@
 language: python
 python: "2.7"
 
-# not really going to work in a container.
-sudo: true
+sudo: false
 
 # Install ansible
 addons:

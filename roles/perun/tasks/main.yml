@@ -4,15 +4,5 @@
   user:
     name: "{{ perun_login }}"
     comment: "{{ perun_name }}"
-    password: "{{ perun_password }}"
+    password: "{{ password_user_sha512 }}"
     update_password: always
-
-- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
-  template:
-    src: "{{ perun_apache_conf[ansible_os_family] }}"
-    dest: "{{ perun_apache_dir[ansible_os_family] }}/perun.conf"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
-  when: ansible_os_family == 'Debian'
-  notify: restart Apache
