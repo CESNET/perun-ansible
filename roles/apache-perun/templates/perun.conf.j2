@@ -1,7 +1,7 @@
 <IfModule mod_ssl.c>
  <VirtualHost _default_:443>
 
-  ServerAdmin perun@cesnet.cz
+  ServerAdmin {{ perun_admin }}
 
   DocumentRoot /var/www
 
@@ -61,7 +61,7 @@
     Allow from all
     SSLRequireSSL
     SSLVerifyClient optional
-    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS" 
+    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS"
     ErrorDocument 403 /notice/certneeded.html
     SSLOptions +StdEnvVars +ExportCertData
     DirectoryIndex PerunWebCert.html
@@ -76,7 +76,7 @@
     Allow from all
     SSLRequireSSL
     SSLVerifyClient optional
-    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS" 
+    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS"
     ErrorDocument 403 /notice/certneeded.html
 
     SSLOptions +StdEnvVars +ExportCertData
@@ -104,7 +104,7 @@
     Allow from all
     SSLRequireSSL
     SSLVerifyClient optional
-    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS" 
+    SSLRequire %{SSL_CLIENT_VERIFY} eq "SUCCESS"
     SSLOptions +StdEnvVars +ExportCertData
   </Location>
 
@@ -116,7 +116,7 @@
     SSLRequireSSL
     SSLVerifyClient none
     AuthType basic
-    AuthName "Perun RPC" 
+    AuthName "Perun RPC"
     Require valid-user
     AuthUserFile /etc/apache2/perun.passwd
 
@@ -137,14 +137,15 @@
 
   # Allow large queries
   SSLProxyEngine On
-  ProxyIOBufferSize 32192  # Note: sometimes, buffer size must be set also in Tomcat and must be lower then this value.
+  ProxyIOBufferSize 32192
+  # Note: sometimes, buffer size must be set also in Tomcat and must be lower then this value.
 
   # Block old SSL with security issues
   SSLProtocol All -SSLv2 -SSLv3
 
-  SSLCertificateFile    /etc/ssl/certs/ssl-cert-snakeoil.pem
-  SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
-  SSLCACertificatePath /etc/grid-security/certificates/
+  SSLCertificateFile {{ SSLCertificateFile }}
+  SSLCertificateKeyFile {{ SSLCertificateKeyFile }}
+  SSLCACertificatePath {{ SSLCACertificatePath }}
 
   ## THIS MUST BE CHANGED AGAINST DEFAULT CONFIGURATION
   SSLVerifyClient optional

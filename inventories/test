@@ -1,2 +1,2 @@
 [perun-servers]
-localhost
+localhost ansible_user=root

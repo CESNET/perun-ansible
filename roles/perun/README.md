@@ -1,12 +1,12 @@
-Role Name
+perun
 =========
 
-A role which configures apache for Perun
+Role perun serves for creating of user Perun.
 
 Requirements
 ------------
 
-Apache
+- Apache
 
 Role Variables
 --------------

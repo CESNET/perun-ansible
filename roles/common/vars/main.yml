@@ -1,9 +1,0 @@
----
-# Login of perun account 
-perun_login: 'perun'
-# Name of perun account
-perun_name: 'Perun'
-# Password of perun account (generate hash of your password in SHA-512) - this is hash of "password"
-perun_password: '$6$yqU43VBELe/Stx2$e91ZpNl8N3XNkVYIh14RTKG5K2A.amoi6mGLXlwhiQpfRdm52mf7OM2hnz7RlGXejxQTwzTqYA6NqXtGlnUS4/'
-# Email of server admin
-perun_email: 'perun@perun-test-domain.com'

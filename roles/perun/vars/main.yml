@@ -2,21 +2,6 @@
 # vars file for perun
 perun_login: perun
 perun_group: perun
-perun_name: Mr. Perun
-perun_password: hahanoway
-perun_login: 'perun'
+perun_name: Perun
 perun_admin: 'admin@perun-test-domain.com'
-# Name of perun account
-#perun_name: 'Perun'
-# Password of perun account (generate hash of your password in SHA-512) - this is hash of "password"
-#perun_password: '$6$yqU43VBELe/Stx2$e91ZpNl8N3XNkVYIh14RTKG5K2A.amoi6mGLXlwhiQpfRdm52mf7OM2hnz7RlGXejxQTwzTqYA6NqXtGlnUS4/'
-# Email of server admin
 perun_email: 'perun@perun-test-domain.com'
-
-# Virtual host config file
-perun_apache_conf:
-  Debian: perun.conf.j2
-  RedHat: perun.conf.j2
-perun_apache_dir:
-  Debian: /etc/apache2/sites-enabled/
-  RedHat: /etc/httpd/conf.d/

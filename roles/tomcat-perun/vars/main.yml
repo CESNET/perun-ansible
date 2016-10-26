@@ -1,0 +1,8 @@
+---
+# vars file for tomcat-perun
+tomcat7_admin_package:
+  Debian: tomcat7-admin
+
+tomcat7_user_package:
+  Debian: tomcat7-user
+

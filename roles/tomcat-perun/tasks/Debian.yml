@@ -1,0 +1,10 @@
+# Debian installation of Tomcat packages
+- name: Install tomcat7-admin package
+  package:
+    name: "{{ tomcat7_admin_package[ansible_os_family ]}}"
+    state: present
+
+- name: Install tomcat7-user package
+  package:
+    name: "{{ tomcat7_user_package[ansible_os_family ]}}"
+    state: present

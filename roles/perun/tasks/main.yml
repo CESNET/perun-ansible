@@ -2,18 +2,7 @@
 # tasks file for perun
 - name: Perun user
   user:
-    # These variables are stored in file "roles/common/vars/main.yml"
     name: "{{ perun_login }}"
     comment: "{{ perun_name }}"
-    password: "{{ perun_password }}"
-    update_password: always # Or change to on_create only?
-
-- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
-  template:
-    src: "{{ perun_apache_conf[ansible_os_family] }}"
-    dest: "{{ perun_apache_dir[ansible_os_family] }}/perun.conf"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
-  when: ansible_os_family == 'Debian'
-  notify: restart Apache
+    password: "{{ password_user_sha512 }}"
+    update_password: always
