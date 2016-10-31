@@ -8,3 +8,13 @@
   package:
     name: "{{ tomcat7_user_package[ansible_os_family ]}}"
     state: present
+
+- name: Install latest version of python
+  package:
+    name: "{{ python_package[ansible_os_family ]}}"
+    state: latest
+
+- name: Install latest version of python-pexpect
+  package:
+    name: "{{ python_pexpect_package[ansible_os_family ]}}"
+    state: latest

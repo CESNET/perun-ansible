@@ -6,3 +6,8 @@ tomcat7_admin_package:
 tomcat7_user_package:
   Debian: tomcat7-user
 
+python_package:
+  Debian: python
+
+python_pexpect_package:
+  Debian: python-pexpect
