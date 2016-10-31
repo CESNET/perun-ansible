@@ -1,8 +1,18 @@
 ---
 # tasks file for perun
+- include: "{{ ansible_os_family }}.yml"
+
 - name: Perun user
   user:
     name: "{{ perun_login }}"
     comment: "{{ perun_name }}"
     password: "{{ password_user_sha512 }}"
     update_password: always
+
+- name: Clone GIT repository to remote server
+  become: yes
+  become_user: "{{ perun_login }}"
+  git: 
+    repo: https://github.com/CESNET/perun.git 
+    dest: "{{ perun_folder }}"
+    update: yes
