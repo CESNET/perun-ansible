@@ -1,0 +1,15 @@
+# Debian installation of packages
+- name: Install postgresql package
+  package:
+    name: "{{ postgre_package[ansible_os_family] }}"
+    state: present
+
+- name: Install postgresql-contrib package
+  package:
+    name: "{{ postgre_contrib_package[ansible_os_family] }}"
+    state: present
+
+- name: Install python-psycopg2 package
+  package:
+    name: "{{ python_psycopg2_package[ansible_os_family] }}"
+    state: latest

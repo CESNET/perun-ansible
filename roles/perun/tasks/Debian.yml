@@ -1,0 +1,5 @@
+---
+- name: Install GIT
+  package:
+    name: "{{ git_package[ansible_os_family] }}"
+    state: latest

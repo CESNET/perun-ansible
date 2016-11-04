@@ -1,0 +1,5 @@
+# Debian installation of slapd package
+- name: Install slapd package # command "dpkg-reconfigure slapd" to change configuration
+  package:
+    name: "{{ slapd_package[ansible_os_family ]}}"
+    state: latest

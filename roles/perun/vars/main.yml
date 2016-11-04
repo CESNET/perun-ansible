@@ -5,3 +5,9 @@ perun_group: perun
 perun_name: Perun
 perun_admin: 'admin@perun-test-domain.com'
 perun_email: 'perun@perun-test-domain.com'
+
+# Path to repository with cloned Perun sources
+perun_folder: "/home/{{ perun_login }}/perun-sources/"
+
+git_package:
+  Debian: git

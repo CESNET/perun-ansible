@@ -1,0 +1,18 @@
+---
+# vars file for ldap-perun
+slapd_package:
+  Debian: slapd
+
+# Path to CA certificate file
+olcTLSCACertificateFile: '/etc/ssl/CA_filename.pem'
+
+# Path to certificate file
+olcTLSCertificateFile: '/etc/ssl/certs/certificate_name.pem'
+
+# Path to key file
+olcTLSCertificateKeyFile: '/etc/ssl/private/key_filename.key'
+
+ssl_conf: 
+  Debian: 'ssl.ldif.j2'
+ssl_conf_dir: 
+  Debian: '/etc/ldap'
