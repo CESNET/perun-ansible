@@ -1,0 +1,16 @@
+# Set where Dispatcher JMS is present
+dispatcher.ip.address=127.0.0.1
+dispatcher.port=6071
+dispatcher.enabled=true
+
+# Set internal Dispatcher identity
+perun.principal.name=perunDispatcher
+perun.principal.extSourceName=INTERNAL
+perun.principal.extSourceType=cz.metacentrum.perun.core.impl.ExtSourceInternal
+
+# Opt settings with default values (might not be present in a file at all)
+dispatcher.cron.propagation=45 0/4 * * * ?
+dispatcher.cron.processpool=0 0/2 * * * ?
+dispatcher.cron.cleantaskresults=0 0 1 * * ?
+dispatcher.cron.maintenance=0 0 2 * * ?
+dispatcher.datadir=/tmp/perun-dispatcher-data
