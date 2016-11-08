@@ -4,6 +4,11 @@
     name: "{{ apache_package[ansible_os_family] }}"
     state: present
 
+- name: Deletes /etc/apache2/sites-enabled/perun.conf if exists
+  file: 
+    path: /etc/apache2/sites-enabled/perun.conf
+    state: absent
+
 # Debian just enables modules.
 - name: Enable modules
   apache2_module:
@@ -37,7 +42,7 @@
   when: SSLCertificateFile == ''
 
 - name: Set default value of SSLCertificateKeyFile
-  set_fact: SSLCertificateKeyFile=/etc/ssl/certs/ssl-cert-snakeoil.key
+  set_fact: SSLCertificateKeyFile=/etc/ssl/private/ssl-cert-snakeoil.key
   when: SSLCertificateKeyFile == ''
 
 # Copy apache configuration file for Perun
@@ -71,6 +76,11 @@
     mode: 0755
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
+
+- name: Deletes "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html" if exists
+  file: 
+    path: "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html"
+    state: absent
 
 # HTML website with warning
 - name: Create file /srv/www/certneeded.html

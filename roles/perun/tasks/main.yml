@@ -15,4 +15,5 @@
   git: 
     repo: https://github.com/CESNET/perun.git 
     dest: "{{ perun_folder }}"
+    version: production
     update: yes

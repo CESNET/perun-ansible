@@ -7,5 +7,7 @@
     - tomcat-perun
     - postgre-perun
     - ldap-perun
+    - configuration-perun
+    - build-perun
   pre_tasks:
     - include_vars: ./group-vars/passwords.yml
