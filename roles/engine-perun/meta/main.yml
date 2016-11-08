@@ -1,7 +1,6 @@
----
 galaxy_info:
   author: Jan Zvěřina
-  description: Deploy LDAP
+  description: Deploys engine of Perun
   company: CESNET
 
   license: BSD
@@ -13,5 +12,5 @@ galaxy_info:
     versions:
     - stretch
     - wheezy
-  
+
 dependencies: []
