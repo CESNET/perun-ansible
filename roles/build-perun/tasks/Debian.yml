@@ -1,0 +1,6 @@
+---
+# Debian installation of packages
+- name: Install Maven package
+  package:
+    name: "{{ maven_package[ansible_os_family] }}"
+    state: present

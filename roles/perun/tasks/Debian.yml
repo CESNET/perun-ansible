@@ -3,3 +3,78 @@
   package:
     name: "{{ git_package[ansible_os_family] }}"
     state: latest
+
+- name: Install OpenJDK-7-JRE
+  package:
+    name: "{{ openjdk_jre_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install OpenJDK-7-JDK
+  package:
+    name: "{{ openjdk_jdk_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libswitch_perl_package
+  package:
+    name: "{{ libswitch_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install liblwp_authen_negotiate_perl_package
+  package:
+    name: "{{ liblwp_authen_negotiate_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libjson_any_perl_package
+  package:
+    name: "{{ libjson_any_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libtext_asciitable_perl_package
+  package:
+    name: "{{ libtext_asciitable_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libterm_readkey_perl_package
+  package:
+    name: "{{ libterm_readkey_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libwww_perl_package
+  package:
+    name: "{{ libwww_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libcrypt_ssleay_perl_package
+  package:
+    name: "{{ libcrypt_ssleay_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libtext_unidecode_perl_package
+  package:
+    name: "{{ libtext_unidecode_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libdate_calc_perl_package
+  package:
+    name: "{{ libdate_calc_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install libnet_ldap_perl_package
+  package:
+    name: "{{ libnet_ldap_perl_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install ldap_utils_package
+  package:
+    name: "{{ ldap_utils_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install ntp_package
+  package:
+    name: "{{ ntp_package[ansible_os_family] }}"
+    state: latest
+
+- name: Install rsync_package
+  package:
+    name: "{{ rsync_package[ansible_os_family] }}"
+    state: latest
