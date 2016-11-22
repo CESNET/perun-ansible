@@ -11,9 +11,6 @@ postgre_version: '9.4'
 python_psycopg2_package:
   Debian: python-psycopg2
 
-db_name: perun
-db_user: perun
-
 init_user_first_name: Master
 init_user_last_name: Perun
 

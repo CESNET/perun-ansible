@@ -1,0 +1,177 @@
+---
+# Task file for Debian distribution
+
+- name: Delete /opt/perun-cli directory if exists
+  file:
+    path: "/opt/perun-cli"
+    state: absent
+
+- name: Create /opt/perun-cli directory
+  file:
+    path: "/opt/perun-cli"
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Create /opt/perun-cli/lib directory
+  file:
+    path: "/opt/perun-cli/lib"
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Copy CLI scripts to /opt/perun-cli/lib/ directory
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: cp -r Perun /opt/perun-cli/lib/
+  args:
+    chdir: "{{ perun_folder }}/perun-rpc/src/main/perl/"
+
+- name: Add user perun-engine into Apache (done by root)
+  htpasswd: 
+    path: /etc/apache2/perun.passwd
+    name: perun-engine
+    password: "{{ password_user }}"
+    state: present
+
+- name: Restart Apache
+  service: 
+    name: apache2 
+    state: restarted
+
+- name: "Build engine of Perun. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: mvn -pl perun-engine -am clean package dependency:copy-dependencies -Dproduction -DskipTests
+  args:
+    chdir: "{{ perun_folder }}"
+
+- name: "Delete /home/{{ perun_login }}/perun-engine directory if exists"
+  file:
+    path: "/home/{{ perun_login }}/perun-engine"
+    state: absent
+
+- name: Create /home/{{ perun_login }}/perun-engine directory
+  become: yes
+  become_user: "{{ perun_login }}"
+  file:
+    path: "/home/{{ perun_login }}/perun-engine"
+    state: directory
+
+- name: "Copy perun-engine-3.0.1-SNAPSHOT-production.jar to /home/{{ perun_login }}/perun-engine/"
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: cp perun-engine-3.0.1-SNAPSHOT-production.jar "/home/{{ perun_login }}/perun-engine/"
+  args:
+    chdir: "{{ perun_folder }}/perun-engine/target/"
+
+- name: "Copy lib components to /home/{{ perun_login }}/perun-engine/"
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: cp -r lib "/home/{{ perun_login }}/perun-engine/"
+  args:
+    chdir: "{{ perun_folder }}/perun-engine/target/"
+
+- name: "Copy GEN scripts of engine to /home/{{ perun_login }}/perun-engine/"
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: cp -r gen "/home/{{ perun_login }}/perun-engine/"
+  args:
+    chdir: "{{ perun_services_folder }}"
+
+- name: "Copy SEND scripts of engine to /home/{{ perun_login }}/perun-engine/"
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: cp -r send "/home/{{ perun_login }}/perun-engine/"
+  args:
+    chdir: "{{ perun_services_folder }}"
+
+- name: "Delete /etc/init.d/perun-engine file if exists"
+  file:
+    path: "/etc/init.d/perun-engine"
+    state: absent
+
+- name: "Copy perun-engine.debian file to /etc/init.d/perun-engine"
+  shell: cp perun-engine.debian /etc/init.d/perun-engine
+  args:
+    chdir: "{{ perun_folder }}/perun-utils/init.d-scripts/"
+
+- name: "Change owner of /etc/init.d/perun-engine file to {{ perun_login }}:{{ perun_group }}"
+  file:
+    path: /etc/init.d/perun-engine
+    state: file
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: "Delete /var/run/perun directory if exists"
+  file:
+    path: "/var/run/perun"
+    state: absent
+
+- name: Create /var/run/perun directory
+  file:
+    path: "/var/run/perun"
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: "Delete /var/log/perun-engine directory if exists"
+  file:
+    path: "/var/log/perun-engine"
+    state: absent
+
+- name: Create /var/log/perun-engine directory
+  file:
+    path: "/var/log/perun-engine"
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: "Delete /var/log/perun-engine/perun-engine-out.log file if exists"
+  file:
+    path: "/var/log/perun-engine/perun-engine-out.log"
+    state: absent
+
+- name: "Create /var/log/perun-engine/perun-engine-out.log file"
+  file:
+    path: "/var/log/perun-engine/perun-engine-out.log"
+    state: touch
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Create file /etc/perun/perun-engine
+  template:
+    src: "perun_engine.j2"
+    dest: "/etc/perun/perun-engine"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Start perun-engine service
+  command: "/etc/init.d/perun-engine start"
+
+- name: "Create file /etc/apt/sources.list.d/meta_repo.list"
+  template: 
+    src: meta_repo.j2
+    dest: /etc/apt/sources.list.d/meta_repo.list
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: "Copy pgb_public_key to {{ perun_login }} user home folder"
+  copy:
+    src: "{{ role_path }}/files/pgb_public_key"
+    dest: "/home/{{ perun_login }}/pgb_public_key"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: "Import pgb_public_key into credible keys"
+  apt_key: 
+    file: "/home/{{ perun_login }}/pgb_public_key" 
+    state: present
+
+- name: "Update repositories cache (apt-update) and install perun base slave script"
+  apt:
+    name: perun-slave-base
+    update_cache: yes

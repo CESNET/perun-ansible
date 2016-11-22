@@ -1,4 +1,10 @@
 ---
+# Task file for perun role for Debian distribution
+
+- name: Update apt-get
+  apt:
+    update_cache: yes
+
 - name: Install GIT
   package:
     name: "{{ git_package[ansible_os_family] }}"
@@ -78,3 +84,40 @@
   package:
     name: "{{ rsync_package[ansible_os_family] }}"
     state: latest
+
+- name: Install python_passlib_package
+  package:
+    name: "{{ python_passlib_package[ansible_os_family] }}"
+    state: latest
+
+- name: "Create {{ perun_login }} user"
+  user:
+    name: "{{ perun_login }}"
+    comment: "{{ perun_name }}"
+    password: "{{ password_user_sha512 }}"
+    update_password: always
+
+- name: "Add {{ perun_login }} user to sudoers"
+  lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^%{{ perun_login }}"
+        line: "%{{ perun_login }} ALL=(ALL:ALL) ALL"
+
+- name: Clone GIT repository of perun sources to remote server
+  become: yes
+  become_user: "{{ perun_login }}"
+  git: 
+    repo: https://github.com/CESNET/perun.git 
+    dest: "{{ perun_folder }}"
+    version: production
+    update: yes
+
+- name: Clone GIT repository of perun services to remote server
+  become: yes
+  become_user: "{{ perun_login }}"
+  git: 
+    repo: https://github.com/CESNET/perun-services.git 
+    dest: "{{ perun_services_folder }}"
+    version: production
+    update: yes

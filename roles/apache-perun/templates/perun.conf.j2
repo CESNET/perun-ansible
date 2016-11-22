@@ -143,9 +143,9 @@
   # Block old SSL with security issues
   SSLProtocol All -SSLv2 -SSLv3
 
-  SSLCertificateFile {{ SSLCertificateFile }}
-  SSLCertificateKeyFile {{ SSLCertificateKeyFile }}
-  SSLCACertificatePath {{ SSLCACertificatePath }}
+  SSLCertificateFile {{ apache_certificate_file }}
+  SSLCertificateKeyFile {{ apache_certificate_key_file }}
+  SSLCACertificatePath {{ apache_ca_certificate_path }}
 
   ## THIS MUST BE CHANGED AGAINST DEFAULT CONFIGURATION
   SSLVerifyClient optional

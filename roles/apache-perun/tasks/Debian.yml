@@ -21,12 +21,26 @@
   package:
     name: "{{ ssl_cert_package[ansible_os_family] }}"
     state: present
-  when: SSLCertificateFile == ""
+  when: apache_certificate_file == "/etc/ssl/certs/ssl-cert-snakeoil.pem"
 
-# Fake Snake Oil if SSLCertificateFile variable is not filled
-- name: Make fake Snake Oil certificate for testing purposes
+# Fake Snake Oil if ssl_certificate_file variable is not filled
+- name: Make fake Snake Oil certificate for testing purposes (ssl_certificate_file variable is not filled (./group_vars/all.yml))
   command: make-ssl-cert generate-default-snakeoil --force-overwrite
-  when: SSLCertificateFile == ""
+  when: apache_certificate_file == "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+
+- name: "Change owner of {{ apache_certificate_file }} to {{ perun_login }}"
+  file:
+    path: "{{ apache_certificate_file }}"
+    state: file
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: "Change owner of {{ apache_certificate_key_file }} to {{ perun_login }}"
+  file:
+    path: "{{ apache_certificate_key_file }}"
+    state: file
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
 
 - name: Make /etc/ssl/p12 directory
   file:
@@ -35,15 +49,6 @@
     mode: 0755
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-
-# Set Default values if variables are not filled
-- name: Set default value of SSLCertificateFile
-  set_fact: SSLCertificateFile=/etc/ssl/certs/ssl-cert-snakeoil.pem
-  when: SSLCertificateFile == ''
-
-- name: Set default value of SSLCertificateKeyFile
-  set_fact: SSLCertificateKeyFile=/etc/ssl/private/ssl-cert-snakeoil.key
-  when: SSLCertificateKeyFile == ''
 
 # Copy apache configuration file for Perun
 - name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
@@ -57,9 +62,11 @@
 
 # Rehash certificates for user identification
 - name: Use c_rehash to your certificates
+  become: yes
+  become_user: "{{ perun_login }}"
   command: c_rehash .
   args:
-    chdir: "{{ SSLCACertificatePath }}"
+    chdir: "{{ apache_ca_certificate_path }}"
 
 - name: Enable JSON data comprimation in Apache
   lineinfile:
