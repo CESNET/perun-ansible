@@ -4,3 +4,66 @@
   package:
     name: "{{ maven_package[ansible_os_family] }}"
     state: present
+
+- name: Create ojdbc7 directory
+  become: yes
+  become_user: "{{ perun_login }}"
+  file:
+    path: "/home/{{ perun_login }}/ojdbc7"
+    state: directory
+
+- name: Unzip the archive with Oracle DB drivers
+  become: yes
+  become_user: "{{ perun_login }}"
+  unarchive: 
+    src: "{{ oracle_drivers_path }}"
+    dest: "/home/{{ perun_login }}/ojdbc7" 
+    remote_src: no
+
+- name: Install ojdbc7
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: mvn install:install-file -Dfile=ojdbc7.jar -DpomFile=ojdbc7-12.1.0.2.0.pom
+  args:
+    chdir: "/home/{{ perun_login }}/ojdbc7"
+
+- name: Install orai18n
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: mvn install:install-file -Dfile=orai18n.jar -DpomFile=orai18n-12.1.0.2.0.pom
+  args:
+    chdir: "/home/{{ perun_login }}/ojdbc7"
+
+- name: Delete ojdbc7 directory
+  file:
+    path: "/home/{{ perun_login }}/ojdbc7"
+    state: absent
+
+- name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: mvn clean install -DskipTests -Dproduction
+  args:
+    chdir: "{{ perun_folder }}"
+
+- name: Copy perun-rpc.war file into tomcat webapps folder
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: cp perun-rpc.war "/home/{{ perun_login }}/tomcat/webapps/perun-rpc.war"
+  args:
+    chdir: "{{ perun_folder }}/perun-rpc/target/"
+
+- name: Delete /var/www/perun-web-gui-3.0.1-SNAPSHOT-production if exists
+  file:
+    path: "/var/www/perun-web-gui-3.0.1-SNAPSHOT-production"
+    state: absent
+
+- name: Deploy GUI
+  command: cp -r ./perun-web-gui-3.0.1-SNAPSHOT-production /var/www/
+  args:
+    chdir: "{{ perun_folder }}/perun-web-gui/target/"
+
+- name: Start Tomcat if its not running
+  service: 
+    name: tomcat7
+    state: started

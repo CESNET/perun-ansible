@@ -1,2 +1,2 @@
 [perun-servers]
-production-perun.awesomesite.cz
+production-perun.awesomesite.cz ansible_user=root

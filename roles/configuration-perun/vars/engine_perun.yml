@@ -1,0 +1,21 @@
+---
+# Variables for Engine
+
+#Login to Perun Core
+perun_principal_name: 'perunEngine'
+perun_principal_extSourceName: 'INTERNAL'
+perun_principal_extSourceType: 'cz.metacentrum.perun.core.impl.ExtSourceInternal'
+
+# Where is Engine JSM located
+engine_unique_id: 1
+engine_ip_address: 127.0.0.1
+engine_port: 6061
+
+# Optional speed settings for engine
+engine_cron_propagation: '45 0/4 * * * ?'
+engine_cron_processpool: '0 0/2 * * * ?'
+engine_cron_taskexecutor: '0 0/4 * * * ?'
+engine_thread_gentasks_max: 10
+engine_thread_sendtasks_max: 1000
+engine_genscript_path: 'gen'
+engine_sendscript_path: 'send'

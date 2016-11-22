@@ -1,0 +1,9 @@
+dn: cn=config
+add: olcTLSCACertificateFile
+olcTLSCACertificateFile: {{ ldap_ca_certificate_file }}
+-
+add: olcTLSCertificateFile
+olcTLSCertificateFile: {{ ldap_certificate_file }}
+-
+add: olcTLSCertificateKeyFile
+olcTLSCertificateKeyFile: {{ ldap_certificate_key_file }}

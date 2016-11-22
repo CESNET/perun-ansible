@@ -1,7 +1,6 @@
 ---
 # vars file for apache-perun
 apache_package:
-  RedHat: httpd
   Debian: apache2
 apache_modules:
   Debian:
@@ -9,14 +8,8 @@ apache_modules:
     - proxy
     - proxy_ajp
     - rewrite
-  RedHat:
-    - mod_ssl
-    - mod_proxy
-    - mod_proxy_ajp
-    - mod_rewrite
 apache_service:
   Debian: apache2
-  RedHat: httpd
 
 ssl_cert_package:
   Debian: ssl-cert
@@ -24,18 +17,11 @@ ssl_cert_package:
 # Virtual host config file
 apache_conf:
   Debian: perun.conf.j2
-  RedHat: perun.conf.j2
 apache_dir:
   Debian: '/etc/apache2/sites-enabled/'
-  RedHat: '/etc/httpd/conf.d/'
 
 # Html website with missing certificate warning
 apache_certneeded:
   Debian: certneeded.html.j2
 apache_certneeded_dir:
   Debian: '/srv/www/'
-
-# Locations of certificate files and path
-SSLCertificateFile: ''
-SSLCertificateKeyFile: ''
-SSLCACertificatePath: '/etc/grid-security/certificates/'

@@ -1,5 +1,73 @@
+---
+# Task file for installation of LDAP in Debian distribution
+
 # Debian installation of slapd package
 - name: Install slapd package # command "dpkg-reconfigure slapd" to change configuration
   package:
     name: "{{ slapd_package[ansible_os_family ]}}"
     state: latest
+
+# SSL configuration ldif
+- name: SSL configuration ldif in /etc/ldap/ssl.ldif
+  template:
+    src: ssl_ldif.j2
+    dest: "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+#- name: Execute ssl.ldif as root
+#  command: ldapmodify -Y EXTERNAL -H ldapi:/// -f "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
+
+- name: Enable secure port in /etc/default/slapd
+  lineinfile: 
+   dest: /etc/default/slapd 
+   regexp: ^SLAPD_SERVICES= 
+   line: SLAPD_SERVICES="ldaps:/// ldapi:///"
+
+- name: Restart LDAP
+  service: 
+    name: "{{ slapd_package[ansible_os_family ]}}" 
+    state: restarted 
+    enabled: yes
+
+- name: Copy perun.ldif to remote server
+  template:
+    src: "perun_ldif.j2"
+    dest: "/home/{{ perun_login }}/perun.ldif"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Copy inetuser.ldif to remote server
+  template:
+    src: "inetuser_ldif.j2"
+    dest: "/home/{{ perun_login }}/inetuser.ldif"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Copy init-perun.ldif to remote server
+  template:
+    src: "init_perun_ldif.j2"
+    dest: "/home/{{ perun_login }}/init-perun.ldif"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+# TODO
+
+- name: "Delete perun.ldif file"
+  file:
+    path: "/home/{{ perun_login }}/perun.ldif"
+    state: absent
+
+- name: "Delete inetuser.ldif file"
+  file:
+    path: "/home/{{ perun_login }}/inetuser.ldif"
+    state: absent
+
+- name: "Delete init-perun.ldif file"
+  file:
+    path: "/home/{{ perun_login }}/init-perun.ldif"
+    state: absent

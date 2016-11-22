@@ -3,37 +3,30 @@ Tomcat-perun
 
 This role serves for installation of Tomcat with recommended settings for Perun.
 
+
 Requirements
 ------------
 
-- Apache
-- Perun user
+- Apache (install it with role apache-perun)
+- If you use default snake oil certificate, you need to generate it with apache-perun role
+- Perun user (create him with role perun)
+
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+You have to set variables in group-vars/all.yml and group-vars/passwords.yml files. Directory group-vars is placed in root directory of this Ansible repository. How to access group-vars/passwords.yml file is written in README.md in root directory of this Ansible repository.
 
-Dependencies
-------------
+The script will export certificate of Apache to format .p12. You have to set password for it in file group-vars/passwords.yml (variable password_tomcat_certificate).
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
--------------------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
 
 License
 -------
 
 BSD
 
+
 Author Information
 ------------------
 
-Jan Zvěřina - CESNET - zverina@cesnet.cz
+Jan Zvěřina, CESNET, zverina@cesnet.cz

@@ -1,5 +1,19 @@
 ---
-# tasks file for configuration-perun
+# Tasks file for configuration-perun
+
+- name: Include variable files
+  include_vars: "{{ item }}"
+  with_items:
+    - cabinet_perun.yml
+    - dispatcher_perun.yml
+    - engine_perun.yml
+    - ldap_perun.yml
+    - notifications_perun.yml
+    - perun_properties.yml
+    - registrar_perun.yml
+    - rpc_perun.yml
+    - web_gui_perun.yml
+
 - name: Delete "{{ perun_var_log_repo }}" directory if exists
   file:
     path: "{{ perun_var_log_repo }}"
@@ -45,7 +59,7 @@
     dest: "{{ log4j_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ log4j_engine_dir }}"
   template:
@@ -53,7 +67,7 @@
     dest: "{{ log4j_engine_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ jdbc_dir }}"
   template:
@@ -61,7 +75,7 @@
     dest: "{{ jdbc_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_conf_dir }}"
   template:
@@ -69,7 +83,7 @@
     dest: "{{ perun_conf_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_namespaces_dir }}"
   template:
@@ -77,7 +91,7 @@
     dest: "{{ perun_namespaces_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_notification_dir }}"
   template:
@@ -85,7 +99,7 @@
     dest: "{{ perun_notification_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_cabinet_dir }}"
   template:
@@ -93,7 +107,7 @@
     dest: "{{ perun_cabinet_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_dispatcher_dir }}"
   template:
@@ -101,7 +115,7 @@
     dest: "{{ perun_dispatcher_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_engine_dir }}"
   template:
@@ -109,7 +123,7 @@
     dest: "{{ perun_engine_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_ldapc_dir }}"
   template:
@@ -117,7 +131,7 @@
     dest: "{{ perun_ldapc_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_registrar_lib_dir }}"
   template:
@@ -125,7 +139,7 @@
     dest: "{{ perun_registrar_lib_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_rpc_lib_dir }}"
   template:
@@ -133,7 +147,7 @@
     dest: "{{ perun_rpc_lib_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_web_gui_dir }}"
   template:
@@ -141,4 +155,4 @@
     dest: "{{ perun_web_gui_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640

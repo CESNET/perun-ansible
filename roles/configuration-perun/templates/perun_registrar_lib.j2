@@ -1,12 +1,12 @@
 # URL to Perun instance
-perunUrl=https://[hostname]/
+perunUrl=https://{{ perun_address }}/
 
 # Secret key for authentication messages
-secretKey=[secret-key]
+secretKey={{ key_registrar_auth_messages }}
 
 # Backup email adresses
-backupFrom=[backup-email]
-backupTo=[backup-email]
+backupFrom={{ backup_from }}
+backupTo={{ backup_to }}
 
 # URL paths behind Shibboleth (since links with anchors needs to be escaped for users)
-fedAuthz=fed
+fedAuthz={{ fed_authz }}
