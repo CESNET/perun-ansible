@@ -75,7 +75,3 @@
     path: "/home/{{ perun_login }}/input.txt"
     state: absent
 
-- name: Restart Tomcat
-  service:
-    name: tomcat7
-    state: restarted
