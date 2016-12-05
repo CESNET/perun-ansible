@@ -38,3 +38,10 @@ ldap_ca_certificate_file: "{{ apache_certificate_file }}"
 ldap_certificate_file: "{{ apache_certificate_file }}"
 # Path to key file of LDAP certificate (Default is value of apache_certificate_key_file.)
 ldap_certificate_key_file: "{{ apache_certificate_key_file }}"
+
+# ORACLE DB DRIVERS
+# Path to ojdbc7 file on your system with Ansible
+ojdbc7_file_path: '~/ojdbc7.jar'
+# Path to orai18n file on your system with Ansible
+orai18n_file_path: '~/orai18n.jar'
+

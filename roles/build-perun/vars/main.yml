@@ -2,5 +2,3 @@
 # vars file for build-perun
 maven_package:
   Debian: maven
-
-oracle_drivers_path: "~/ojdbc7-12.1.0.2.0.zip"

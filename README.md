@@ -50,6 +50,11 @@ This repository serves for easier installation and preparation of Perun server.
 
 - Some of the roles included here depend on roles themselves. Install these by doing : `ansible-galaxy install -r requirements.yml -p roles`
 
+## Download Oracle DB drivers
+- Download Oracle DB drivers 'orai18n’ and 'ojdbc7’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html) on your system with Ansible.
+- You need to register before downloading these files.
+- Set paths to these files in **./group-vars/all.yml** file (variables **ojdbc7_file_path** and **orai18n_file_path**).
+
 ## Choose roles you want to install
 
 - In **site.yml** file comment roles you don't want to install by adding # before them. **Don't comment necessary roles**.

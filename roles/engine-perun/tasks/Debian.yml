@@ -147,8 +147,10 @@
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Start perun-engine service
-  command: "/etc/init.d/perun-engine start"
+- name: Start perun-engine
+  service: 
+    name: perun-engine
+    state: started
 
 - name: "Create file /etc/apt/sources.list.d/meta_repo.list"
   template: 
