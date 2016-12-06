@@ -1,22 +1,6 @@
 ---
 # Vars file for perun
 
-# Login name of perun user
-perun_login: 'perun'
-# Group name of perun user
-perun_group: 'perun'
-# Full name of perun user
-perun_name: 'Perun'
-# Email address of admin of Perun server
-perun_admin: 'admin@perun-test-domain.com'
-
-# Path to repository with cloned Perun sources
-perun_folder: "/home/{{ perun_login }}/perun-sources/"
-
-# Path to repository with cloned Perun services
-perun_services_folder: "/home/{{ perun_login }}/perun-services/"
-
-
 # Necessary packages
 git_package:
   Debian: git

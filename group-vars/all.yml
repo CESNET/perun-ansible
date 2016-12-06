@@ -11,7 +11,7 @@ perun_name: 'Perun'
 perun_admin: 'admin@perun-test-domain.com'
 
 # Address of your Perun server
-perun_address: 'host-address.example.com'
+perun_address: '192.168.56.20'
 
 # Path to repository with cloned Perun sources from GIT
 perun_folder: "/home/{{ perun_login }}/perun-sources/"

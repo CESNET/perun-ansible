@@ -90,6 +90,11 @@
     name: "{{ python_passlib_package[ansible_os_family] }}"
     state: latest
 
+- name: Install sudo to remote server
+  package:
+    name: sudo
+    state: present
+
 - name: "Create {{ perun_login }} user"
   user:
     name: "{{ perun_login }}"

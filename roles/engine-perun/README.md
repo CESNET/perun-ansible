@@ -14,7 +14,7 @@ Requirements
 Role Variables
 --------------
 
-This role doesn't use inner variables which you should set. It uses variables from group-vars/all.yml file (directory reachable from root of this Ansible repository).
+This role doesn't use inner variables which you should set. It uses variables from **group-vars/all.yml** file (directory reachable from root of this Ansible repository).
 
 
 License

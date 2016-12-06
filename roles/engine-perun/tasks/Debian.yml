@@ -35,9 +35,10 @@
     state: present
 
 - name: Restart Apache
-  service: 
-    name: apache2 
+  systemd:
     state: restarted
+    daemon_reload: yes
+    name: apache2
 
 - name: "Build engine of Perun. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
@@ -148,9 +149,10 @@
     mode: 0644
 
 - name: Start perun-engine
-  service: 
-    name: perun-engine
+  systemd:
     state: started
+    daemon_reload: yes
+    name: perun-engine
 
 - name: "Create file /etc/apt/sources.list.d/meta_repo.list"
   template: 
