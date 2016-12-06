@@ -70,6 +70,7 @@
     chdir: "{{ perun_folder }}/perun-web-gui/target/"
 
 - name: Start Tomcat if its not running
-  service: 
-    name: tomcat7
+  systemd:
     state: started
+    daemon_reload: yes
+    name: tomcat7

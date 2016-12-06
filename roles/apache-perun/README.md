@@ -1,7 +1,7 @@
 Apache-perun
 =========
 
-This role contains tasks serving for installation of Apache to your server.
+This role contains tasks for installation of Apache to your server.
 
 
 Requirements
@@ -13,7 +13,7 @@ Requirements
 Role Variables
 --------------
 
-Variables stored in this role are only for inner purposes. You have to fill apache_certificate variables in group-vars/all.yml. Directory "group-vars" is in root directory of this Ansible repository. If you will not change them, script will use fake snakeoil certificate.
+Variables stored in this role are only for inner purposes. You have to fill **apache_certificate** variables in **group-vars/all.yml**. Directory **group-vars** is in root directory of this Ansible repository. If you will not change them, script will use fake snakeoil certificate.
 
 
 License

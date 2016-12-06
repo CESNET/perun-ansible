@@ -5,6 +5,11 @@
   apt:
     update_cache: yes
 
+- name: Install tomcat7 package
+  package:
+    name: "{{ tomcat7_package[ansible_os_family ]}}"
+    state: present
+
 - name: Install tomcat7-admin package
   package:
     name: "{{ tomcat7_admin_package[ansible_os_family ]}}"
@@ -23,10 +28,10 @@
     creates: "/home/{{ perun_login }}/tomcat/webapps/"
 
 - name: Disable autostart of system-wide tomcat when machine is rebooted
-  service: 
-    name: tomcat7
+  systemd:
     enabled: no
-    state: stopped
+    daemon_reload: yes
+    name: tomcat7
 
 - name: Copy application tomcat-admin for easier remote deployment
   command: cp -r /usr/share/tomcat7-admin/manager/ "/home/{{ perun_login }}/tomcat/webapps/"

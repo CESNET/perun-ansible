@@ -13,6 +13,8 @@ This repository serves for easier installation and preparation of Perun server.
 
 - First you need to install Ansible to your system (http://docs.ansible.com/ansible/intro_installation.html), which will be used to install Perun to remote server (or localhost).
 - **The minimal version of Ansible is 2.2.0.0!**
+- **Your public SSH key must be placed in authorized_keys file in .ssh/ folder of root on the remote server!**
+- **SSH must be installed on both sides of communication.**
 
 ## Clone this repo
 
@@ -34,7 +36,7 @@ This repository serves for easier installation and preparation of Perun server.
 - Variable files are:
   - ./group_vars/all.yml
   - ./group_vars/passwords.yml
-  - ./roles/*/vars/*
+  - ./roles/configuration-perun/vars/*
 
 ## Set address of your server in inventories
 
@@ -45,10 +47,6 @@ This repository serves for easier installation and preparation of Perun server.
 ## Install necessary certificates
 
 - Put all your certificates you will use for user authentication to path defined by **ssl_ca_certificate_path** variable stored in **./group-vars/all.yml** file.
-
-## Install prerequisite roles
-
-- Some of the roles included here depend on roles themselves. Install these by doing : `ansible-galaxy install -r requirements.yml -p roles`
 
 ## Download Oracle DB drivers
 - Download Oracle DB drivers 'orai18n’ and 'ojdbc7’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html) on your system with Ansible.

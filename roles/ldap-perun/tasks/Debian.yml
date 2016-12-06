@@ -26,10 +26,11 @@
    line: SLAPD_SERVICES="ldaps:/// ldapi:///"
 
 - name: Restart LDAP
-  service: 
-    name: "{{ slapd_package[ansible_os_family ]}}" 
-    state: restarted 
+  systemd:
+    state: restarted
+    daemon_reload: yes
     enabled: yes
+    name: "{{ slapd_package[ansible_os_family ]}}"
 
 - name: Copy perun.ldif to remote server
   template:
