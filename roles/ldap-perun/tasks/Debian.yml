@@ -5,19 +5,49 @@
 - name: Install slapd package # command "dpkg-reconfigure slapd" to change configuration
   package:
     name: "{{ slapd_package[ansible_os_family ]}}"
-    state: latest
+    state: present
 
 # SSL configuration ldif
 - name: SSL configuration ldif in /etc/ldap/ssl.ldif
   template:
     src: ssl_ldif.j2
     dest: "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
+    owner: openldap
+    group: openldap
+    mode: 0640
 
-#- name: Execute ssl.ldif as root
-#  command: ldapmodify -Y EXTERNAL -H ldapi:/// -f "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
+- name: Change group of openldap user to ssl-cert
+  user:
+    name: openldap
+    groups: openldap,ssl-cert
+
+- name: Change group of LDAP CA certificate file to openldap
+  file:
+    path: "{{ ldap_ca_certificate_file }}"
+    group: ssl-cert
+    owner: "{{ perun_login }}"
+
+- name: Change group of LDAP certificate file to openldap
+  file:
+    path: "{{ ldap_certificate_file }}"
+    group: ssl-cert
+    owner: "{{ perun_login }}"
+
+- name: Change group of LDAP certificate key file to openldap
+  file:
+    path: "{{ ldap_certificate_key_file }}"
+    group: ssl-cert
+    owner: "{{ perun_login }}"
+
+- name: Restart LDAP
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: "{{ slapd_package[ansible_os_family ]}}"
+
+- name: Execute ssl.ldif as root
+  command: ldapmodify -Y EXTERNAL -H ldapi:/// -f "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
 
 - name: Enable secure port in /etc/default/slapd
   lineinfile: 
@@ -32,43 +62,77 @@
     enabled: yes
     name: "{{ slapd_package[ansible_os_family ]}}"
 
+- name: Create temporary directory for temporary LDAP files
+  file:
+    state: directory
+    path: "{{ temporary_dir_path }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0755
+
 - name: Copy perun.ldif to remote server
   template:
     src: "perun_ldif.j2"
-    dest: "/home/{{ perun_login }}/perun.ldif"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
+    dest: "{{ temporary_dir_path }}/perun.ldif"
+    owner: openldap
+    group: openldap
+    mode: 0640
 
 - name: Copy inetuser.ldif to remote server
   template:
     src: "inetuser_ldif.j2"
-    dest: "/home/{{ perun_login }}/inetuser.ldif"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
+    dest: "{{ temporary_dir_path }}/inetuser.ldif"
+    owner: openldap
+    group: openldap
+    mode: 0640
 
 - name: Copy init-perun.ldif to remote server
   template:
     src: "init_perun_ldif.j2"
-    dest: "/home/{{ perun_login }}/init-perun.ldif"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
+    dest: "{{ temporary_dir_path }}/init-perun.ldif"
+    owner: openldap
+    group: openldap
+    mode: 0640
 
-# TODO
+- name: Execute files with ldapadd
+  command: ldapadd -Y EXTERNAL -H ldapi:/// -f {{ item }}
+  args:
+    chdir: "{{ temporary_dir_path }}"
+  with_items:
+    - perun.ldif
+    - inetuser.ldif
+  ignore_errors: true
 
-- name: "Delete perun.ldif file"
+- name: Generate the root password for ldap
+  shell: slappasswd -s {{ password_ldap_root }}
+  register: root_password
+
+# Dependency on root_password variable registered from slappasswd command
+- name: Copy settings.ldif to remote server
+  template:
+    src: "settings_ldif.j2"
+    dest: "{{ temporary_dir_path }}/settings.ldif"
+    owner: openldap
+    group: openldap
+    mode: 0640
+
+- name: Execute file init-perun.ldif
+  command: ldapadd -Y EXTERNAL -H ldapi:/// -f {{ item }}
+  args:
+    chdir: "{{ temporary_dir_path }}"
+  with_items:
+    - settings.ldif
+    #- init-perun.ldif
+  ignore_errors: true
+
+- name: Delete temporary directory with temporary files
   file:
-    path: "/home/{{ perun_login }}/perun.ldif"
     state: absent
+    path: "{{ temporary_dir_path }}"
 
-- name: "Delete inetuser.ldif file"
-  file:
-    path: "/home/{{ perun_login }}/inetuser.ldif"
-    state: absent
-
-- name: "Delete init-perun.ldif file"
-  file:
-    path: "/home/{{ perun_login }}/init-perun.ldif"
-    state: absent
+- name: Restart LDAP
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    enabled: yes
+    name: "{{ slapd_package[ansible_os_family ]}}"

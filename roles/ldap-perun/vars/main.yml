@@ -5,3 +5,5 @@ slapd_package:
 
 ssl_conf_dir: 
   Debian: '/etc/ldap'
+
+temporary_dir_path: "/home/{{ perun_login }}/openldap"

@@ -1,0 +1,10 @@
+dn: olcDatabase={1}mdb,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=admin,dc=perun,dc=cesnet,dc=cz
+-
+replace: olcSuffix
+olcSuffix: dc=perun,dc=cesnet,dc=cz
+-
+replace: olcRootPW
+olcRootPW: {{ root_password.stdout }}
