@@ -1,22 +1,54 @@
 ---
-# vars file for perun
-perun_login: perun
-perun_group: perun
-perun_name: Mr. Perun
-perun_password: hahanoway
-perun_login: 'perun'
-perun_admin: 'admin@perun-test-domain.com'
-# Name of perun account
-#perun_name: 'Perun'
-# Password of perun account (generate hash of your password in SHA-512) - this is hash of "password"
-#perun_password: '$6$yqU43VBELe/Stx2$e91ZpNl8N3XNkVYIh14RTKG5K2A.amoi6mGLXlwhiQpfRdm52mf7OM2hnz7RlGXejxQTwzTqYA6NqXtGlnUS4/'
-# Email of server admin
-perun_email: 'perun@perun-test-domain.com'
+# Vars file for perun
 
-# Virtual host config file
-perun_apache_conf:
-  Debian: perun.conf.j2
-  RedHat: perun.conf.j2
-perun_apache_dir:
-  Debian: /etc/apache2/sites-enabled/
-  RedHat: /etc/httpd/conf.d/
+# Necessary packages
+git_package:
+  Debian: git
+
+openjdk_jre_package:
+  Debian: openjdk-7-jre
+
+openjdk_jdk_package:
+  Debian: openjdk-7-jdk
+
+libswitch_perl_package:
+  Debian: libswitch-perl
+
+liblwp_authen_negotiate_perl_package:
+  Debian: liblwp-authen-negotiate-perl
+
+libjson_any_perl_package:
+  Debian: libjson-any-perl
+
+libtext_asciitable_perl_package:
+  Debian: libtext-asciitable-perl
+
+libterm_readkey_perl_package:
+  Debian: libterm-readkey-perl
+
+libwww_perl_package:
+  Debian: libwww-perl
+
+libcrypt_ssleay_perl_package:
+  Debian: libcrypt-ssleay-perl
+
+libtext_unidecode_perl_package:
+  Debian: libtext-unidecode-perl
+
+libdate_calc_perl_package:
+  Debian: libdate-calc-perl
+
+libnet_ldap_perl_package:
+  Debian: libnet-ldap-perl
+
+ldap_utils_package:
+  Debian: ldap-utils
+
+ntp_package:
+  Debian: ntp
+
+rsync_package:
+  Debian: rsync
+
+python_passlib_package:
+  Debian: python-passlib

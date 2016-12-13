@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  author: Jan Zvěřina
+  description: Configures the Tomcat
+  company: CESNET
+
+  license: BSD
+  min_ansible_version: 2.2
+  
+  platforms:
+  - name: Debian
+    versions:
+    - stretch
+    - wheezy
+  categories:
+  - database
+  - database:sql
+  
+dependencies: []

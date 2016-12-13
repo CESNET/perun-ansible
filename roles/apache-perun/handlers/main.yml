@@ -1,2 +1,7 @@
 ---
 # handlers file for apache-perun
+- name: restart Apache
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: "{{ apache_service[ansible_os_family] }}"

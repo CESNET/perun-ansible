@@ -1,13 +1,99 @@
 # tasks file for apache-perun
 - name: Install Apache
   package:
-    name: "{{ apache_package[ansible_os_family ]}}"
+    name: "{{ apache_package[ansible_os_family] }}"
     state: present
 
-# Debian just enables modules.
+- name: Deletes /etc/apache2/sites-enabled/perun.conf if exists
+  file: 
+    path: /etc/apache2/sites-enabled/perun.conf
+    state: absent
 
+# Debian just enables modules.
 - name: Enable modules
   apache2_module:
     name: "{{ item }}"
     state: present
   with_items: "{{ apache_modules[ansible_os_family] }}"
+
+# Install ssl-cert for making certificate
+- name: Install ssl-cert package
+  package:
+    name: "{{ ssl_cert_package[ansible_os_family] }}"
+    state: present
+  when: apache_certificate_file == "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+
+# Fake Snake Oil if ssl_certificate_file variable is not filled
+- name: Make fake Snake Oil certificate for testing purposes (ssl_certificate_file variable is not filled (./group_vars/all.yml))
+  command: make-ssl-cert generate-default-snakeoil --force-overwrite
+  when: apache_certificate_file == "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+
+- name: "Change owner of {{ apache_certificate_file }} to {{ perun_login }}"
+  file:
+    path: "{{ apache_certificate_file }}"
+    state: file
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: "Change owner of {{ apache_certificate_key_file }} to {{ perun_login }}"
+  file:
+    path: "{{ apache_certificate_key_file }}"
+    state: file
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Make /etc/ssl/p12 directory
+  file:
+    path: /etc/ssl/p12
+    state: directory
+    mode: 0755
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+# Copy apache configuration file for Perun
+- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
+  template:
+    src: "{{ apache_conf[ansible_os_family] }}"
+    dest: "{{ apache_dir[ansible_os_family] }}/perun.conf"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+  notify: restart Apache
+
+# Rehash certificates for user identification
+- name: Use c_rehash to your certificates
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: c_rehash .
+  args:
+    chdir: "{{ apache_ca_certificate_path }}"
+
+- name: Enable JSON data comprimation in Apache
+  lineinfile:
+    dest: /etc/apache2/mods-available/deflate.conf
+    insertafter: "<IfModule mod_filter.c>\n"
+    line: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
+    regexp: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
+    backrefs: yes
+
+- name: Ensures /srv/www/ directory exists
+  file: 
+    path: /srv/www
+    state: directory
+    mode: 0755
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Deletes "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html" if exists
+  file: 
+    path: "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html"
+    state: absent
+
+# HTML website with warning
+- name: Create file /srv/www/certneeded.html
+  template:
+    src: "{{ apache_certneeded[ansible_os_family] }}"
+    dest: "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644

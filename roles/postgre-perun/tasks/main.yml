@@ -1,0 +1,3 @@
+---
+# tasks file for postgre-perun
+- include: "{{ ansible_os_family }}.yml"

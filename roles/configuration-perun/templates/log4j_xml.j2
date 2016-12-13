@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    <appender class="org.apache.log4j.RollingFileAppender" name="notification">
+        <param value="{{ perun_var_log_repo }}/perun-notif.log" name="File"/>
+        <param value="1" name="MaxBackupIndex"/>
+        <param value="1000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d{ISO8601}: [%t] %-5p %C{1}.%M(%L) - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_auditer_log">
+        <param value="{{ perun_var_log_repo }}/perun-auditer.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_cabinet_log">
+        <param value="{{ perun_var_log_repo }}/perun-cabinet.log" name="File"/>
+        <param value="5" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_core_log">
+        <param value="{{ perun_var_log_repo }}/perun-core.log" name="File"/>
+        <param value="25" name="MaxBackupIndex"/>
+        <param value="50000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_dispatcher_event_processor_log">
+        <param value="{{ perun_var_log_repo }}/perun-dispatcher-eventProcessor.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_dispatcher_events_log">
+        <param value="{{ perun_var_log_repo }}/perun-dispatcher-events.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_dispatcher_jms_log">
+        <param value="{{ perun_var_log_repo }}/perun-dispatcher-jms.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_dispatcher_log">
+        <param value="{{ perun_var_log_repo }}/perun-dispatcher.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30MB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_dispatcher_matcher_log">
+        <param value="{{ perun_var_log_repo }}/perun-dispatcher-matcher.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_dispatcher_queue_log">
+        <param value="{{ perun_var_log_repo }}/perun-dispatcher-queue.log" name="File"/>
+        <param value="2" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_registrar_log">
+        <param value="{{ perun_var_log_repo }}/perun-registrar.log" name="File"/>
+        <param value="5" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_rpc_lib_log">
+        <param value="{{ perun_var_log_repo }}/perun-rpc-lib.log" name="File"/>
+        <param value="5" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="perun_rpc_log">
+        <param value="{{ perun_var_log_repo }}/perun-rpc.log" name="File"/>
+        <param value="5" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="sendedMessages">
+        <param value="{{ perun_var_log_repo }}/perun-notif-sended.log" name="File"/>
+        <param value="10" name="MaxBackupIndex"/>
+        <param value="100000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d{ISO8601}: [%t] %-5p %C{1}.%M(%L) - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <appender class="org.apache.log4j.RollingFileAppender" name="spring_log">
+        <param value="{{ perun_var_log_repo }}/perun-spring.log" name="File"/>
+        <param value="5" name="MaxBackupIndex"/>
+        <param value="30000KB" name="MaxFileSize"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param value="%d %-5p %c - %m%n" name="ConversionPattern"/>
+        </layout>
+    </appender>
+    <logger name="cz.metacentrum.perun.cabinet">
+        <level value="debug"/>
+        <appender-ref ref="perun_cabinet_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.core">
+        <level value="debug"/>
+        <appender-ref ref="perun_core_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.core.impl.JdbcPerunTemplate">
+        <level value="error"/>
+        <appender-ref ref="perun_core_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.core.impl.PerunTransactionManager">
+        <level value="error"/>
+        <appender-ref ref="perun_core_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.core.impl.PerunBasicDataSource">
+        <level value="error"/>
+        <appender-ref ref="perun_core_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.core.impl.Auditer">
+        <level value="error"/>
+        <appender-ref ref="perun_auditer_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.dispatcher">
+        <level value="debug"/>
+        <appender-ref ref="perun_dispatcher_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.dispatcher.jms">
+        <level value="debug"/>
+        <appender-ref ref="perun_dispatcher_jms_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.dispatcher.jms.DispatcherQueue">
+        <level value="debug"/>
+        <appender-ref ref="perun_dispatcher_queue_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.dispatcher.processing.EventLogger">
+        <level value="debug"/>
+        <appender-ref ref="perun_dispatcher_events_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.dispatcher.processing.impl.EventProcessorImpl">
+        <level value="debug"/>
+        <appender-ref ref="perun_dispatcher_event_processor_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.dispatcher.processing.impl.SmartMatcherImpl">
+        <level value="debug"/>
+        <appender-ref ref="perun_dispatcher_matcher_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.notif">
+        <level value="debug"/>
+        <appender-ref ref="notification"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.registrar">
+        <level value="debug"/>
+        <appender-ref ref="perun_registrar_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.rpc">
+        <level value="debug"/>
+        <appender-ref ref="perun_rpc_log"/>
+    </logger>
+    <logger name="cz.metacentrum.perun.rpclib">
+        <level value="debug"/>
+        <appender-ref ref="perun_rpc_lib_log"/>
+    </logger>
+    <logger name="org.springframework">
+        <level value="info"/>
+        <appender-ref ref="spring_log"/>
+    </logger>
+    <logger name="sendMessages">
+        <level value="debug"/>
+        <appender-ref ref="sendedMessages"/>
+    </logger>
+</log4j:configuration>

@@ -1,0 +1,28 @@
+---
+# tasks file for shibboleth-perun
+
+- name: Install Shibboleth module for Apache
+  package:
+    name: libapache2-mod-shib2
+    state: present
+
+# WARNING: Apache2 has problem with shib2 name of module and it throws error. It should be fixed soon.
+- name: Enable Shibboleth module
+  apache2_module:
+    name: shib2
+    state: present
+  ignore_errors: true
+
+- name: Copy default site configuration with Shibboleth included
+  template:
+    src: settings.j2
+    dest: '/etc/apache2/sites-enabled/perun.conf'
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: restart Apache
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: apache2

@@ -1,9 +1,29 @@
 ---
 # Main perun orchestration playbook
-- hosts: localhost
-  strategy: debug
+- hosts: perun-servers
   roles:
-    # - perun-user
-    # - common
-    - apache-perun
+    # NECESSARY ROLES
+    # ---------------
+    # This role will create user perun and download all packages and GIT repositories you will need in installation process.
     - perun
+    # This role will install Apache on your server.
+    - apache-perun
+    # This role will install Tomcat on your server.
+    - tomcat-perun
+    # This role will deploy Postgre DB on your server and prepares DB tables. 
+    - postgre-perun
+    # This role will copy configuration files of Perun on your server.
+    - configuration-perun
+    # This role will build Perun on your server.
+    - build-perun
+    # This role will build engine of Perun on your server.
+    - engine-perun
+    # This role will deploy LDAP on your server.
+    - ldap-perun
+
+    # OPTIONAL ROLES
+    # --------------
+    #- shibboleth-perun
+  pre_tasks:
+    - include_vars: ./group-vars/passwords.yml
+    - include_vars: ./group-vars/all.yml

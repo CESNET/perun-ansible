@@ -1,0 +1,17 @@
+---
+# vars file for postgre-perun
+postgre_package:
+  Debian: postgresql-9.4
+
+postgre_contrib_package:
+  Debian: postgresql-contrib-9.4
+
+postgre_version: '9.4'
+
+python_psycopg2_package:
+  Debian: python-psycopg2
+
+init_user_first_name: Master
+init_user_last_name: Perun
+
+postgres_conf_file_path: "{{ perun_folder }}/perun-db/postgres.sql"

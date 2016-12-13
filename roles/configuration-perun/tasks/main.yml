@@ -1,0 +1,158 @@
+---
+# Tasks file for configuration-perun
+
+- name: Include variable files
+  include_vars: "{{ item }}"
+  with_items:
+    - cabinet_perun.yml
+    - dispatcher_perun.yml
+    - engine_perun.yml
+    - ldap_perun.yml
+    - notifications_perun.yml
+    - perun_properties.yml
+    - registrar_perun.yml
+    - rpc_perun.yml
+    - web_gui_perun.yml
+
+- name: Delete "{{ perun_var_log_repo }}" directory if exists
+  file:
+    path: "{{ perun_var_log_repo }}"
+    state: absent
+
+- name: Make empty "{{ perun_var_log_repo }}" directory
+  file:
+    path: "{{ perun_var_log_repo }}"
+    state: directory
+    mode: 0740
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Delete "{{ perun_engine_var_log_repo }}" directory if exists
+  file:
+    path: "{{ perun_engine_var_log_repo }}"
+    state: absent
+
+- name: Make empty "{{ perun_engine_var_log_repo }}" directory
+  file:
+    path: "{{ perun_engine_var_log_repo }}"
+    state: directory
+    mode: 0740
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Delete "{{ perun_repo }}" directory if exists
+  file:
+    path: "{{ perun_repo }}"
+    state: absent
+
+- name: Make empty "{{ perun_repo }}" directory
+  file:
+    path: "{{ perun_repo }}"
+    state: directory
+    mode: 0740
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Create file "{{ log4j_dir }}"
+  template:
+    src: "{{ log4j_template }}"
+    dest: "{{ log4j_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ log4j_engine_dir }}"
+  template:
+    src: "{{ log4j_engine_template }}"
+    dest: "{{ log4j_engine_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ jdbc_dir }}"
+  template:
+    src: "{{ jdbc_template }}"
+    dest: "{{ jdbc_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_conf_dir }}"
+  template:
+    src: "{{ perun_conf_template }}"
+    dest: "{{ perun_conf_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_namespaces_dir }}"
+  template:
+    src: "{{ perun_namespaces_template }}"
+    dest: "{{ perun_namespaces_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_notification_dir }}"
+  template:
+    src: "{{ perun_notification_template }}"
+    dest: "{{ perun_notification_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_cabinet_dir }}"
+  template:
+    src: "{{ perun_cabinet_template }}"
+    dest: "{{ perun_cabinet_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_dispatcher_dir }}"
+  template:
+    src: "{{ perun_dispatcher_template }}"
+    dest: "{{ perun_dispatcher_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_engine_dir }}"
+  template:
+    src: "{{ perun_engine_template }}"
+    dest: "{{ perun_engine_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_ldapc_dir }}"
+  template:
+    src: "{{ perun_ldapc_template }}"
+    dest: "{{ perun_ldapc_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_registrar_lib_dir }}"
+  template:
+    src: "{{ perun_registrar_lib_template }}"
+    dest: "{{ perun_registrar_lib_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_rpc_lib_dir }}"
+  template:
+    src: "{{ perun_rpc_lib_template }}"
+    dest: "{{ perun_rpc_lib_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+
+- name: Create file "{{ perun_web_gui_dir }}"
+  template:
+    src: "{{ perun_web_gui_template }}"
+    dest: "{{ perun_web_gui_dir }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0640

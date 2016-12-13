@@ -1,0 +1,9 @@
+---
+# vars file for ldap-perun
+slapd_package:
+  Debian: slapd
+
+ssl_conf_dir: 
+  Debian: '/etc/ldap'
+
+temporary_dir_path: "/home/{{ perun_login }}/openldap"

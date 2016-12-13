@@ -1,0 +1,81 @@
+# Perun administrators
+perun.admins = {{ perun_admins }}
+
+# Principals for the Engines (user 'perun' for this example setup)
+perun.engine.principals = {{ perun_engine_principals }}
+
+# Principals for the Registrar
+perun.registrar.principals = {{ perun_registrar_principals }}
+
+# Principals for the Notificator 
+perun.notification.principals = {{ perun_notification_principals }}
+
+# Principal for the RPC
+perun.rpc.principal = {{ perun_rpc_principal }}
+
+# DB type (use 'oracle' or 'postgresql' respectively
+perun.db.type = {{ perun_db_type }}
+
+# Default group synchronization interval in fold of 5 minutes
+perun.group.synchronization.interval = {{ perun_group_synchronization_interval }}
+
+# Timeout for group synchronization in minutes
+perun.group.synchronization.timeout = {{ perun_group_synchronization_timeout }}
+
+# Users who can do delegation (used for custom external components acting as logged users)
+perun.rpc.powerusers = {{ perun_rpc_powerusers }}
+
+# Perun DB Name (by default it's 'perun')
+perun.perun.db.name = {{ db_name }}
+
+# Perun RT URL
+perun.rt.url = {{ perun_rt_url }}
+
+# Default queue in RT
+perun.rt.defaultQueue= {{ perun_rt_defaultQueue }}
+
+# Perun service user for RT tickets
+perun.rt.serviceuser.username = {{ perun_rt_serviceuser_username }}
+
+# Perun service user for RT tickets
+perun.rt.serviceuser.password = {{ password_rt_service_user }}
+
+# Program which ensures password changes in case Perun manages some namespace (LDAP, Kerberos server)
+perun.passwordManager.program = {{ perun_passwordManager_program }}
+
+# Program which ensures alternative passwords changes
+perun.alternativePasswordManager.program = {{ perun_alternativePasswordManager_program }}
+
+# Peruns reCaptcha private key
+perun.recaptcha.privatekey = {{ key_perun_recaptcha }}
+
+# Perun properties for email validation message
+perun.mailchange.secretKey = {{ key_mailchange }}
+perun.mailchange.backupFrom = {{ perun_mailchange_backupFrom }}
+perun.mailchange.validationWindow = {{ perun_mailchange_validationWindow }}
+
+# Perun properties for non-authz password reset (min. 16 chars/bytes for AES 128)
+perun.pwdreset.secretKey = {{ key_pwdreset }}
+perun.pwdreset.initVector = {{ init_vector_pwdreset }}
+perun.pwdreset.validationWindow = {{ perun_pwdreset_validationWindow }}
+
+# Set native language properties
+perun.native.language = {{ perun_native_language }}
+
+# List of login-namespaces which will have value automatically generated from users name.
+perun.loginNamespace.generated = {{ perun_loginNamespace_generated }}
+
+# Program which sends sms from Perun
+perun.sms.program = {{ perun_sms_program }}
+
+# Set true if perun DB connection should be read only (item is optional, default is false)
+perun.readOnlyPerun = {{ perun_readOnlyPerun }}
+
+# Set true if Perun should update DB version when new version of code is present (item is optional, defualt is false). 
+perun.DBInitializatorEnabled = {{ perun_DBInitializatorEnabled }}
+
+# Define perun instance name used in a subject of some mail notifications. If not set/present "Perun" is used.
+perun.instanceName = {{ perun_instanceName }}
+
+# List of ext sources which can't be removed from user if present, splitted by ";", value can be "ext source name" or "name,regex" where regex is applied to users login in ext source
+perun.userExtSources.persistent = {{ perun_userExtSources_persistent }}

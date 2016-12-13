@@ -1,0 +1,82 @@
+---
+# Task file for tomcat installation on Debian distribution
+
+- name: Update apt-get
+  apt:
+    update_cache: yes
+
+- name: Install tomcat7 package
+  package:
+    name: "{{ tomcat7_package[ansible_os_family ]}}"
+    state: present
+
+- name: Install tomcat7-admin package
+  package:
+    name: "{{ tomcat7_admin_package[ansible_os_family ]}}"
+    state: present
+
+- name: Install tomcat7-user package
+  package:
+    name: "{{ tomcat7_user_package[ansible_os_family ]}}"
+    state: present
+
+- name: Create an instance of Tomcat in home as user perun
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: tomcat7-instance-create -p 8080 -c 8005 "/home/{{ perun_login }}/tomcat"
+  args:    
+    creates: "/home/{{ perun_login }}/tomcat/webapps/"
+
+- name: Disable autostart of system-wide tomcat when machine is rebooted
+  systemd:
+    enabled: no
+    daemon_reload: yes
+    name: tomcat7
+
+- name: Copy application tomcat-admin for easier remote deployment
+  command: cp -r /usr/share/tomcat7-admin/manager/ "/home/{{ perun_login }}/tomcat/webapps/"
+
+- name: Add records to tomcat-users.xml
+  blockinfile:
+    dest: /home/{{ perun_login }}/tomcat/conf/tomcat-users.xml
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    insertbefore: "^</tomcat-users>"
+    block: |
+        <role rolename="manager-gui"/>
+        <role rolename="manager-script"/>
+        <role rolename="standard"/>
+        <user username="admin" password="{{ password_tomcat_admin }}" roles="standard,manager-gui,manager-script"/>
+
+- name: Set connectors in server.xml
+  blockinfile:
+    dest: /home/{{ perun_login }}/tomcat/conf/server.xml
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    insertbefore: "<Engine name=\"Catalina\" defaultHost=\"localhost\">"
+    block: |
+        <Connector port="18443" protocol="HTTP/1.1" SSLEnabled="true" 
+           maxThreads="150" scheme="https" secure="true" 
+           clientAuth="false" sslProtocol="TLS" 
+
+           keystoreFile="/etc/ssl/p12/ssl-cert-snakeoil.p12" 
+           keystorePass="{{ password_tomcat_certificate }}" keystoreType="PKCS12" 
+
+        />
+
+        <Connector port="8009" protocol="AJP/1.3" redirectPort="18443" address="127.0.0.1" tomcatAuthentication="false" URIEncoding="UTF-8"/>
+
+- name: Export temporary password file for tomcat certificate to remote computer
+  template: 
+    src: input.j2  
+    dest: "/home/{{ perun_login }}/input.txt" 
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Export certificate of machine (Apache) into format .p12
+  command: openssl pkcs12 -passout "file:/home/{{ perun_login }}/input.txt" -export -out "/etc/ssl/p12/ssl-cert-snakeoil.p12" -in "{{ apache_certificate_file }}" -inkey "{{ apache_certificate_key_file }}"
+
+- name: Delete temporary password file for tomcat certificate
+  file:
+    path: "/home/{{ perun_login }}/input.txt"
+    state: absent
+

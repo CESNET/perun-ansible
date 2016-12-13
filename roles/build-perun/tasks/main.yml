@@ -1,0 +1,3 @@
+---
+# tasks file for build-perun
+- include: "{{ ansible_os_family }}.yml"

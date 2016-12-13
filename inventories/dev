@@ -1,2 +1,2 @@
 [perun-servers]
-192.168.56.20
+192.168.56.20 ansible_user=root

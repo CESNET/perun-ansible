@@ -1,0 +1,6 @@
+---
+# Variables for Cabinet
+# NOTE: Password for cabinet is stored in group_vars/passwords.yml
+
+# Your login to Cabinet
+cabinet_login: 'perun'
