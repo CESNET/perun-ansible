@@ -1,6 +1,6 @@
 ---
 # Basic variables used through all roles
-
+site_name: africa-grid
 # Login name of Perun user
 perun_login: 'perun'
 # Group name of Perun user
@@ -8,10 +8,11 @@ perun_group: 'perun'
 # Full name of Perun user
 perun_name: 'Perun'
 # Email address of admin of Perun server
-perun_admin: 'admin@perun-test-domain.com'
+perun_admin: 'perun@africa-grid.org'
 
 # Address of your Perun server
-perun_address: '192.168.56.20'
+# this should be obtained as a lookup
+perun_address: '151.97.41.47'
 
 # Path to repository with cloned Perun sources from GIT
 perun_folder: "/home/{{ perun_login }}/perun-sources/"
@@ -44,4 +45,3 @@ ldap_certificate_key_file: "{{ apache_certificate_key_file }}"
 ojdbc7_file_path: '~/ojdbc7.jar'
 # Path to orai18n file on your system with Ansible
 orai18n_file_path: '~/orai18n.jar'
-
