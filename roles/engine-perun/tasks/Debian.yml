@@ -25,7 +25,7 @@
   become_user: "{{ perun_login }}"
   command: cp -r Perun /opt/perun-cli/lib/
   args:
-    chdir: "{{ perun_folder }}/perun-rpc/src/main/perl/"
+    chdir: "{{ perun_folder }}/perun-cli"
 
 - name: Add user perun-engine into Apache (done by root)
   htpasswd: 

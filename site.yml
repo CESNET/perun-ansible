@@ -18,11 +18,12 @@
     - build-perun
     # This role will build engine of Perun on your server.
     - engine-perun
+    # This role will deploy LDAP on your server.
+    - ldap-perun
 
     # OPTIONAL ROLES
     # --------------
-    # This role will deploy LDAP on your server. (WARNING: is not functional yet)
-    #- ldap-perun
+    #- shibboleth-perun
   pre_tasks:
     - include_vars: ./group-vars/passwords.yml
     - include_vars: ./group-vars/all.yml
