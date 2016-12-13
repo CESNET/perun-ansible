@@ -23,7 +23,7 @@
 
     # OPTIONAL ROLES
     # --------------
-    #
+    #- shibboleth-perun
   pre_tasks:
     - include_vars: ./group-vars/passwords.yml
     - include_vars: ./group-vars/all.yml
