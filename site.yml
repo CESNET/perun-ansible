@@ -20,7 +20,7 @@
     # This role will install Apache on your server.
     - { role: apache-perun, become: true, tags: apache }
     # This role will install Tomcat on your server.
-    - tomcat-perun
+    - { role: tomcat-perun, become: true, become_user: "{{ perun_login }}", tags: tomcat }
     # This role will deploy Postgre DB on your server and prepares DB tables.
     - postgre-perun
     # This role will copy configuration files of Perun on your server.

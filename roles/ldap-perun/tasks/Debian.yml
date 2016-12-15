@@ -40,9 +40,9 @@
     owner: "{{ perun_login }}"
 
 - name: Restart LDAP
-  systemd:
+  service:
     state: restarted
-    daemon_reload: yes
+    state: reloaded
     enabled: yes
     name: "{{ slapd_package[ansible_os_family ]}}"
 
@@ -56,9 +56,9 @@
    line: SLAPD_SERVICES="ldaps:/// ldapi:///"
 
 - name: Restart LDAP
-  systemd:
+  service:
     state: restarted
-    daemon_reload: yes
+    state: reloaded
     enabled: yes
     name: "{{ slapd_package[ansible_os_family ]}}"
 
@@ -131,8 +131,8 @@
     path: "{{ temporary_dir_path }}"
 
 - name: Restart LDAP
-  systemd:
+  service:
     state: restarted
-    daemon_reload: yes
+    state: reloaded
     enabled: yes
     name: "{{ slapd_package[ansible_os_family ]}}"

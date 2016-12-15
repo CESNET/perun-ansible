@@ -17,9 +17,9 @@
     state: latest
 
 - name: Ensure the PostgreSQL service is running
-  systemd:
+  service:
     state: started
-    daemon_reload: yes
+    state: reloaded
     enabled: yes
     name: postgresql
 
@@ -85,10 +85,10 @@
         host perun perun 127.0.0.1/32 md5
 
 - name: Restart PostgreSQL
-  systemd:
+  service:
     state: restarted
     enabled: yes
-    daemon_reload: yes
+    state: reloaded
     name: postgresql
 
 - name: Make user "{{ db_user }}" temporary superuser
