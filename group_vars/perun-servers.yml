@@ -1,6 +1,6 @@
 ---
 # Basic variables used through all roles
-site_name: africa-grid
+
 # Login name of Perun user
 perun_login: 'perun'
 # Group name of Perun user
@@ -8,11 +8,10 @@ perun_group: 'perun'
 # Full name of Perun user
 perun_name: 'Perun'
 # Email address of admin of Perun server
-perun_admin: 'perun@africa-grid.org'
+perun_admin: 'admin@perun-test-domain.com'
 
-# Address of your Perun server
-# this should be obtained as a lookup
-perun_address: '151.97.41.47'
+# Address of your Perun server - now done with a group lookup
+# perun_address: '192.168.56.20'
 
 # Path to repository with cloned Perun sources from GIT
 perun_folder: "/home/{{ perun_login }}/perun-sources/"

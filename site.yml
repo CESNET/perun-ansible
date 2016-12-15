@@ -2,13 +2,23 @@
 # Main perun orchestration playbook
 - hosts: perun-servers
   strategy: debug
+  pre_tasks:
+  - name: Pull in site-specific passwords
+    include_vars: "{{ item }}"
+    with_first_found:
+      - files:
+        - "passwords-{{ site_name }}.yml"
+        paths:
+        - "."
+        - "group_vars"
+        - "site_vars"
   roles:
     # NECESSARY ROLES
     # ---------------
     # This role will create user perun and download all packages and GIT repositories you will need in installation process.
-    - { role: perun, become: true}
+    - { role: perun, become: true, tags: perun }
     # This role will install Apache on your server.
-    - apache-perun
+    - { role: apache-perun, become: true, tags: apache }
     # This role will install Tomcat on your server.
     - tomcat-perun
     # This role will deploy Postgre DB on your server and prepares DB tables.
@@ -25,6 +35,3 @@
     # OPTIONAL ROLES
     # --------------
     #- shibboleth-perun
-  pre_tasks:
-    - include_vars: ./group-vars/africa-grid.yml
-    - include_vars: "group-vars/passwords-{{ site_name }}.yml"
