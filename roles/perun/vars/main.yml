@@ -1,54 +1,24 @@
 ---
 # Vars file for perun
-
 # Necessary packages
-git_package:
-  Debian: git
-
-openjdk_jre_package:
-  Debian: openjdk-7-jre
-
-openjdk_jdk_package:
-  Debian: openjdk-7-jdk
-
-libswitch_perl_package:
-  Debian: libswitch-perl
-
-liblwp_authen_negotiate_perl_package:
-  Debian: liblwp-authen-negotiate-perl
-
-libjson_any_perl_package:
-  Debian: libjson-any-perl
-
-libtext_asciitable_perl_package:
-  Debian: libtext-asciitable-perl
-
-libterm_readkey_perl_package:
-  Debian: libterm-readkey-perl
-
-libwww_perl_package:
-  Debian: libwww-perl
-
-libcrypt_ssleay_perl_package:
-  Debian: libcrypt-ssleay-perl
-
-libtext_unidecode_perl_package:
-  Debian: libtext-unidecode-perl
-
-libdate_calc_perl_package:
-  Debian: libdate-calc-perl
-
-libnet_ldap_perl_package:
-  Debian: libnet-ldap-perl
-
-ldap_utils_package:
-  Debian: ldap-utils
-
-ntp_package:
-  Debian: ntp
-
-rsync_package:
-  Debian: rsync
-
-python_passlib_package:
-  Debian: python-passlib
+prerequisites:
+  Debian:
+  - git
+  - openjdk-7-jre
+  - openjdk-7-jdk
+  - libswitch-perl
+  - liblwp-authen-negotiate-perl
+  - libjson-any-perl
+  - libtext-asciitable-perl
+  - libterm-readkey-perl
+  - libwww-perl
+  - libcrypt-ssleay-perl
+  - libtext-unidecode-perl
+  - libdate-calc-perl
+  - libnet-ldap-perl
+  - ldap-utils
+  - ntp
+  - rsync
+  - python-passlib
+  - sudo
+  RedHat: []

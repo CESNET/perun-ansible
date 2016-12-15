@@ -1,128 +1,45 @@
 ---
 # Task file for perun role for Debian distribution
 
-- name: Update apt-get
-  apt:
-    update_cache: yes
+# - name: Update apt-get
+#   apt:
+#     update_cache: yes
 
-- name: Install GIT
+- name: Install prerequisites
   package:
-    name: "{{ git_package[ansible_os_family] }}"
+    name: "{{ item }}"
     state: latest
-
-- name: Install OpenJDK-7-JRE
-  package:
-    name: "{{ openjdk_jre_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install OpenJDK-7-JDK
-  package:
-    name: "{{ openjdk_jdk_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libswitch_perl_package
-  package:
-    name: "{{ libswitch_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install liblwp_authen_negotiate_perl_package
-  package:
-    name: "{{ liblwp_authen_negotiate_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libjson_any_perl_package
-  package:
-    name: "{{ libjson_any_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libtext_asciitable_perl_package
-  package:
-    name: "{{ libtext_asciitable_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libterm_readkey_perl_package
-  package:
-    name: "{{ libterm_readkey_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libwww_perl_package
-  package:
-    name: "{{ libwww_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libcrypt_ssleay_perl_package
-  package:
-    name: "{{ libcrypt_ssleay_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libtext_unidecode_perl_package
-  package:
-    name: "{{ libtext_unidecode_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libdate_calc_perl_package
-  package:
-    name: "{{ libdate_calc_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install libnet_ldap_perl_package
-  package:
-    name: "{{ libnet_ldap_perl_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install ldap_utils_package
-  package:
-    name: "{{ ldap_utils_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install ntp_package
-  package:
-    name: "{{ ntp_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install rsync_package
-  package:
-    name: "{{ rsync_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install python_passlib_package
-  package:
-    name: "{{ python_passlib_package[ansible_os_family] }}"
-    state: latest
-
-- name: Install sudo to remote server
-  package:
-    name: sudo
-    state: present
+  with_items: "{{ prerequisites[ansible_os_family]}}"
 
 - name: "Create {{ perun_login }} user"
   user:
     name: "{{ perun_login }}"
     comment: "{{ perun_name }}"
-    password: "{{ password_user_sha512 }}"
+    #password: "{{ password_user_sha512 }}"
+    password: "{{ password_user_sha512 | default (lookup('password'))}}"
     update_password: always
 
 - name: "Add {{ perun_login }} user to sudoers"
   lineinfile:
-        dest: /etc/sudoers
-        state: present
-        regexp: "^%{{ perun_login }}"
-        line: "%{{ perun_login }} ALL=(ALL:ALL) ALL"
+    dest: /etc/sudoers
+    state: present
+    regexp: "^%{{ perun_login }}"
+    line: "%{{ perun_login }} ALL=(ALL:ALL) ALL"
 
-- name: Clone GIT repository of perun sources to remote server
+- name: Clone git repository of perun sources to remote server
   become: yes
   become_user: "{{ perun_login }}"
-  git: 
-    repo: https://github.com/CESNET/perun.git 
+  git:
+    repo: https://github.com/CESNET/perun.git
     dest: "{{ perun_folder }}"
     version: production
     update: yes
 
-- name: Clone GIT repository of perun services to remote server
+- name: Clone git repository of perun services to remote server
   become: yes
   become_user: "{{ perun_login }}"
-  git: 
-    repo: https://github.com/CESNET/perun-services.git 
+  git:
+    repo: https://github.com/CESNET/perun-services.git
     dest: "{{ perun_services_folder }}"
     version: production
     update: yes
