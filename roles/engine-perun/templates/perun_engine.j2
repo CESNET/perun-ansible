@@ -3,7 +3,7 @@ export PERL5LIB=/opt/perun-cli/lib/
 export PERUN_USER=perun-engine
 # ensure engine can connect to localhost if it doesn't have proper certificate (comment for production use) 
 export PERL_LWP_SSL_VERIFY_HOSTNAME=0
-export PERUN_URL=https://{{ perun_address }}/ba/rpc/
+export PERUN_URL=https://{{ hostvars[groups['perun-servers'][0]]['ansible_ipv4_address']}}/ba/rpc/
 
 # If other type of RPC then "Perun RPC" 
 # export PERUN_RPC_TYPE="[rpc_type]" 
