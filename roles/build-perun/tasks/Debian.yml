@@ -36,16 +36,6 @@
   args:
     chdir: "/home/{{ perun_login }}"
 
-- name: Delete ojdbc7 file from remote server
-  file:
-    path: "/home/{{ perun_login }}/ojdbc7.jar"
-    state: absent
-
-- name: Delete orai18n file from remote server
-  file:
-    path: "/home/{{ perun_login }}/orai18n.jar"
-    state: absent
-
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
@@ -54,7 +44,7 @@
     chdir: "{{ perun_folder }}"
   register: perun_build
   async: 600
-    poll: 5
+  poll: 5
 
 - name: debug  build output
   debug:
