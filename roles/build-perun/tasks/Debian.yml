@@ -1,9 +1,10 @@
 ---
 # Debian installation of packages
-- name: Install Maven package
+- name: Ensure prerequisites
   package:
-    name: "{{ maven_package[ansible_os_family] }}"
+    name: "{{ item }}"
     state: present
+  with_items: "{{prerequisites[ansible_os_family]}}"
 
 - name: Copy ojdbc7 file to remote server
   copy:
@@ -48,9 +49,16 @@
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  command: mvn clean install -DskipTests -Dproduction
+  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} clean install -DskipTests -Dproduction > out.log"
   args:
     chdir: "{{ perun_folder }}"
+  register: perun_build
+  async: 600
+    poll: 5
+
+- name: debug  build output
+  debug:
+    var: perun_build.stderr
 
 - name: Copy perun-rpc.war file into tomcat webapps folder
   become: yes

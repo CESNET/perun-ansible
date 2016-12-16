@@ -2,7 +2,7 @@
 # Variables for LDAP
 # NOTE: Password for LDAP is stored in group_vars/passwords.yml
 
-ldap_url: "ldaps://{{ hostvars[groups['perun-servers'][0]]['ansible_ipv4_address']}}:636"
+ldap_url: "ldaps://{{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}:636"
 ldap_user_dn: ''
 ldap_base: ''
 ldap_consumer_name: ldapcConsumer
