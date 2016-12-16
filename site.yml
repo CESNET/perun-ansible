@@ -22,11 +22,11 @@
     # This role will install Tomcat on your server.
     - { role: tomcat-perun, become: true, become_user: "{{ perun_login }}", tags: tomcat }
     # This role will deploy Postgre DB on your server and prepares DB tables.
-    - postgre-perun
+    - { role: postgre-perun, tags: db}
     # This role will copy configuration files of Perun on your server.
-    - configuration-perun
+    - { role: configuration-perun, become: true, tags: config-perun}
     # This role will build Perun on your server.
-    - build-perun
+    - { role: build-perun, become: true, tags: build-perun }
     # This role will build engine of Perun on your server.
     - engine-perun
     # This role will deploy LDAP on your server.
