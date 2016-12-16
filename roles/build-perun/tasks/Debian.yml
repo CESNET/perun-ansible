@@ -28,6 +28,7 @@
   command: mvn install:install-file -Dfile=ojdbc7.jar -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.2.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+    creates: "/home/{{ perun_login}}.m2/repository/com/oracle/ojdbc7/12.1.0.2.0/ojdbc7-12.1.0.2.0.jar"
 
 - name: Install orai18n
   become: yes
@@ -35,6 +36,8 @@
   command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.1.0.2.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+    creates: "/home/{{ perun_login}}.m2/repository/com/oracle/orai18n/12.1.0.2.0/orai18n-12.1.0.2.0.jar"
+  when:
 
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
@@ -42,9 +45,11 @@
   shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} clean install -DskipTests -Dproduction > out.log"
   args:
     chdir: "{{ perun_folder }}"
+    creates: "{{perun_folder}}/target/perun-web-gui-production.war"
   register: perun_build
   async: 600
   poll: 5
+
 
 - name: debug  build output
   debug:
@@ -68,7 +73,7 @@
     chdir: "{{ perun_folder }}/perun-web-gui/target/"
 
 - name: Start Tomcat if its not running
+  become: true
   service:
     state: started
-    state: reloaded
     name: tomcat7
