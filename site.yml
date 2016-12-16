@@ -1,7 +1,6 @@
 ---
 # Main perun orchestration playbook
 - hosts: perun-servers
-  strategy: debug
   pre_tasks:
   - name: Pull in site-specific passwords
     include_vars: "{{ item }}"
@@ -28,9 +27,9 @@
     # This role will build Perun on your server.
     - { role: build-perun, become: true, tags: build-perun }
     # This role will build engine of Perun on your server.
-    - engine-perun
+    - {role: engine-perun, become: true, tags: engine-perun}
     # This role will deploy LDAP on your server.
-    - ldap-perun
+    - {role: ldap-perun, become: true, tags: ldap-perun }
 
     # OPTIONAL ROLES
     # --------------
