@@ -28,7 +28,7 @@
     chdir: "{{ perun_folder }}/perun-cli"
 
 - name: Add user perun-engine into Apache (done by root)
-  htpasswd: 
+  htpasswd:
     path: /etc/apache2/perun.passwd
     name: perun-engine
     password: "{{ password_user }}"
@@ -155,7 +155,7 @@
     name: perun-engine
 
 - name: "Create file /etc/apt/sources.list.d/meta_repo.list"
-  template: 
+  template:
     src: meta_repo.j2
     dest: /etc/apt/sources.list.d/meta_repo.list
     owner: "{{ perun_login }}"
@@ -171,11 +171,13 @@
     mode: 0644
 
 - name: "Import pgb_public_key into credible keys"
-  apt_key: 
-    file: "/home/{{ perun_login }}/pgb_public_key" 
+  become: true
+  apt_key:
+    file: "/home/{{ perun_login }}/pgb_public_key"
     state: present
 
 - name: "Update repositories cache (apt-update) and install perun base slave script"
+  become: true
   apt:
     name: perun-slave-base
     update_cache: yes
