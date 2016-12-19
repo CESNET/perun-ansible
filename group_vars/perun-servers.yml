@@ -10,8 +10,8 @@ perun_name: 'Perun'
 # Email address of admin of Perun server
 perun_admin: 'admin@perun-test-domain.com'
 
-# Address of your Perun server
-perun_address: '192.168.56.20'
+# Address of your Perun server - now done with a group lookup
+# perun_address: '192.168.56.20'
 
 # Path to repository with cloned Perun sources from GIT
 perun_folder: "/home/{{ perun_login }}/perun-sources/"
@@ -44,4 +44,3 @@ ldap_certificate_key_file: "{{ apache_certificate_key_file }}"
 ojdbc7_file_path: '~/ojdbc7.jar'
 # Path to orai18n file on your system with Ansible
 orai18n_file_path: '~/orai18n.jar'
-

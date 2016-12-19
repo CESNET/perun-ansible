@@ -1,4 +1,5 @@
 ---
 # vars file for build-perun
-maven_package:
-  Debian: maven
+prerequisites:
+  Debian:
+    - maven

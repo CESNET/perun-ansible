@@ -1,29 +1,36 @@
 ---
 # Main perun orchestration playbook
 - hosts: perun-servers
+  pre_tasks:
+  - name: Pull in site-specific passwords
+    include_vars: "{{ item }}"
+    with_first_found:
+      - files:
+        - "passwords-{{ site_name }}.yml"
+        paths:
+        - "."
+        - "group_vars"
+        - "site_vars"
   roles:
     # NECESSARY ROLES
     # ---------------
     # This role will create user perun and download all packages and GIT repositories you will need in installation process.
-    - perun
+    - { role: perun, become: true, tags: perun }
     # This role will install Apache on your server.
-    - apache-perun
+    - { role: apache-perun, become: true, tags: apache }
     # This role will install Tomcat on your server.
-    - tomcat-perun
-    # This role will deploy Postgre DB on your server and prepares DB tables. 
-    - postgre-perun
+    - { role: tomcat-perun, become: true, become_user: "{{ perun_login }}", tags: tomcat }
+    # This role will deploy Postgre DB on your server and prepares DB tables.
+    - { role: postgre-perun, tags: db}
     # This role will copy configuration files of Perun on your server.
-    - configuration-perun
+    - { role: configuration-perun, become: true, tags: config-perun}
     # This role will build Perun on your server.
-    - build-perun
+    - { role: build-perun, become: true, tags: build-perun }
     # This role will build engine of Perun on your server.
-    - engine-perun
+    - {role: engine-perun, become: true, tags: engine-perun}
     # This role will deploy LDAP on your server.
-    - ldap-perun
+    - {role: ldap-perun, become: true, tags: ldap-perun }
 
     # OPTIONAL ROLES
     # --------------
     #- shibboleth-perun
-  pre_tasks:
-    - include_vars: ./group-vars/passwords.yml
-    - include_vars: ./group-vars/all.yml

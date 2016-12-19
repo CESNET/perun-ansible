@@ -4,8 +4,9 @@
 # Debian installation of slapd package
 - name: Install slapd package # command "dpkg-reconfigure slapd" to change configuration
   package:
-    name: "{{ slapd_package[ansible_os_family ]}}"
+    name: "{{ item }}"
     state: present
+  with_items: "{{prerequisites[ansible_os_family]}}"
 
 # SSL configuration ldif
 - name: SSL configuration ldif in /etc/ldap/ssl.ldif
@@ -39,28 +40,27 @@
     group: ssl-cert
     owner: "{{ perun_login }}"
 
+- name: debug service name
+  debug:
+    var: slapd_service[ansible_os_family]
+
 - name: Restart LDAP
-  systemd:
+  service:
     state: restarted
-    daemon_reload: yes
     enabled: yes
-    name: "{{ slapd_package[ansible_os_family ]}}"
+    name: "{{ slapd_service[ansible_os_family] }}"
 
 - name: Execute ssl.ldif as root
   command: ldapmodify -Y EXTERNAL -H ldapi:/// -f "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
 
-- name: Enable secure port in /etc/default/slapd
-  lineinfile: 
-   dest: /etc/default/slapd 
-   regexp: ^SLAPD_SERVICES= 
-   line: SLAPD_SERVICES="ldaps:/// ldapi:///"
 
-- name: Restart LDAP
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    enabled: yes
-    name: "{{ slapd_package[ansible_os_family ]}}"
+- name: Enable secure port in /etc/default/slapd
+  lineinfile:
+   dest: /etc/default/slapd
+   regexp: ^SLAPD_SERVICES=
+   line: SLAPD_SERVICES="ldaps:/// ldapi:///"
+  notify: Restart LDAP
+
 
 - name: Create temporary directory for temporary LDAP files
   file:
@@ -102,6 +102,12 @@
     - perun.ldif
     - inetuser.ldif
   ignore_errors: true
+  register: ldapadd
+  notify: Restart LDAP
+
+- name: debug ldap add
+  debug:
+    var: ldapadd
 
 - name: Generate the root password for ldap
   shell: slappasswd -s {{ password_ldap_root }}
@@ -124,15 +130,4 @@
     - settings.ldif
     #- init-perun.ldif
   ignore_errors: true
-
-- name: Delete temporary directory with temporary files
-  file:
-    state: absent
-    path: "{{ temporary_dir_path }}"
-
-- name: Restart LDAP
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    enabled: yes
-    name: "{{ slapd_package[ansible_os_family ]}}"
+  notify: Restart LDAP

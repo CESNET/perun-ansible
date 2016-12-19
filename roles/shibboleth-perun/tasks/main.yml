@@ -22,7 +22,7 @@
     mode: 0644
 
 - name: restart Apache
-  systemd:
+  service:
     state: restarted
-    daemon_reload: yes
+    state: reloaded
     name: apache2

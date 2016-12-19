@@ -3,23 +3,26 @@
 
 - name: Include variable files
   include_vars: "{{ item }}"
-  with_items:
-    - cabinet_perun.yml
-    - dispatcher_perun.yml
-    - engine_perun.yml
-    - ldap_perun.yml
-    - notifications_perun.yml
-    - perun_properties.yml
-    - registrar_perun.yml
-    - rpc_perun.yml
-    - web_gui_perun.yml
+  with_fileglob:
+    - ../vars/*
+    # - cabinet_perun.yml
+    # - dispatcher_perun.yml
+    # - engine_perun.yml
+    # - ldap_perun.yml
+    # - notifications_perun.yml
+    # - perun_properties.yml
+    # - registrar_perun.yml
+    # - rpc_perun.yml
+    # - web_gui_perun.yml
 
 - name: Delete "{{ perun_var_log_repo }}" directory if exists
+  become: true
   file:
     path: "{{ perun_var_log_repo }}"
     state: absent
 
 - name: Make empty "{{ perun_var_log_repo }}" directory
+  become: true
   file:
     path: "{{ perun_var_log_repo }}"
     state: directory
@@ -28,11 +31,13 @@
     group: "{{ perun_group }}"
 
 - name: Delete "{{ perun_engine_var_log_repo }}" directory if exists
+  become: true
   file:
     path: "{{ perun_engine_var_log_repo }}"
     state: absent
 
 - name: Make empty "{{ perun_engine_var_log_repo }}" directory
+  become: true
   file:
     path: "{{ perun_engine_var_log_repo }}"
     state: directory
@@ -41,11 +46,13 @@
     group: "{{ perun_group }}"
 
 - name: Delete "{{ perun_repo }}" directory if exists
+  become: true
   file:
     path: "{{ perun_repo }}"
     state: absent
 
 - name: Make empty "{{ perun_repo }}" directory
+  become: true
   file:
     path: "{{ perun_repo }}"
     state: directory

@@ -2,26 +2,17 @@
 # Task file for postgre database installation in Debian distribution
 
 - name: Install postgresql package
+  become: true
   package:
-    name: "{{ postgre_package[ansible_os_family] }}"
+    name: "{{ item }}"
     state: present
-
-- name: Install postgresql-contrib package
-  package:
-    name: "{{ postgre_contrib_package[ansible_os_family] }}"
-    state: present
+  with_items: "{{postgre_packages[ansible_os_family]}}"
 
 - name: Install python-psycopg2 package
+  become: true
   package:
     name: "{{ python_psycopg2_package[ansible_os_family] }}"
     state: latest
-
-- name: Ensure the PostgreSQL service is running
-  systemd:
-    state: started
-    daemon_reload: yes
-    enabled: yes
-    name: postgresql
 
 - name: Change password of postgres super-user
   become: yes
@@ -30,22 +21,25 @@
     name: postgres
     password: "{{ password_postgre }}"
     state: present
+  notify: Ensure the PostgreSQL service is running
+
+- meta: flush_handlers
 
 - name: Ensure database "{{ db_name }}" is created
   become: yes
   become_user: postgres
-  postgresql_db: 
+  postgresql_db:
     name: "{{ db_name }}"
     encoding: 'UTF-8'
-    lc_collate: 'cs_CZ.UTF-8'
-    lc_ctype: 'cs_CZ.UTF-8'
+    # lc_collate: 'cs_CZ.UTF-8'
+    # lc_ctype: 'cs_CZ.UTF-8'
     template: 'template0'
     state: present
 
 - name: Ensure user has access to the database
   become: yes
   become_user: postgres
-  postgresql_user: 
+  postgresql_user:
     db: "{{ db_name }}"
     name: "{{ db_user }}"
     password: "{{ password_db }}"
@@ -55,7 +49,7 @@
 - name: Ensure user "{{ db_user }}" does not have unnecessary privileges
   become: yes
   become_user: postgres
-  postgresql_user: 
+  postgresql_user:
     name: "{{ db_user }}"
     role_attr_flags: NOSUPERUSER,NOCREATEDB
     state: present
@@ -84,17 +78,18 @@
         local perun perun ident
         host perun perun 127.0.0.1/32 md5
 
-- name: Restart PostgreSQL
-  systemd:
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
-    name: postgresql
+# - name: Restart PostgreSQL
+#   become: true
+#   service:
+#     state: restarted
+#     enabled: yes
+#     state: reloaded
+#     name: postgresql
 
 - name: Make user "{{ db_user }}" temporary superuser
   become: yes
   become_user: postgres
-  postgresql_user: 
+  postgresql_user:
     name: "{{ db_user }}"
     role_attr_flags: SUPERUSER
     state: present
@@ -107,7 +102,7 @@
 - name: Remove user "{{ db_user }}" superuser privileges
   become: yes
   become_user: postgres
-  postgresql_user: 
+  postgresql_user:
     name: "{{ db_user }}"
     role_attr_flags: NOSUPERUSER
     state: present

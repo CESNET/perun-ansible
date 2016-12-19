@@ -1,9 +1,10 @@
 ---
 # Debian installation of packages
-- name: Install Maven package
+- name: Ensure prerequisites
   package:
-    name: "{{ maven_package[ansible_os_family] }}"
+    name: "{{ item }}"
     state: present
+  with_items: "{{prerequisites[ansible_os_family]}}"
 
 - name: Copy ojdbc7 file to remote server
   copy:
@@ -27,6 +28,7 @@
   command: mvn install:install-file -Dfile=ojdbc7.jar -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.2.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+    creates: "/home/{{ perun_login}}.m2/repository/com/oracle/ojdbc7/12.1.0.2.0/ojdbc7-12.1.0.2.0.jar"
 
 - name: Install orai18n
   become: yes
@@ -34,23 +36,24 @@
   command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.1.0.2.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
-
-- name: Delete ojdbc7 file from remote server
-  file:
-    path: "/home/{{ perun_login }}/ojdbc7.jar"
-    state: absent
-
-- name: Delete orai18n file from remote server
-  file:
-    path: "/home/{{ perun_login }}/orai18n.jar"
-    state: absent
+    creates: "/home/{{ perun_login}}.m2/repository/com/oracle/orai18n/12.1.0.2.0/orai18n-12.1.0.2.0.jar"
+  when:
 
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  command: mvn clean install -DskipTests -Dproduction
+  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} clean install -DskipTests -Dproduction > out.log"
   args:
     chdir: "{{ perun_folder }}"
+    creates: "{{perun_folder}}/target/perun-web-gui-production.war"
+  register: perun_build
+  async: 600
+  poll: 5
+
+
+- name: debug  build output
+  debug:
+    var: perun_build.stderr
 
 - name: Copy perun-rpc.war file into tomcat webapps folder
   become: yes
@@ -70,7 +73,7 @@
     chdir: "{{ perun_folder }}/perun-web-gui/target/"
 
 - name: Start Tomcat if its not running
-  systemd:
+  become: true
+  service:
     state: started
-    daemon_reload: yes
     name: tomcat7
