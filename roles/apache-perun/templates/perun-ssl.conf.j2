@@ -1,0 +1,257 @@
+<IfModule mod_ssl.c>
+# Go ahead and accept connections for these vhosts
+# from non-SNI clients
+SSLStrictSNIVHostCheck off
+
+ShibCompatValidUser on
+
+<VirtualHost *:443>
+
+  ServerAdmin {{ perun_email }}
+
+  ServerName {{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}
+  {% if perun_hostname_alias is defined and perun_hostname_alias|length > 0  %}
+  ServerAlias {{ perun_hostname_alias }}
+  {% endif %}
+
+  DocumentRoot /var/www/
+
+  # GENERIC ERRORS
+  ErrorDocument 401 /maintenance/401.html
+  ErrorDocument 403 /maintenance/403.html
+  ErrorDocument 404 /maintenance/404.html
+  ErrorDocument 500 /maintenance/500.html
+  ErrorDocument 503 /maintenance/503.html
+
+  # mod_auth_kerb bug workaround
+  KeepAlive off
+
+  #### SSL
+
+  SSLEngine on
+
+  SSLCertificateFile {{ apache_certificate_file }}
+  SSLCertificateKeyFile {{ apache_certificate_key_file }}
+  #SSLCertificateChainFile /etc/perun/ssl/chain_TERENA_SSL_CA_2.pem
+  SSLCACertificatePath {{ apache_ca_certificate_path }}
+
+  SSLVerifyClient optional
+  SSLVerifyDepth 5
+  SSLProtocol All -SSLv2 -SSLv3
+
+  # Make sure certs are exported in old DN format stored in Perun
+  SSLOptions +LegacyDNStringFormat
+
+  SSLHonorCipherOrder On
+  #SSLCipherSuite EECDH+AES:EDH+AES:-SHA1:EECDH+RC4:EDH+RC4:RC4-SHA:EECDH+AES256:EDH+AES256:AES256-SHA:!aNULL:!eNULL:!EXP:!LOW:!MD5
+  SSLCipherSuite ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
+
+  SSLProxyEngine On
+
+  # Note: sometimes, buffer size must be set also in Tomcat and must be lower then this value.
+  ProxyIOBufferSize 32192
+
+  BrowserMatch "MSIE [2-6]" \
+  nokeepalive ssl-unclean-shutdown \
+  downgrade-1.0 force-response-1.0
+  # MSIE 7 and newer should be able to use keepalive
+  BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+
+  #### SECURITY
+
+  # FIX: HTTP tracing
+  TraceEnable off
+  # FIX: Clickjacking
+  Header always set X-Frame-Options DENY
+  # FIX: HSTS Missing From HTTPS Server
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+
+  #### REWRITE
+
+  RewriteEngine On
+
+  # Protection against proxy attacks
+  RewriteCond  %{REQUEST_URI}  !^$
+  RewriteCond  %{REQUEST_URI}  !^/
+  RewriteRule  .*              -    [R=400,L]
+
+  ###################################
+  # Logging                      ####
+  ###################################
+
+  # Following handles also rewrite log
+  LogLevel warn rewrite:warn
+  ErrorLog ${APACHE_LOG_DIR}/cloud255-204.cerit-sc.cz-error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+ ####################################
+ ##      MAINTENANCE             ####
+ ####################################
+ #RewriteCond %{REQUEST_URI} !^/.*/rpc/
+ #RewriteCond %{REQUEST_URI} !^/cert/.*
+ #RewriteCond %{REQUEST_URI} !^/krb/.*
+ #RewriteCond %{REQUEST_URI} !^/fed/.*
+ #RewriteCond %{REQUEST_URI} !^/maintenance/maintenance.html
+ #RewriteCond %{REQUEST_URI} !^/Shibboleth.sso/
+ #RewriteRule .* /maintenance/maintenance.html [R,L]
+
+ ####################################
+ ##     RPC                      ####
+ ####################################
+
+ # General rewrite role
+ RewriteRule ^/(.*)/rpc/(.*)$ ajp://localhost:8009/perun-rpc/$2 [P,QSA,E=AJP_SSL_CLIENT_VERIFY:%{SSL:SSL_CLIENT_VERIFY},E=AJP_SSL_CLIENT_I_DN:%{SSL:SSL_CLIENT_I_DN},E=AJP_SSL_CLIENT_S_DN:%{SSL:SSL_CLIENT_S_DN},E=AJP_SSL_CLIENT_CERT:%{SSL:SSL_CLIENT_CERT}]
+
+ ####################################
+ ##     GUI                      ####
+ ####################################
+ RewriteRule ^/(.*)/gui$ https://%{HTTP_HOST}/$1/gui/ [L,R=301]
+ RewriteRule ^/(.*)/gui/$ /var/www/perun-web-gui/PerunWeb.html [L]
+ RewriteRule ^/(.*)/gui/(.+)$ /var/www/perun-web-gui/$2 [L]
+
+ ####################################
+ ##     Registrar                ####
+ ####################################
+ RewriteCond %{REQUEST_URI} ^/(.*)/registrar$
+ RewriteRule (.*) %{REQUEST_URI}/ [R=301,L]
+
+ RewriteRule ^/(.*)/registrar/?$ /var/www/perun-wui/PerunRegistrar.html [L]
+ RewriteRule ^/(.*)/registrar/(.+)$ /var/www/perun-wui/$2 [L]
+
+ ####################################
+ ##     Password Reset           ####
+ ####################################
+ RewriteRule ^/(.*)/pwd-reset$ https://%{HTTP_HOST}/$1/pwd-reset/ [L,R=301]
+ RewriteRule ^/(.*)/pwd-reset/$ /var/www/perun-wui/PerunPwdReset.html [L]
+ RewriteRule ^/(.*)/pwd-reset/(.+)$ /var/www/perun-wui/$2 [L]
+
+ ####################################
+ ##     Identity Consolidator    ####
+ ####################################
+ RewriteRule ^/(.*)/ic$ https://%{HTTP_HOST}/$1/ic/ [L,R=301]
+ RewriteRule ^/(.*)/ic/$ /var/www/perun-wui/PerunConsolidator.html [L]
+ RewriteRule ^/(.+)/ic/(.+)$ /var/www/perun-wui/$2 [L]
+
+ ####################################
+ ##     AuthN Methods            ####
+ ####################################
+
+ <LocationMatch "^/cert/">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient require
+    SSLOptions +StdEnvVars +ExportCertData +LegacyDNStringFormat
+
+    SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceX509
+    SetEnvIf _ .* AJP_EXTSOURCELOA=2
+ </LocationMatch>
+
+ <LocationMatch "^/fed/">
+    AuthType shibboleth
+    ShibRequestSetting requireSession 1
+    ShibUseHeaders On
+    Require valid-user
+    Order allow,deny
+    Allow from all
+ </LocationMatch>
+
+ <LocationMatch "^/non/">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient none
+
+    SetEnvIf _ .* AJP_EXTSOURCE=LOCAL
+    SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceInternal
+    SetEnvIf _ .* AJP_EXTSOURCELOA=0
+ </LocationMatch>
+
+ <Location "/ba/rpc/">
+    Options FollowSymLinks
+    Order allow,deny
+    Allow from all
+    SSLRequireSSL
+    SSLVerifyClient none
+    AuthType basic
+    AuthName "Perun RPC" 
+    Require valid-user
+    AuthBasicProvider file
+    # relative to ServerRoot
+    AuthUserFile perun.passwd
+
+    SetEnvIf _ .* AJP_EXTSOURCE=INTERNAL
+    SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceInternal
+    SetEnvIf _ .* AJP_EXTSOURCELOA=0
+  </Location>
+
+ #<LocationMatch "^/krb/">
+ #   Options FollowSymLinks
+ #   SSLRequireSSL
+ #   AuthType KerberosV5
+ #   AuthName "Kerberos META"
+ #   Krb5Keytab /etc/apache2/krb5.http.keytab
+ #   KrbAuthRealms META
+ #   KrbSaveCredentials Off
+ #   KrbMethodNegotiate On
+ #   KrbMethodK5Passwd On
+ #   KrbServiceName Any
+ #   KrbVerifyKDC Off
+
+ #   Require valid-user
+ #   Order allow,deny
+ #   Allow from all
+
+    # Definice externiho overeni uzivatelu
+ #   SetEnvIf _ .* AJP_EXTSOURCE=META
+ #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
+ #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
+ #</LocationMatch>
+
+ #<LocationMatch "^/krbe/">
+ #   Options FollowSymLinks
+ #   SSLRequireSSL
+ #   SSLVerifyClient none
+ #   SSLOptions +StdEnvVars +ExportCertData
+ #   AuthType KerberosV5
+ #   AuthName "Kerberos EINFRA"
+ #   require valid-user
+ #   Krb5Keytab /etc/apache2/krb5.http.keytab
+ #   KrbAuthRealms EINFRA
+ #   KrbSaveCredentials Off
+ #   KrbMethodNegotiate On
+ #   KrbMethodK5Passwd On
+ #   KrbServiceName Any
+ #   KrbVerifyKDC Off
+
+    # Definice externiho overeni uzivatelu
+ #   SetEnvIf _ .* AJP_EXTSOURCE=EINFRA
+ #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
+ #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
+ #</LocationMatch>
+
+ #<LocationMatch "^/krbes/">
+ #   Options FollowSymLinks
+ #   SSLRequireSSL
+ #   SSLVerifyClient none
+ #   AuthType KerberosV5
+ #   AuthName "Kerberos EINFRA-SERVICES"
+ #   require valid-user
+ #   Krb5Keytab /etc/apache2/krb5.http.keytab
+ #   KrbAuthRealms EINFRA-SERVICES
+ #   KrbSaveCredentials Off
+ #   KrbMethodNegotiate On
+ #   KrbMethodK5Passwd On
+ #   KrbServiceName Any
+ #   KrbVerifyKDC Off
+
+    # Definice externiho overeni uzivatelu
+ #   SetEnvIf _ .* AJP_EXTSOURCE=EINFRA-SERVICES
+ #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
+ #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
+ #</LocationMatch>
+
+ </VirtualHost>
+</IfModule>

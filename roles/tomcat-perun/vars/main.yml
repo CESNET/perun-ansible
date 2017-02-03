@@ -12,3 +12,5 @@ python_packages:
     - python
     - python-pexpect
   RedHat: []
+
+apache_p12_file: /etc/perun/ssl/ssl-apache-cert.p12

@@ -1,8 +1,7 @@
 LDAP-Perun
 ========
-
+**THIS ROLE IS NOT FUNCTIONAL AT THIS MOMENT!**
 Sets LDAP for Perun.
-
 
 Requirements
 ------------

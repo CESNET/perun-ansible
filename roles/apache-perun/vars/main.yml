@@ -4,6 +4,7 @@ apache_package:
   Debian: apache2
 apache_modules:
   Debian:
+    - headers
     - ssl
     - proxy
     - proxy_ajp
@@ -14,14 +15,20 @@ apache_service:
 ssl_cert_package:
   Debian: ssl-cert
 
-# Virtual host config file
-apache_conf:
-  Debian: perun.conf.j2
-apache_dir:
-  Debian: '/etc/apache2/sites-enabled/'
+maintenance_files:
+  - 401.html
+  - 403.html
+  - 404.html
+  - 500.html
+  - 503.html
+  - certneeded.html
+  - error.html
+  - igtf-certneeded.html
+  - maintenance.html
 
-# Html website with missing certificate warning
-apache_certneeded:
-  Debian: certneeded.html.j2
-apache_certneeded_dir:
-  Debian: '/srv/www/'
+igtf_certificates:
+  - ca-policy-igtf-classic
+  - ca-policy-igtf-mics
+  - ca-policy-igtf-slcs
+  - ca-aaacertificateservices
+  - ca-terena*

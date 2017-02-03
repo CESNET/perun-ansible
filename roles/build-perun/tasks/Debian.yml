@@ -23,16 +23,12 @@
     mode: 0644
 
 - name: Install ojdbc7
-  become: yes
-  become_user: "{{ perun_login }}"
   command: mvn install:install-file -Dfile=ojdbc7.jar -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.2.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
     creates: "/home/{{ perun_login}}.m2/repository/com/oracle/ojdbc7/12.1.0.2.0/ojdbc7-12.1.0.2.0.jar"
 
 - name: Install orai18n
-  become: yes
-  become_user: "{{ perun_login }}"
   command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.1.0.2.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
@@ -50,27 +46,45 @@
   async: 600
   poll: 5
 
-
-- name: debug  build output
+- name: Debug build output
   debug:
     var: perun_build.stderr
 
 - name: Copy perun-rpc.war file into tomcat webapps folder
-  become: yes
-  become_user: "{{ perun_login }}"
-  command: cp perun-rpc.war "/home/{{ perun_login }}/tomcat/webapps/perun-rpc.war"
+  command: cp perun-rpc.war "/var/lib/tomcat7/webapps/perun-rpc.war"
   args:
     chdir: "{{ perun_folder }}/perun-rpc/target/"
 
-- name: Delete /var/www/perun-web-gui-3.0.1-SNAPSHOT-production if exists
+- name: Change rights on perun-rpc.war file
   file:
-    path: "/var/www/perun-web-gui-3.0.1-SNAPSHOT-production"
+    path: /var/lib/tomcat7/webapps/perun-rpc.war
+    owner: tomcat7
+    group: tomcat7
+    mode: 0644
+
+- name: Delete /var/www/perun-web-gui
+  file:
+    path: "/var/www/perun-web-gui"
     state: absent
 
 - name: Deploy GUI
-  command: cp -r ./perun-web-gui-3.0.1-SNAPSHOT-production /var/www/
+  command: cp -r ./perun-web-gui-3.0.1-SNAPSHOT-production /var/www/perun-web-gui
   args:
     chdir: "{{ perun_folder }}/perun-web-gui/target/"
+
+- name: Change owner of /var/www/perun-web-gui directory and its content to user perun
+  file:
+    path: /var/www/perun-web-gui
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_login }}"
+    recurse: yes
+
+- name: Sets rights on /var/www/perun-web-gui directory
+  file:
+    path: /var/www/perun-web-gui
+    state: directory
+    mode: 0755
 
 - name: Start Tomcat if its not running
   become: true

@@ -8,15 +8,23 @@ perun_group: 'perun'
 # Full name of Perun user
 perun_name: 'Perun'
 # Email address of admin of Perun server
-perun_admin: 'admin@perun-test-domain.com'
+perun_email: 'admin@perun-test-domain.com'
 
-# Address of your Perun server - now done with a group lookup
-# perun_address: '192.168.56.20'
+# If your server has alias for its hostname, put it here (ServerAlias variable in Apache config). If not, leave it empty.
+perun_hostname_alias: ''
+
 
 # Path to repository with cloned Perun sources from GIT
 perun_folder: "/home/{{ perun_login }}/perun-sources/"
 # Path to repository with cloned Perun services from GIT
 perun_services_folder: "/home/{{ perun_login }}/perun-services/"
+# Path to repository with cloned Perun WUI
+perun_wui_folder: "/home/{{ perun_login }}/perun-wui"
+
+
+# Username for RPC (password for RPC user is stored in passwords-default.yml file)
+perun_rpc_username: 'perun'
+
 
 # Database name (we recommend to don't change it)
 db_name: 'perun'
@@ -24,23 +32,19 @@ db_name: 'perun'
 db_user: 'perun'
 
 # APACHE CERTIFICATE
-# Path to Apache certificate file (Default is fake snake oil, which will be created. Please change this path, if you want to use your own certificate.)
-apache_certificate_file: '/etc/ssl/certs/ssl-cert-snakeoil.pem'
-# Path to key for Apache certificate file (Default is key to fake snake oil, which will be created. Please change this path, if you changed certificate to your own.)
-apache_certificate_key_file: '/etc/ssl/private/ssl-cert-snakeoil.key'
-# Path to directory with CA certificates
+# Path to Apache certificate file. Default is fake snake oil, which will be created. Please change this path, if you want to use your own certificate.
+apache_certificate_file: '/etc/perun/ssl/ssl-cert-snakeoil.pem'
+# Path to key for Apache certificate file. Default is key to fake snake oil, which will be created. Please change this path, if you changed certificate to your own.
+apache_certificate_key_file: '/etc/perun/ssl/ssl-cert-snakeoil.key'
+# Path to directory with CA certificates. If you leave it with default value, IGTF certificates will be installed.
 apache_ca_certificate_path: '/etc/grid-security/certificates/'
-
-# LDAP CERTIFICATE
-# Path to CA certificate of LDAP (Default is value of apache_certificate_file. Change it, if you have separate CA certificate for LDAP.)
-ldap_ca_certificate_file: "{{ apache_certificate_file }}"
-# Path to certificate file of LDAP (Default is value of apache_certificate_file. Change it, if you have separate certificate for LDAP.)
-ldap_certificate_file: "{{ apache_certificate_file }}"
-# Path to key file of LDAP certificate (Default is value of apache_certificate_key_file.)
-ldap_certificate_key_file: "{{ apache_certificate_key_file }}"
 
 # ORACLE DB DRIVERS
 # Path to ojdbc7 file on your system with Ansible
 ojdbc7_file_path: '~/ojdbc7.jar'
 # Path to orai18n file on your system with Ansible
 orai18n_file_path: '~/orai18n.jar'
+
+
+# Federative authz
+fed_authz: 'fed'

@@ -31,13 +31,19 @@
   htpasswd:
     path: /etc/apache2/perun.passwd
     name: perun-engine
-    password: "{{ password_user }}"
+    password: "{{ password_perun_engine }}"
+    state: present
+
+- name: Add user perun into Apache (done by root)
+  htpasswd:
+    path: /etc/apache2/perun.passwd
+    name: perun
+    password: "{{ password_perun_admin }}"
     state: present
 
 - name: Restart Apache
   service:
     state: restarted
-    state: reloaded
     name: apache2
 
 - name: "Build engine of Perun. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
@@ -97,13 +103,6 @@
   args:
     chdir: "{{ perun_folder }}/perun-utils/init.d-scripts/"
 
-- name: "Change owner of /etc/init.d/perun-engine file to {{ perun_login }}:{{ perun_group }}"
-  file:
-    path: /etc/init.d/perun-engine
-    state: file
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-
 - name: "Delete /var/run/perun directory if exists"
   file:
     path: "/var/run/perun"
@@ -140,18 +139,9 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
-- name: Create file /etc/perun/perun-engine
-  template:
-    src: "perun_engine.j2"
-    dest: "/etc/perun/perun-engine"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
-
 - name: Start perun-engine
   service:
     state: started
-    state: reloaded
     name: perun-engine
 
 - name: "Create file /etc/apt/sources.list.d/meta_repo.list"

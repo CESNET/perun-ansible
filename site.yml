@@ -6,7 +6,7 @@
     include_vars: "{{ item }}"
     with_first_found:
       - files:
-        - "passwords-{{ site_name }}.yml"
+        - "passwords-{{ site_name | default('default') }}.yml"
         paths:
         - "."
         - "group_vars"
@@ -16,21 +16,17 @@
     # ---------------
     # This role will create user perun and download all packages and GIT repositories you will need in installation process.
     - { role: perun, become: true, tags: perun }
+    # This role will copy configuration files of Perun on your server.
+    - { role: configuration-perun, become: true, tags: config-perun}
     # This role will install Apache on your server.
     - { role: apache-perun, become: true, tags: apache }
     # This role will install Tomcat on your server.
-    - { role: tomcat-perun, become: true, become_user: "{{ perun_login }}", tags: tomcat }
+    - { role: tomcat-perun, become: true, tags: tomcat }
     # This role will deploy Postgre DB on your server and prepares DB tables.
     - { role: postgre-perun, tags: db}
-    # This role will copy configuration files of Perun on your server.
-    - { role: configuration-perun, become: true, tags: config-perun}
     # This role will build Perun on your server.
     - { role: build-perun, become: true, tags: build-perun }
     # This role will build engine of Perun on your server.
-    - {role: engine-perun, become: true, tags: engine-perun}
-    # This role will deploy LDAP on your server.
-    - {role: ldap-perun, become: true, tags: ldap-perun }
-
-    # OPTIONAL ROLES
-    # --------------
-    #- shibboleth-perun
+    - { role: engine-perun, become: true, tags: engine-perun}
+    # This role will deploy new web user interface of Perun on your server.
+    - { role: wui-perun, become: true, tags: wui-perun}

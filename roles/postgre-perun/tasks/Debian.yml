@@ -31,8 +31,6 @@
   postgresql_db:
     name: "{{ db_name }}"
     encoding: 'UTF-8'
-    # lc_collate: 'cs_CZ.UTF-8'
-    # lc_ctype: 'cs_CZ.UTF-8'
     template: 'template0'
     state: present
 
@@ -78,13 +76,11 @@
         local perun perun ident
         host perun perun 127.0.0.1/32 md5
 
-# - name: Restart PostgreSQL
-#   become: true
-#   service:
-#     state: restarted
-#     enabled: yes
-#     state: reloaded
-#     name: postgresql
+- name: Restart PostgreSQL
+  become: true
+  service:
+    state: reloaded
+    name: postgresql
 
 - name: Make user "{{ db_user }}" temporary superuser
   become: yes

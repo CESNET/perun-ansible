@@ -1,0 +1,21 @@
+galaxy_info:
+  author: Jan Zvěřina
+  description: Deploys the Perun's Web User Interface
+  company: CESNET
+
+  license: BSD
+
+  min_ansible_version: 2.2
+
+  platforms:
+  
+  - name: Debian
+    versions:
+    - stretch
+    - wheezy
+
+  galaxy_tags:
+    - web
+    - identity
+
+dependencies: []

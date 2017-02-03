@@ -4,11 +4,20 @@
 # Main Perun folder
 perun_repo: /etc/perun
 
+# Perun folder for SSL certificates
+perun_repo_ssl: "{{ perun_repo }}/ssl"
+
 # Variables log folder for Perun
 perun_var_log_repo: /var/log/perun
 
 # Variables log folder for Perun-engine
 perun_engine_var_log_repo: /var/log/perun-engine
+
+# Owner of configuration files
+config_files_owner: tomcat7
+
+# DIRECTORIES
+# -------------------------------------------------------------------
 
 # Template file and destination in remote system for log4j.xml
 log4j_template: log4j_xml.j2
@@ -26,10 +35,6 @@ jdbc_dir: "{{ perun_repo }}/jdbc.properties"
 perun_conf_template: perun_properties.j2
 perun_conf_dir: "{{ perun_repo }}/perun.properties"
 
-# Template file and destination in remote system for perun-namespaces.properties
-perun_namespaces_template: perun_namespaces_properties.j2
-perun_namespaces_dir: "{{ perun_repo }}/perun-namespaces.properties"
-
 # Template file and destination in remote system for perun-notification.properties
 perun_notification_template: perun_notification_properties.j2
 perun_notification_dir: "{{ perun_repo }}/perun-notification.properties"
@@ -43,16 +48,16 @@ perun_dispatcher_template: perun_dispatcher_properties.j2
 perun_dispatcher_dir: "{{ perun_repo }}/perun-dispatcher.properties"
 
 # Template file and destination in remote system for perun-engine.properties
-perun_engine_template: perun_engine_properties.j2
-perun_engine_dir: "{{ perun_repo }}/perun-engine.properties"
+perun_engine_properties_template: perun_engine_properties.j2
+perun_engine_properties_dir: "{{ perun_repo }}/perun-engine.properties"
 
-# Template file and destination in remote system for perun-ldapc.properties
-perun_ldapc_template: perun_ldapc_properties.j2
-perun_ldapc_dir: "{{ perun_repo }}/perun-ldapc.properties"
+# Template file and destination in remote system for perun-engine file
+perun_engine_template: perun_engine.j2
+perun_engine_dir: "{{ perun_repo }}/perun-engine"
 
 # Template file and destination in remote system for perun-registrar-lib
 perun_registrar_lib_template: perun_registrar_lib.j2
-perun_registrar_lib_dir: "{{ perun_repo }}/perun-registrar-lib"
+perun_registrar_lib_dir: "{{ perun_repo }}/perun-registrar-lib.properties"
 
 # Template file and destination in remote system for perun-rpc-lib.properties
 perun_rpc_lib_template: perun_rpc_lib_properties.j2
@@ -61,3 +66,7 @@ perun_rpc_lib_dir: "{{ perun_repo }}/perun-rpc-lib.properties"
 # Template file and destination in remote system for perun-web-gui.properties
 perun_web_gui_template: perun_web_gui_properties.j2
 perun_web_gui_dir: "{{ perun_repo }}/perun-web-gui.properties"
+
+# Template file and destination in remote system for perun-extSources.xml
+perun_ext_sources_template: perun_extSources_xml.j2
+perun_ext_sources_dir: "{{ perun_repo }}/perun-extSources.xml"

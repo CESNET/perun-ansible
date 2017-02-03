@@ -1,12 +1,12 @@
-# URL to Perun instance
-perunUrl=https://{{hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}
+# URL to perun instance
+perunUrl=https://{{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}
 
 # Secret key for authentication messages
-secretKey={{ key_registrar_auth_messages }}
+secretKey={{ registrar_secret_key }}
 
 # Backup email adresses
-backupFrom={{ backup_from }}
-backupTo={{ backup_to }}
+backupFrom={{ perun_email }}
+backupTo={{ perun_email }}
 
-# URL paths behind Shibboleth (since links with anchors needs to be escaped for users)
+# Federative authz
 fedAuthz={{ fed_authz }}

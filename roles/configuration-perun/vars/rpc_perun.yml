@@ -1,5 +1,0 @@
----
-# Variables for RPC
-# NOTE: Password for RPC library is stored in group_vars/passwords.yml
-
-perun_rpc_lib_username: 'perun'

@@ -21,4 +21,5 @@ prerequisites:
   - rsync
   - python-passlib
   - sudo
+  - whois
   RedHat: []
