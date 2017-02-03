@@ -1,64 +1,114 @@
-# tasks file for apache-perun
-- name: Install Apache
-  package:
-    name: "{{ apache_package[ansible_os_family] }}"
-    state: present
-
-- name: Deletes /etc/apache2/sites-enabled/perun.conf if exists
-  file: 
-    path: /etc/apache2/sites-enabled/perun.conf
-    state: absent
-
-# Debian just enables modules.
-- name: Enable modules
-  apache2_module:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ apache_modules[ansible_os_family] }}"
+# Tasks file for apache-perun
 
 # Install ssl-cert for making certificate
 - name: Install ssl-cert package
   package:
     name: "{{ ssl_cert_package[ansible_os_family] }}"
     state: present
-  when: apache_certificate_file == "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+  when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
 
 # Fake Snake Oil if ssl_certificate_file variable is not filled
-- name: Make fake Snake Oil certificate for testing purposes (ssl_certificate_file variable is not filled (./group_vars/all.yml))
+- name: Make fake Snake Oil certificate for testing purposes
   command: make-ssl-cert generate-default-snakeoil --force-overwrite
-  when: apache_certificate_file == "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+  when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
 
-- name: "Change owner of {{ apache_certificate_file }} to {{ perun_login }}"
+- name: Copy Snake Oil certificate to /etc/perun/ssl folder
+  command: cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/ssl/private/ssl-cert-snakeoil.key /etc/perun/ssl/
+  when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+
+- name: Check rights on certificate
   file:
     path: "{{ apache_certificate_file }}"
-    state: file
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
+    owner: root
+    group: root
+    mode: 0644
 
-- name: "Change owner of {{ apache_certificate_key_file }} to {{ perun_login }}"
+- name: Check rights on certificate key
   file:
     path: "{{ apache_certificate_key_file }}"
-    state: file
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
+    owner: root
+    group: root
+    mode: 0640
 
-- name: Make /etc/ssl/p12 directory
-  file:
-    path: /etc/ssl/p12
-    state: directory
-    mode: 0755
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
+- name: Get status for perun.conf
+  stat:
+    path: /etc/apache2/sites-enabled/perun.conf
+  register: status_perun
 
-# Copy apache configuration file for Perun
-- name: Copy perun.conf file to /etc/apache2/sites-enabled/perun.conf
+- name: Get status for perun-ssl.conf
+  stat:
+    path: /etc/apache2/sites-enabled/perun-ssl.conf
+  register: status_perun_ssl
+
+- name: Install Apache
+  package:
+    name: "{{ apache_package[ansible_os_family] }}"
+    state: present
+
+- name: Disable perun.conf if enabled
+  shell:  a2dissite perun
+  when: status_perun.stat.islnk is defined
+
+- name: Disable perun-ssl.conf if enabled
+  shell:  a2dissite perun-ssl
+  when: status_perun_ssl.stat.islnk is defined
+
+- name: Enable modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache_modules[ansible_os_family] }}"
+
+- name: Copy Apache configuration files to /etc/apache2/sites-available/
   template:
-    src: "{{ apache_conf[ansible_os_family] }}"
-    dest: "{{ apache_dir[ansible_os_family] }}/perun.conf"
+    src: "{{ item }}.j2"
+    dest: "/etc/apache2/sites-available/{{ item }}"
+    mode: 0644
+  with_items:
+    - perun.conf
+    - perun-ssl.conf
+
+- name: Enable Perun sites in Apache
+  shell:  a2ensite "{{ item }}"
+  with_items:
+    - perun.conf
+    - perun-ssl.conf
+
+- name: Create directory for maintenance files
+  file:
+    path: /var/www/maintenance
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0755
+
+- name: Copy maintenance files
+  template:
+    src: "./maintenance/{{ item }}.j2"
+    dest: "/var/www/maintenance/{{ item }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
-  notify: restart Apache
+  with_items: "{{ maintenance_files }}"
+
+- name: Create file /etc/apt/sources.list.d/eugridpma.list
+  template:
+    src: "eugridpma.list.j2"
+    dest: "/etc/apt/sources.list.d/eugridpma.list"
+    mode: 0644
+  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+
+- name: Update apt-get
+  apt:
+    update_cache: yes
+  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+
+- name: Install requirements for IGTF certificates
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ igtf_certificates }}"
+  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
 # Rehash certificates for user identification
 - name: Use c_rehash to your certificates
@@ -76,24 +126,7 @@
     regexp: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
     backrefs: yes
 
-- name: Ensures /srv/www/ directory exists
-  file: 
-    path: /srv/www
-    state: directory
-    mode: 0755
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-
-- name: Deletes "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html" if exists
-  file: 
-    path: "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html"
-    state: absent
-
-# HTML website with warning
-- name: Create file /srv/www/certneeded.html
-  template:
-    src: "{{ apache_certneeded[ansible_os_family] }}"
-    dest: "{{ apache_certneeded_dir[ansible_os_family] }}/certneeded.html"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
+- name: Restart Apache
+  service:
+    state: restarted
+    name: "{{ apache_service[ansible_os_family] }}"

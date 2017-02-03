@@ -1,22 +1,13 @@
 #Login to Perun Core
-perun.principal.name={{ perun_principal_name }}
-perun.principal.extSourceName={{ perun_principal_extSourceName }}
-perun.principal.extSourceType={{ perun_principal_extSourceType }}
+perun.principal.name=perunEngine
+perun.principal.extSourceName=INTERNAL
+perun.principal.extSourceType=cz.metacentrum.perun.core.impl.ExtSourceInternal
 
 # Where is Engine JSM located
-engine.unique.id={{ engine_unique_id }}
-engine.ip.address={{ engine_ip_address }}
-engine.port={{ engine_port }}
+engine.unique.id=1
+engine.ip.address=127.0.0.1
+engine.port=6061
 
 # Set where to find Dispatcher
-dispatcher.ip.address={{ dispatcher_ip_address }}
-dispatcher.port={{ dispatcher_port }}
-
-# Optional speed settings for engine
-engine.cron.propagation={{ engine_cron_propagation }}
-engine.cron.processpool={{ engine_cron_processpool }}
-engine.cron.taskexecutor={{ engine_cron_taskexecutor }}
-engine.thread.gentasks.max={{ engine_thread_gentasks_max }}
-engine.thread.sendtasks.max={{ engine_thread_sendtasks_max }}
-engine.genscript.path={{ engine_genscript_path }}
-engine.sendscript.path={{ engine_sendscript_path }}
+dispatcher.ip.address=127.0.0.1
+dispatcher.port=6071

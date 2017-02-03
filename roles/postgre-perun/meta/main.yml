@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Jan Zvěřina
-  description: Configures the Tomcat
+  description: Configures the Postgre database
   company: CESNET
 
   license: BSD
