@@ -77,3 +77,9 @@ perun.DBInitializatorEnabled=false
 
 # Perun instance name
 perun.instanceName = GENERIC
+
+# Comma separated list of entityIDs of proxy IdPs which is infront of Perun. So Perun can work with them differently.
+perun.proxyIdPs= {{ proxy_idps }}
+
+# Perun ID salt for login-namespace:kypo (can be ommited if login-namespace:kypo not used)
+perun.id.salt=

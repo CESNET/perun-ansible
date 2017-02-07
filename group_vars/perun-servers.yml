@@ -48,3 +48,10 @@ orai18n_file_path: '~/orai18n.jar'
 
 # Federative authz
 fed_authz: 'fed'
+
+
+# OPTIONAL
+
+# Comma separated list of entityIDs of proxy IdPs which is infront of Perun.
+# So Perun can work with them differently.
+proxy_idps: ''

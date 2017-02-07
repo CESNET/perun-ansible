@@ -22,4 +22,8 @@ prerequisites:
   - python-passlib
   - sudo
   - whois
+  - tomcat7
+  - tomcat7-admin
+  - tomcat7-user
+  - apache2
   RedHat: []

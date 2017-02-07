@@ -22,9 +22,9 @@ This repository serves for easier deployment of Perun server with default config
 
 ## Set your passwords in Ansible Vault file
 
-- Passwords and secret keys needed for Perun system are stored in **./group-vars/passwords-default.yml** file in cloned Ansible repository.
-- Change password for this file with command: `ansible-vault rekey ./group-vars/passwords-default.yml` (**Default password is set to "test"**!)
-- In root of your Ansible repository use command: `ansible-vault edit ./group-vars/passwords-default.yml`.
+- Passwords and secret keys needed for Perun system are stored in **./group_vars/passwords-default.yml** file in cloned Ansible repository.
+- Change password for this file with command: `ansible-vault rekey ./group_vars/passwords-default.yml` (**Default password is set to "test"**!)
+- In root of your Ansible repository use command: `ansible-vault edit ./group_vars/passwords-default.yml`.
 - Change values of passwords and secret keys to users and services.
 
 ## Set Local variables
@@ -36,11 +36,11 @@ This repository serves for easier deployment of Perun server with default config
 
 - Download Oracle DB drivers 'orai18n’ and 'ojdbc7’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html) on your system with Ansible (**the system which you will use to run this playbook**).
 - You need to register before downloading these files.
-- Set paths to these files in **./group-vars/all.yml** file (variables **ojdbc7_file_path** and **orai18n_file_path**).
+- Set paths to these files in **./group_vars/perun-servers.yml** file (variables **ojdbc7_file_path** and **orai18n_file_path**).
 
 ## Install necessary certificates
 
-- Put all your certificates you will use for user authentication to path defined by **apache_ca_certificate_path** variable stored in **./group-vars/perun-servers.yml** file.
+- Put all your certificates you will use for user authentication to path defined by **apache_ca_certificate_path** variable stored in **./group_vars/perun-servers.yml** file.
 
 ## Set address of your server in inventories
 
