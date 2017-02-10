@@ -40,6 +40,11 @@
     path: /etc/apache2/sites-enabled/perun-ssl.conf
   register: status_perun_ssl
 
+- name: Get status for 000-default.conf
+  stat:
+    path: /etc/apache2/sites-enabled/000-default.conf
+  register: status_default
+
 - name: Install Apache
   package:
     name: "{{ apache_package[ansible_os_family] }}"
@@ -52,6 +57,10 @@
 - name: Disable perun-ssl.conf if enabled
   shell:  a2dissite perun-ssl
   when: status_perun_ssl.stat.islnk is defined
+
+- name: Disable 000-default.conf if enabled
+  shell:  a2dissite 000-default
+  when: status_default.stat.islnk is defined
 
 - name: Enable modules
   apache2_module:
@@ -98,15 +107,12 @@
     mode: 0644
   when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
-- name: Update apt-get
-  apt:
-    update_cache: yes
-  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
-
 - name: Install requirements for IGTF certificates
-  package:
+  apt:
     name: "{{ item }}"
     state: latest
+    allow_unauthenticated: yes
+    update_cache: yes
   with_items: "{{ igtf_certificates }}"
   when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 

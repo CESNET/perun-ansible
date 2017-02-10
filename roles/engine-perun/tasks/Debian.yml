@@ -140,9 +140,10 @@
     group: "{{ perun_group }}"
 
 - name: Start perun-engine
-  service:
-    state: started
+  systemd:
     name: perun-engine
+    state: started
+    daemon_reload: yes
 
 - name: "Create file /etc/apt/sources.list.d/meta_repo.list"
   template:
