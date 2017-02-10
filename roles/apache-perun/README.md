@@ -1,4 +1,4 @@
-Apache-perun
+Apache-Perun
 =========
 
 This role contains tasks for installation of Apache to your server.

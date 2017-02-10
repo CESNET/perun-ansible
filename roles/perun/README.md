@@ -1,4 +1,4 @@
-perun
+Perun
 =========
 
 Role perun serves for creation of user Perun. It also serves for installation of every necessary package which will be used during instalation.

@@ -26,4 +26,5 @@ prerequisites:
   - tomcat7-admin
   - tomcat7-user
   - apache2
+  - libapache2-mod-shib2
   RedHat: []

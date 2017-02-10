@@ -1,4 +1,4 @@
-Role Name
+WUI-Perun
 =========
 
 Role which deploys new web user interface of Perun.

@@ -1,4 +1,4 @@
-Postgre-perun
+Postgre-Perun
 ========
 
 This role server for installation of Postgre database. It also sets everything necessary in database files.

@@ -52,7 +52,7 @@ This repository serves for easier deployment of Perun server with default config
 
 - Now you can run ansible script with this command (**you need to be in downloaded Ansible repository**). It uses hostname from ./inventories/prod file. You can change it to ./inventories/test (or dev) to use hostname from another inventory.
   - `ansible-playbook -i inventories/prod --ask-become-pass --ask-vault-pass site.yml`
-  - It will ask for your **root password and ansible-vault password** (the file which stores passwords meantioned before)
+  - It will ask for your **root password (leave empty if target contains your public ssh key in root authorized_keys) and ansible-vault password** (the file which stores passwords meantioned before)
 
 - Perun should be running after installation on **https://[hostname]/[auth-type]/rpc/**, where [auth-type] is either cert for certificates, non for non-authorized access and ba for basic auth (our initial user perun).
 - For example: **https://[hostname]/ba/gui/** will show GUI of Perun. First you need to fill username and password (user: perun, password: the one you set in passwords-default.yml file in password_perun_admin variable).

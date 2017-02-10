@@ -1,4 +1,4 @@
-Role Name
+Shibboleth-Perun
 =========
 **THIS ROLE IS NOT FUNCTIONAL AT THIS MOMENT!**
 Installation of Shibboleth for Perun server.

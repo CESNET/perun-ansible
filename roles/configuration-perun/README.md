@@ -1,4 +1,4 @@
-Role Name
+Configuration-Perun
 ========
 
 This role serves for deployment of configuration files to Perun server.

@@ -1,4 +1,4 @@
-Build-perun
+Build-Perun
 ========
 
 Build of Perun with Maven
