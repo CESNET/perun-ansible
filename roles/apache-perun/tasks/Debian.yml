@@ -107,6 +107,10 @@
     mode: 0644
   when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
+- name: Add an egi-igtf key file
+  apt_key:
+    url: https://dist.eugridpma.info/distribution/igtf/current/GPG-KEY-EUGridPMA-RPM-3
+
 - name: Install requirements for IGTF certificates
   apt:
     name: "{{ item }}"
