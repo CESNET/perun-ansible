@@ -7,6 +7,31 @@
     state: latest
   with_items: "{{ prerequisites[ansible_os_family]}}"
 
+- name: Copy webupd8team-java.list file to sources.list.d directory
+  copy:
+    src: "{{ role_path }}/files/webupd8team-java.list"
+    dest: "/etc/apt/sources.list.d/webupd8team-java.list"
+    mode: 0644
+
+- name: Add an apt key by id from a keyserver
+  apt_key:
+    url: hkp://keyserver.ubuntu.com:80
+    id: EEA14886
+
+- name: Accept Oracle licence
+  debconf:
+    name: 'oracle-java8-installer'
+    question: 'shared/accepted-oracle-license-v1-1'
+    value: 'true'
+    vtype: 'select'
+
+- name: Install Java8
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items: "{{ java[ansible_os_family]}}"
+
 - name: Generate the hash of user's password (SHA-512)
   shell: mkpasswd -m sha-512 "{{ password_user | default (lookup('password')) }}"
   register: password_user_hash

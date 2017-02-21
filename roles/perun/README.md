@@ -1,7 +1,7 @@
 Perun
 =========
 
-Role perun serves for creation of user Perun. It also serves for installation of every necessary package which will be used during instalation.
+Role perun serves for creation of user Perun. It also serves for installation of every necessary package which will be used during instalation including Java8 Oracle packages.
 Supports Debian operating system.
 
 Role Variables

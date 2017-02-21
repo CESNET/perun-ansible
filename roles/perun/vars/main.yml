@@ -4,8 +4,6 @@
 prerequisites:
   Debian:
   - git
-  - openjdk-7-jre
-  - openjdk-7-jdk
   - libswitch-perl
   - liblwp-authen-negotiate-perl
   - libjson-any-perl
@@ -28,3 +26,10 @@ prerequisites:
   - apache2
   - libapache2-mod-shib2
   RedHat: []
+
+# Java packages
+java:
+  Debian:
+  - oracle-java8-installer
+  - oracle-java8-set-default
+  - oracle-java8-unlimited-jce-policy
