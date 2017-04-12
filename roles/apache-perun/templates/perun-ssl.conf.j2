@@ -10,7 +10,7 @@ ShibCompatValidUser on
   ServerAdmin {{ perun_email }}
 
   ServerName {{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}
-  {% if perun_hostname_alias is defined and perun_hostname_alias|length > 0  %}
+  {% if perun_hostname_alias is defined and perun_hostname_alias|length > 0 %}
   ServerAlias {{ perun_hostname_alias }}
   {% endif %}
 
@@ -32,8 +32,11 @@ ShibCompatValidUser on
 
   SSLCertificateFile {{ apache_certificate_file }}
   SSLCertificateKeyFile {{ apache_certificate_key_file }}
-  #SSLCertificateChainFile /etc/perun/ssl/chain_TERENA_SSL_CA_2.pem
   SSLCACertificatePath {{ apache_ca_certificate_path }}
+  {% if apache_certificate_chain_file is defined and apache_certificate_chain_file|length > 0 %}
+SSLCertificateChainFile {{ apache_certificate_chain_file }}
+  {% endif %}
+  
 
   SSLVerifyClient optional
   SSLVerifyDepth 5

@@ -65,6 +65,10 @@ Now you need to do stuff, which is not handled by Ansible script:
   - As perun user use command: `ssh-keygen -t rsa -C "perun@[perun's_address]" -f ~/.ssh/id_rsa`
   - Public part of key must be set in /root/.ssh/authorized_keys on target machines, which have to be accessible for Perun. 
 
+- **Add certificates to truststore**
+  - The truststore have to contain certificates of servers, which are contacted by Perun. More precisely, chain of their parent certificates (if they are not distributed with Java / browser). Keytool is used to add them:
+  - `keytool -keystore /home/perun/.truststore -importcert -trustcacerts -file /tmp/file_with_cert -alias [cert alias, e.g. rt4.cesnet.cz]`
+
 - **Install slave scripts**
   - For example: `apt-get install perun-slave-process-passwd` for installation of **passwd service**
   - For **all services**: `apt-get install perun-slave-meta`
