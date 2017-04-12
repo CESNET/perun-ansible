@@ -15,8 +15,9 @@
 
 - name: Add an apt key by id from a keyserver
   apt_key:
-    url: hkp://keyserver.ubuntu.com:80
+    keyserver: hkp://keyserver.ubuntu.com:80
     id: EEA14886
+    state: present
 
 - name: Accept Oracle licence
   debconf:

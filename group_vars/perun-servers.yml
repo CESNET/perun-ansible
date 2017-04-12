@@ -32,12 +32,16 @@ db_name: 'perun'
 db_user: 'perun'
 
 # APACHE CERTIFICATE
-# Path to Apache certificate file. Default is fake snake oil, which will be created. Please change this path, if you want to use your own certificate.
+# Path to Apache certificate file (SSLCertificateFile). Default is fake snake oil, which will be created. Please change this path, if you want to use your own certificate.
 apache_certificate_file: '/etc/perun/ssl/ssl-cert-snakeoil.pem'
 # Path to key for Apache certificate file. Default is key to fake snake oil, which will be created. Please change this path, if you changed certificate to your own.
 apache_certificate_key_file: '/etc/perun/ssl/ssl-cert-snakeoil.key'
+# Chain file for your Apache certificate file (SSLCertificateChainFile). It is deprecated -> leave empty if you are using Apache version 2.4 or higher (from Debian 8).
+# From Apache version 2.4 or higher you should include chain to your certificate defined in variable "apache_certificate_file" (SSLCertificateFile).
+apache_certificate_chain_file: ''
 # Path to directory with CA certificates. If you leave it with default value, IGTF certificates will be installed.
 apache_ca_certificate_path: '/etc/grid-security/certificates/'
+
 
 # ORACLE DB DRIVERS
 # Path to ojdbc7 file on your system with Ansible
