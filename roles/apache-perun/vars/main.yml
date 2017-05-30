@@ -27,8 +27,4 @@ maintenance_files:
   - maintenance.html
 
 igtf_certificates:
-  - ca-policy-igtf-classic
-  - ca-policy-igtf-mics
-  - ca-policy-igtf-slcs
-  - ca-aaacertificateservices
-  - ca-terena*
+  - ca-policy-egi-core
