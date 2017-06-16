@@ -97,13 +97,13 @@
     <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
     -->
 
-<Connector port="18443" protocol="HTTP/1.1" SSLEnabled="true" 
-           maxThreads="150" scheme="https" secure="true" 
+    <Connector port="18443" protocol="HTTP/1.1" SSLEnabled="true"
+           maxThreads="150" scheme="https" secure="true"
            clientAuth="false" sslProtocol="TLS"
-           keystoreFile="{{ apache_p12_file }}" 
+           keystoreFile="{{ apache_p12_file }}"
            keystorePass="{{ password_tomcat_certificate }}" keystoreType="PKCS12" />
 
-<Connector port="8009" protocol="AJP/1.3" redirectPort="18443" address="127.0.0.1" tomcatAuthentication="false" URIEncoding="UTF-8"/>
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="18443" address="127.0.0.1" tomcatAuthentication="false" URIEncoding="UTF-8"/>
 
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone
@@ -146,9 +146,10 @@
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html
              Note: The pattern used is equivalent to using pattern="common" -->
-        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+        <!--<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log." suffix=".txt"
                pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+        -->
 
       </Host>
     </Engine>
