@@ -59,3 +59,7 @@ fed_authz: 'fed'
 # Comma separated list of entityIDs of proxy IdPs which is infront of Perun.
 # So Perun can work with them differently.
 proxy_idps: ''
+
+# Perun instance Name and ID
+instance_name: 'GENERIC'
+instance_id: 'GENERIC01A02B03C'

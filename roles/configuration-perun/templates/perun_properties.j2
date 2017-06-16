@@ -5,9 +5,9 @@ perun.admins = perun, perunTests, perunDispatcher, perunController, perunEngine,
 perun.engine.principals = perunEngine, perun-engine
 
 # Principals for the Registrar
-perun.registrar.principals = 
+perun.registrar.principals =
 
-# Principals for the Notificator 
+# Principals for the Notificator
 perun.notification.principals = perunNotifications
 
 # Principal for the RPC
@@ -72,14 +72,19 @@ perun.sms.program = /home/perun/send_sms.sh
 # Set true if perun DB connection should be read only (item is optional, default is false)
 perun.readOnlyPerun=false
 
-# Set true if Perun should update DB version when new version of code is present (item is optional, defualt is false). 
+# Set true if Perun should update DB version when new version of code is present (item is optional, defualt is false).
 perun.DBInitializatorEnabled=false
 
 # Perun instance name
-perun.instanceName = GENERIC
+perun.instanceName = {{ instance_name }}
+
+# Perun instance
+perun.instanceId = {{ instance_id }}
+
+# set which user ext sources are non removable. Ext sources are divided by ';' if only extsource name is present all user extsources are non removable.
+# If ',' character is present, everything after is considered as regex and applied to user login in ext. source (such logins/dentities are then non removable).
+# Example:   ExtSourceName1;ExtSourceName2,regex2;ExtSourceName3
+perun.userExtSources.persistent=PERUN;
 
 # Comma separated list of entityIDs of proxy IdPs which is infront of Perun. So Perun can work with them differently.
 perun.proxyIdPs= {{ proxy_idps }}
-
-# Perun ID salt for login-namespace:kypo (can be ommited if login-namespace:kypo not used)
-perun.id.salt=
