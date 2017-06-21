@@ -71,4 +71,4 @@ Now you need to do stuff, which is not handled by Ansible script:
 
 - **Install slave scripts**
   - For example: `apt-get install perun-slave-process-passwd` for installation of **passwd service**
-  - For **all services**: `apt-get install perun-slave-meta`
+  - For **all services**: `apt-get install perun-slave-full`
