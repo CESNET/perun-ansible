@@ -13,7 +13,7 @@
 - name: "Build Perun's Web User Interface. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} clean install -DskipTests -Dproduction"
+  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} install -DskipTests -Dproduction"
   args:
     chdir: "{{ perun_wui_folder }}"
   async: 600
