@@ -1,22 +1,23 @@
 ---
 # Task file for perun role for Debian distribution
 
-- name: Install prerequisites
-  package:
-    name: "{{ item }}"
-    state: latest
-  with_items: "{{ prerequisites[ansible_os_family]}}"
+- name: Require Debian 8
+  assert:
+    that:
+      - ansible_distribution == "Debian"
+      - ansible_distribution_major_version == "8"
+    msg: "Only Debian 8 is supported"
 
-- name: Copy webupd8team-java.list file to sources.list.d directory
-  copy:
-    src: "{{ role_path }}/files/webupd8team-java.list"
-    dest: "/etc/apt/sources.list.d/webupd8team-java.list"
-    mode: 0644
-
-- name: Add an apt key by id from a keyserver
+- name: Add Oracle java repository key
   apt_key:
     keyserver: hkp://keyserver.ubuntu.com:80
     id: EEA14886
+    state: present
+
+- name: Add Oracle java repository
+  apt_repository:
+    repo: 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main'
+    filename: 'webupd8team-java'
     state: present
 
 - name: Accept Oracle licence
@@ -26,12 +27,33 @@
     value: 'true'
     vtype: 'select'
 
+- name: Add backports repository
+  apt_repository:
+    repo: 'deb http://http.debian.net/debian jessie-backports main'
+    filename: 'jessie-backports'
+    state: present
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  apt:
+    update_cache: yes
+    cache_valid_time: 900
+
+- name: Install prerequisites
+  package:
+    name: "{{ prerequisites[ansible_os_family]}}"
+    state: latest
+
 - name: Install Java8
   apt:
-    name: "{{ item }}"
+    name: "{{ java[ansible_os_family]}}"
     state: latest
-    update_cache: yes
-  with_items: "{{ java[ansible_os_family]}}"
+
+- name: Install Maven
+  apt:
+    name: maven
+    default_release: jessie-backports
+    state: latest
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
 
 - name: Generate the hash of user's password (SHA-512)
   shell: mkpasswd -m sha-512 "{{ password_user | default (lookup('password')) }}"
