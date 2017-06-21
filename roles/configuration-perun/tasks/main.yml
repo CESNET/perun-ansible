@@ -10,7 +10,7 @@
   file:
     path: "{{ perun_var_log_repo }}"
     state: directory
-    mode: 0755
+    mode: 0775
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
