@@ -1,0 +1,69 @@
+# Ignore Java project files #
+*.class
+*.jar
+*.war
+*.ear
+
+# Ignore data folder of running perun-rpc | perun-dispatcher
+perun-rpc/data/
+
+# Ignore Maven target #
+
+**/target
+dependency-reduced-pom.xml
+
+# Ignore IntelliJ project files #
+
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Ignore Intellij Perl5 plugin - de-parsed system subs used for resolution
+_Deparsed_XSubs.pm
+
+# Ignore Eclipse project files #
+
+*.pydevproject
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+.externalToolBuilders/
+*.launch
+.cproject
+.buildpath
+
+# Ignore NetBeans project files #
+
+nbproject/private/
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# LINUX ignore #
+
+.*
+!.gitignore
+!.gitattributes
+*~
+
+# Window ignore #
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/

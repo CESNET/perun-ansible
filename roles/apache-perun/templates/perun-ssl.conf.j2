@@ -34,9 +34,9 @@ ShibCompatValidUser on
   SSLCertificateKeyFile {{ apache_certificate_key_file }}
   SSLCACertificatePath {{ apache_ca_certificate_path }}
   {% if apache_certificate_chain_file is defined and apache_certificate_chain_file|length > 0 %}
-SSLCertificateChainFile {{ apache_certificate_chain_file }}
+  SSLCertificateChainFile {{ apache_certificate_chain_file }}
   {% endif %}
-  
+
 
   SSLVerifyClient optional
   SSLVerifyDepth 5
@@ -84,7 +84,7 @@ SSLCertificateChainFile {{ apache_certificate_chain_file }}
 
   # Following handles also rewrite log
   LogLevel warn rewrite:warn
-  ErrorLog ${APACHE_LOG_DIR}/cloud255-204.cerit-sc.cz-error.log
+  ErrorLog ${APACHE_LOG_DIR}/error.log
   CustomLog ${APACHE_LOG_DIR}/access.log combined
 
  ####################################
@@ -179,7 +179,7 @@ SSLCertificateChainFile {{ apache_certificate_chain_file }}
     SSLRequireSSL
     SSLVerifyClient none
     AuthType basic
-    AuthName "Perun RPC" 
+    AuthName "Perun RPC"
     Require valid-user
     AuthBasicProvider file
     # relative to ServerRoot
