@@ -11,14 +11,6 @@
     path: "{{ perun_var_log_repo }}"
     state: directory
     mode: 0755
-    owner: "{{ config_files_owner }}"
-    group: "{{ perun_group }}"
-
-- name: Make "{{ perun_engine_var_log_repo }}" directory
-  file:
-    path: "{{ perun_engine_var_log_repo }}"
-    state: directory
-    mode: 0755
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
@@ -36,18 +28,18 @@
     state: directory
     mode: 0755
 
-- name: Create file "{{ log4j_dir }}"
+- name: Create file "{{ logback_dir }}"
   template:
-    src: "{{ log4j_template }}"
-    dest: "{{ log4j_dir }}"
+    src: "{{ logback_template }}"
+    dest: "{{ logback_dir }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ log4j_engine_dir }}"
+- name: Create file "{{ logback_engine_dir }}"
   template:
-    src: "{{ log4j_engine_template }}"
-    dest: "{{ log4j_engine_dir }}"
+    src: "{{ logback_engine_template }}"
+    dest: "{{ logback_engine_dir }}"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644

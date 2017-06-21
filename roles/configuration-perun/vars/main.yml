@@ -10,22 +10,19 @@ perun_repo_ssl: "{{ perun_repo }}/ssl"
 # Variables log folder for Perun
 perun_var_log_repo: /var/log/perun
 
-# Variables log folder for Perun-engine
-perun_engine_var_log_repo: /var/log/perun-engine
-
 # Owner of configuration files
 config_files_owner: tomcat7
 
 # DIRECTORIES
 # -------------------------------------------------------------------
 
-# Template file and destination in remote system for log4j.xml
-log4j_template: log4j_xml.j2
-log4j_dir: "{{ perun_repo }}/log4j.xml"
+# Template file and destination in remote system for logback.xml
+logback_template: logback_xml.j2
+logback_dir: "{{ perun_repo }}/logback.xml"
 
-# Template file and destination in remote system for log4j-engine.xml
-log4j_engine_template: log4j_engine_xml.j2
-log4j_engine_dir: "{{ perun_repo }}/log4j-engine.xml"
+# Template file and destination in remote system for logback-engine.xml
+logback_engine_template: logback_engine_xml.j2
+logback_engine_dir: "{{ perun_repo }}/logback-engine.xml"
 
 # Template file and destination in remote system for jdbc.properties
 jdbc_template: jdbc_properties.j2
