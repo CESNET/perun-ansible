@@ -100,24 +100,25 @@
     mode: 0644
   with_items: "{{ maintenance_files }}"
 
-- name: Create file /etc/apt/sources.list.d/eugridpma.list
-  template:
-    src: "eugridpma.list.j2"
-    dest: "/etc/apt/sources.list.d/eugridpma.list"
-    mode: 0644
+- name: Add EGI IGTF repository key
+  apt_key:
+    id: 3CDBBC71
+    url: "https://dist.eugridpma.info/distribution/igtf/current/GPG-KEY-EUGridPMA-RPM-3"
+    state: present
   when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
-- name: Add an egi-igtf key file
-  apt_key:
-    url: https://dist.eugridpma.info/distribution/igtf/current/GPG-KEY-EUGridPMA-RPM-3
+- name: Add EGI IGTF repository
+  apt_repository:
+    repo: 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core'
+    filename: 'igtf'
+    state: present
+  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
-- name: Install requirements for IGTF certificates
+- name: Install latest IGTF certificates
   apt:
-    name: "{{ item }}"
+    name: ca-policy-egi-core
     state: latest
-    allow_unauthenticated: yes
     update_cache: yes
-  with_items: "{{ igtf_certificates }}"
   when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
 # Rehash certificates for user identification
@@ -127,6 +128,7 @@
   command: c_rehash .
   args:
     chdir: "{{ apache_ca_certificate_path }}"
+  when: apache_ca_certificate_path != "/etc/grid-security/certificates/"
 
 - name: Enable JSON data comprimation in Apache
   lineinfile:
