@@ -115,6 +115,13 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
+- name: "Create /var/log/perun/perun-engine-out.log file"
+  file:
+    path: "/var/log/perun/perun-engine-out.log"
+    state: touch
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
 - name: Start perun-engine
   systemd:
     name: perun-engine
