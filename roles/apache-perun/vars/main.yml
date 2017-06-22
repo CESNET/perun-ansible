@@ -25,6 +25,3 @@ maintenance_files:
   - error.html
   - igtf-certneeded.html
   - maintenance.html
-
-igtf_certificates:
-  - ca-policy-egi-core

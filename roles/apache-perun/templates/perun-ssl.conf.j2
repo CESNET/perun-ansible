@@ -141,8 +141,7 @@ ShibCompatValidUser on
 
  <LocationMatch "^/cert/">
     Options FollowSymLinks
-    Order allow,deny
-    Allow from all
+    Require all granted
     SSLRequireSSL
     SSLVerifyClient require
     SSLOptions +StdEnvVars +ExportCertData +LegacyDNStringFormat
@@ -156,14 +155,11 @@ ShibCompatValidUser on
     ShibRequestSetting requireSession 1
     ShibUseHeaders On
     Require valid-user
-    Order allow,deny
-    Allow from all
  </LocationMatch>
 
  <LocationMatch "^/non/">
     Options FollowSymLinks
-    Order allow,deny
-    Allow from all
+    Require all granted
     SSLRequireSSL
     SSLVerifyClient none
 
@@ -174,8 +170,6 @@ ShibCompatValidUser on
 
  <Location "/ba/rpc/">
     Options FollowSymLinks
-    Order allow,deny
-    Allow from all
     SSLRequireSSL
     SSLVerifyClient none
     AuthType basic
@@ -204,8 +198,6 @@ ShibCompatValidUser on
  #   KrbVerifyKDC Off
 
  #   Require valid-user
- #   Order allow,deny
- #   Allow from all
 
     # Definice externiho overeni uzivatelu
  #   SetEnvIf _ .* AJP_EXTSOURCE=META
@@ -220,7 +212,7 @@ ShibCompatValidUser on
  #   SSLOptions +StdEnvVars +ExportCertData
  #   AuthType KerberosV5
  #   AuthName "Kerberos EINFRA"
- #   require valid-user
+ #   Require valid-user
  #   Krb5Keytab /etc/apache2/krb5.http.keytab
  #   KrbAuthRealms EINFRA
  #   KrbSaveCredentials Off
@@ -241,7 +233,7 @@ ShibCompatValidUser on
  #   SSLVerifyClient none
  #   AuthType KerberosV5
  #   AuthName "Kerberos EINFRA-SERVICES"
- #   require valid-user
+ #   Require valid-user
  #   Krb5Keytab /etc/apache2/krb5.http.keytab
  #   KrbAuthRealms EINFRA-SERVICES
  #   KrbSaveCredentials Off
