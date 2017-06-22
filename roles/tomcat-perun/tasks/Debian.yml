@@ -7,7 +7,8 @@
     state: latest
   with_items: "{{ tomcat7_packages[ansible_os_family ]}}"
 
-- user: Add user tomcat7 to group perun
+- name: Add user tomcat7 to group perun
+  user:
     name: tomcat7
     groups: perun
     append: yes
