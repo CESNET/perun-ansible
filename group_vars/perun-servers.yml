@@ -44,8 +44,8 @@ apache_ca_certificate_path: '/etc/grid-security/certificates/'
 
 
 # ORACLE DB DRIVERS
-# Path to ojdbc7 file on your system with Ansible
-ojdbc7_file_path: '~/ojdbc7.jar'
+# Path to ojdbc8 file on your system with Ansible
+ojdbc8_file_path: '~/ojdbc8.jar'
 # Path to orai18n file on your system with Ansible
 orai18n_file_path: '~/orai18n.jar'
 
