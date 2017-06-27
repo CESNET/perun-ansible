@@ -6,10 +6,10 @@
     state: present
   with_items: "{{prerequisites[ansible_os_family]}}"
 
-- name: Copy ojdbc7 file to remote server
+- name: Copy ojdbc8 file to remote server
   copy:
-    src: "{{ ojdbc7_file_path }}"
-    dest: "/home/{{ perun_login }}/ojdbc7.jar"
+    src: "{{ ojdbc8_file_path }}"
+    dest: "/home/{{ perun_login }}/ojdbc8.jar"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
@@ -22,17 +22,17 @@
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Install ojdbc7
+- name: Install ojdbc8
   become: yes
   become_user: "{{ perun_login }}"
-  command: mvn install:install-file -Dfile=ojdbc7.jar -DgroupId=com.oracle -DartifactId=ojdbc7 -Dversion=12.1.0.2.0 -Dpackaging=jar
+  command: mvn install:install-file -Dfile=ojdbc8.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
 
 - name: Install orai18n
   become: yes
   become_user: "{{ perun_login }}"
-  command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.1.0.2.0 -Dpackaging=jar
+  command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.2.0.1.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
 

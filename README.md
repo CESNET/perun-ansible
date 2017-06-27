@@ -34,9 +34,9 @@ This repository serves for easier deployment of Perun server with default config
 
 ## Download Oracle DB drivers
 
-- Download Oracle DB drivers 'orai18n’ and 'ojdbc7’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-drivers-12c-download-1958347.html) on your system with Ansible (**the system which you will use to run this playbook**).
+- Download Oracle DB drivers 'orai18n’ and 'ojdbc8’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-ucp-122-3110062.html) on your system with Ansible (**the system which you will use to run this playbook**).
 - You need to register before downloading these files.
-- Set paths to these files in **./group_vars/perun-servers.yml** file (variables **ojdbc7_file_path** and **orai18n_file_path**).
+- Set paths to these files in **./group_vars/perun-servers.yml** file (variables **ojdbc8_file_path** and **orai18n_file_path**).
 
 ## Install necessary certificates
 
