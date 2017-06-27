@@ -7,6 +7,12 @@
     state: latest
   with_items: "{{ tomcat7_packages[ansible_os_family ]}}"
 
+- name: Add user tomcat7 to group perun
+  user:
+    name: tomcat7
+    groups: perun
+    append: yes
+
 - name: Disable autostart of system-wide tomcat when machine is rebooted
   service:
     enabled: no

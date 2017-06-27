@@ -1,5 +1,5 @@
 ---
-# Task file for perun role for Debian distribution
+# Task file for perun role for Debian OS family (Debian or Ubuntu)
 
 - name: Require Debian 8
   assert:
@@ -32,6 +32,7 @@
     repo: 'deb http://http.debian.net/debian jessie-backports main'
     filename: 'jessie-backports'
     state: present
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
 
 - name: Run the equivalent of "apt-get update" as a separate step
   apt:
@@ -48,12 +49,18 @@
     name: "{{ java[ansible_os_family]}}"
     state: latest
 
-- name: Install Maven
+- name: Install Maven from backports
   apt:
     name: maven
     default_release: jessie-backports
     state: latest
   when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
+
+- name: Install Maven
+  apt:
+    name: maven
+    state: latest
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "9"
 
 - name: Generate the hash of user's password (SHA-512)
   shell: mkpasswd -m sha-512 "{{ password_user | default (lookup('password')) }}"
@@ -64,6 +71,7 @@
     name: "{{ perun_login }}"
     comment: "{{ perun_name }}"
     password: "{{ password_user_hash.stdout }}"
+    shell: /bin/bash
     update_password: always
 
 - name: "Add {{ perun_login }} user to sudoers"

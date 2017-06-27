@@ -115,26 +115,9 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
-- name: "Delete /var/log/perun-engine directory if exists"
+- name: "Create /var/log/perun/perun-engine-out.log file"
   file:
-    path: "/var/log/perun-engine"
-    state: absent
-
-- name: Create /var/log/perun-engine directory
-  file:
-    path: "/var/log/perun-engine"
-    state: directory
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-
-- name: "Delete /var/log/perun-engine/perun-engine-out.log file if exists"
-  file:
-    path: "/var/log/perun-engine/perun-engine-out.log"
-    state: absent
-
-- name: "Create /var/log/perun-engine/perun-engine-out.log file"
-  file:
-    path: "/var/log/perun-engine/perun-engine-out.log"
+    path: "/var/log/perun/perun-engine-out.log"
     state: touch
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"

@@ -6,134 +6,126 @@
   with_fileglob:
     - ../vars/*
 
-- name: Make "{{ perun_var_log_repo }}" directory
+- name: Make "{{ perun_log_dir }}" directory
   file:
-    path: "{{ perun_var_log_repo }}"
+    path: "{{ perun_log_dir }}"
     state: directory
-    mode: 0755
-    owner: "{{ config_files_owner }}"
-    group: "{{ perun_group }}"
-
-- name: Make "{{ perun_engine_var_log_repo }}" directory
-  file:
-    path: "{{ perun_engine_var_log_repo }}"
-    state: directory
-    mode: 0755
+    mode: 0775
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
-- name: Make "{{ perun_repo }}" directory
+- name: Make "{{ perun_config_dir }}" directory
   file:
-    path: "{{ perun_repo }}"
+    path: "{{ perun_config_dir }}"
     state: directory
     mode: 0755
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
 
-- name: Make "{{ perun_repo_ssl }}" directory
+- name: Make "{{ perun_ssl_dir }}" directory
   file:
-    path: "{{ perun_repo_ssl }}"
+    path: "{{ perun_ssl_dir }}"
     state: directory
     mode: 0755
 
-- name: Create file "{{ log4j_dir }}"
+- name: Create file "{{ logback_xml_file }}"
   template:
-    src: "{{ log4j_template }}"
-    dest: "{{ log4j_dir }}"
+    src: "{{ logback_xml_template }}"
+    dest: "{{ logback_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ log4j_engine_dir }}"
+- name: Create file "{{ logback_engine_xml_file }}"
   template:
-    src: "{{ log4j_engine_template }}"
-    dest: "{{ log4j_engine_dir }}"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
-
-- name: Create file "{{ jdbc_dir }}"
-  template:
-    src: "{{ jdbc_template }}"
-    dest: "{{ jdbc_dir }}"
+    src: "{{ logback_engine_xml_template }}"
+    dest: "{{ logback_engine_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_notification_dir }}"
+- name: Create file "{{ jdbc_properties_file }}"
   template:
-    src: "{{ perun_notification_template }}"
-    dest: "{{ perun_notification_dir }}"
+    src: "{{ jdbc_properties_template }}"
+    dest: "{{ jdbc_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_cabinet_dir }}"
+- name: Create file "{{ perun_notification_properties_file }}"
   template:
-    src: "{{ perun_cabinet_template }}"
-    dest: "{{ perun_cabinet_dir }}"
+    src: "{{ perun_notification_properties_template }}"
+    dest: "{{ perun_notification_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_dispatcher_dir }}"
+- name: Create file "{{ perun_cabinet_properties_file }}"
   template:
-    src: "{{ perun_dispatcher_template }}"
-    dest: "{{ perun_dispatcher_dir }}"
+    src: "{{ perun_cabinet_properties_template }}"
+    dest: "{{ perun_cabinet_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_engine_dir }}"
+- name: Create file "{{ perun_dispatcher_properties_file }}"
+  template:
+    src: "{{ perun_dispatcher_properties_template }}"
+    dest: "{{ perun_dispatcher_properties_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Create file "{{ perun_engine_file }}"
   template:
     src: "{{ perun_engine_template }}"
-    dest: "{{ perun_engine_dir }}"
+    dest: "{{ perun_engine_file }}"
     mode: 0644
 
-- name: Create file "{{ perun_engine_properties_dir }}"
+- name: Create file "{{ perun_engine_properties_file }}"
   template:
     src: "{{ perun_engine_properties_template }}"
-    dest: "{{ perun_engine_properties_dir }}"
+    dest: "{{ perun_engine_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_registrar_lib_dir }}"
+- name: Create file "{{ perun_registrar_lib_properties_file }}"
   template:
-    src: "{{ perun_registrar_lib_template }}"
-    dest: "{{ perun_registrar_lib_dir }}"
+    src: "{{ perun_registrar_lib_properties_template }}"
+    dest: "{{ perun_registrar_lib_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_rpc_lib_dir }}"
+- name: Create file "{{ perun_rpc_lib_properties_file }}"
   template:
-    src: "{{ perun_rpc_lib_template }}"
-    dest: "{{ perun_rpc_lib_dir }}"
+    src: "{{ perun_rpc_lib_properties_template }}"
+    dest: "{{ perun_rpc_lib_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_web_gui_dir }}"
+- name: Create file "{{ perun_web_gui_properties_file }}"
   template:
-    src: "{{ perun_web_gui_template }}"
-    dest: "{{ perun_web_gui_dir }}"
+    src: "{{ perun_web_gui_properties_template }}"
+    dest: "{{ perun_web_gui_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_ext_sources_dir }}"
+- name: Create file "{{ perun_ext_sources_xml_file }}"
   template:
-    src: "{{ perun_ext_sources_template }}"
-    dest: "{{ perun_ext_sources_dir }}"
+    src: "{{ perun_ext_sources_xml_template }}"
+    dest: "{{ perun_ext_sources_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
 
-- name: Create file "{{ perun_conf_dir }}"
+- name: Create file "{{ perun_properties_file }}"
   template:
-    src: "{{ perun_conf_template }}"
-    dest: "{{ perun_conf_dir }}"
+    src: "{{ perun_properties_template }}"
+    dest: "{{ perun_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644

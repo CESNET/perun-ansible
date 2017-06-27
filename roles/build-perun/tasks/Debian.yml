@@ -39,7 +39,7 @@
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} install -DskipTests -Dproduction > out.log"
+  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} install -Dproduction > out.log"
   args:
     chdir: "{{ perun_folder }}"
     creates: "{{perun_folder}}/target/perun-web-gui-production.war"

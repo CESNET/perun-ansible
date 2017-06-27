@@ -1,3 +1,7 @@
 ---
 # Tasks file for perun
+# ansible_os_family - Debian means Ubuntu or Debian
+# ansible_distribution - Debian means Debian
+# ansible_distribution_major_version - OS version, e.g. "8"
+# ansible_distribution_release - e.g. "jessie"
 - include: "{{ ansible_os_family }}.yml"
