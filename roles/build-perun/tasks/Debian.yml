@@ -52,15 +52,15 @@
     var: perun_build.stderr
 
 - name: Copy perun-rpc.war file into tomcat webapps folder
-  command: cp perun-rpc.war "/var/lib/tomcat7/webapps/perun-rpc.war"
+  command: cp perun-rpc.war "/var/lib/tomcat8/webapps/perun-rpc.war"
   args:
     chdir: "{{ perun_folder }}/perun-rpc/target/"
 
 - name: Change rights on perun-rpc.war file
   file:
-    path: /var/lib/tomcat7/webapps/perun-rpc.war
-    owner: tomcat7
-    group: tomcat7
+    path: /var/lib/tomcat8/webapps/perun-rpc.war
+    owner: tomcat8
+    group: tomcat8
     mode: 0644
 
 - name: Delete /var/www/perun-web-gui
@@ -91,4 +91,4 @@
   become: true
   service:
     state: started
-    name: tomcat7
+    name: tomcat8

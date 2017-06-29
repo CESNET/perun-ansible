@@ -64,8 +64,11 @@
 
 # Setting access to database for user perun
 # -----------------------------------------
+- name:
+  include_vars:
+    file: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
 
-- name: "Add rows to /etc/postgresql/{{ postgre_version }}/main/pg_hba.conf"
+- name: "Add rows to pg_hba.conf"
   become: yes
   become_user: postgres
   blockinfile:

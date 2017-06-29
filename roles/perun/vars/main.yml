@@ -2,34 +2,23 @@
 # Vars file for perun
 # Necessary packages
 prerequisites:
-  Debian:
-  - git
-  - libswitch-perl
-  - liblwp-authen-negotiate-perl
-  - libjson-any-perl
-  - libtext-asciitable-perl
-  - libterm-readkey-perl
-  - libwww-perl
-  - libcrypt-ssleay-perl
-  - libtext-unidecode-perl
-  - libdate-calc-perl
-  - libnet-ldap-perl
-  - ldap-utils
-  - ntp
-  - rsync
-  - python-passlib
-  - sudo
-  - whois
-  - tomcat7
-  - tomcat7-admin
-  - tomcat7-user
-  - apache2
-  - libapache2-mod-shib2
-  RedHat: []
-
-# Java packages
-java:
-  Debian:
-  - oracle-java8-installer
-  - oracle-java8-set-default
-  - oracle-java8-unlimited-jce-policy
+ Debian:
+   - git
+   - libswitch-perl
+   - liblwp-authen-negotiate-perl
+   - libjson-any-perl
+   - libtext-asciitable-perl
+   - libterm-readkey-perl
+   - libwww-perl
+   - libcrypt-ssleay-perl
+   - libtext-unidecode-perl
+   - libdate-calc-perl
+   - libnet-ldap-perl
+   - ldap-utils
+   - ntp
+   - rsync
+   - python-passlib
+   - sudo
+   - whois
+   - apache2
+   - libapache2-mod-shib2

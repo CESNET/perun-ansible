@@ -1,10 +1,10 @@
 ---
 # vars file for tomcat-perun
-tomcat7_packages:
+tomcat8_packages:
   Debian:
-    - tomcat7
-    - tomcat7-admin
-    - tomcat7-user
+    - tomcat8
+    - tomcat8-admin
+    - tomcat8-user
   RedHat: []
 
 python_packages:

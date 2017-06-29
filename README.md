@@ -30,7 +30,7 @@ This repository serves for easier deployment of Perun server with default config
 ## Set Local variables
 
 - Set variables and paths to your certificates in file **./group_vars/perun-servers.yml**
-- **Copy your certificates for Apache to Perun server (paths you defined in previous step). User tomcat7 should have access to these certificates!**
+- **Copy your certificates for Apache to Perun server (paths you defined in previous step). User tomcat8 should have access to these certificates!**
 
 ## Download Oracle DB drivers
 
