@@ -4,4 +4,15 @@
 # ansible_distribution - Debian means Debian
 # ansible_distribution_major_version - OS version, e.g. "8"
 # ansible_distribution_release - e.g. "jessie"
-- include: "{{ ansible_os_family }}.yml"
+
+# Debian 7 has only Apache 2.2 and Shibboleth 2.5, which have incopatible config files with Apache 2.4 and Shibboleth 2.6
+- name: Require Debian 8,9
+  assert:
+    that:
+      - ansible_distribution == "Debian"
+      - ansible_distribution_major_version in ["8","9"]
+    msg: "Only Debian 8,9 are supported"
+# specific tasks
+- include: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+# common tasks
+- include: "{{ ansible_distribution }}.yml"

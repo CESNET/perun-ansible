@@ -1,29 +1,23 @@
 ---
 # Task file for tomcat installation on Debian distribution
 
-- name: Install tomcat7 packages
-  package:
-    name: "{{ item }}"
-    state: latest
-  with_items: "{{ tomcat7_packages[ansible_os_family ]}}"
-
-- name: Add user tomcat7 to group perun
+- name: Add user tomcat8 to group perun
   user:
-    name: tomcat7
+    name: tomcat8
     groups: perun
     append: yes
 
-- name: Disable autostart of system-wide tomcat when machine is rebooted
-  service:
-    enabled: no
-    name: tomcat7
+#- name: Disable autostart of system-wide tomcat when machine is rebooted
+#  service:
+#    enabled: no
+#    name: tomcat8
 
 - name: Copy tomcat-users.xml and server.xml to tomcat 
   template:
     src: "{{ item }}.j2"
-    dest: "/etc/tomcat7/{{ item }}"
+    dest: "/etc/tomcat8/{{ item }}"
     mode: 0640
-    group: tomcat7
+    group: tomcat8
   with_items:
     - server.xml
     - tomcat-users.xml
@@ -39,18 +33,38 @@
 - name: Export certificate of machine (Apache) into format .p12
   command: openssl pkcs12 -passout "file:/home/{{ perun_login }}/input.txt" -export -out "{{ apache_p12_file }}" -in "{{ apache_certificate_file }}" -inkey "{{ apache_certificate_key_file }}"
 
+- name: make p12 file readable by tomcat
+  file:
+    path: "{{ apache_p12_file }}"
+    state: file
+    group: tomcat8
+    mode: 0640
+
 - name: Delete temporary password file for tomcat certificate
   file:
     path: "/home/{{ perun_login }}/input.txt"
     state: absent
 
-- name: Copy tomcat7 configuration to remote
+- name: Copy tomcat8 configuration to remote
   template:
-    src: tomcat7.j2
-    dest: "/etc/default/tomcat7"
+    src: tomcat8.j2
+    dest: "/etc/default/tomcat8"
     mode: 0644
+
+- name: create dirs to stop tomcat complaining
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+     - /var/lib/tomcat8/common/classes
+     - /var/lib/tomcat8/server/classes
+     - /var/lib/tomcat8/shared/classes
+     - /usr/share/tomcat8/common/classes
+     - /usr/share/tomcat8/server/classes
+     - /usr/share/tomcat8/shared/classes
+
 
 - name: Restart Tomcat
   service:
     state: restarted
-    name: tomcat7
+    name: tomcat8

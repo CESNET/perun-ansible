@@ -1,0 +1,60 @@
+---
+- name: Require Debian 8
+  assert:
+    that:
+      - ansible_distribution == "Debian" 
+      - ansible_distribution_major_version == "8" 
+    msg: "Debian 8 specific tasks"
+
+- name: Add jessie-backports repository
+  apt_repository:
+    repo: 'deb http://http.debian.net/debian jessie-backports main'
+    filename: 'jessie-backports'
+    state: present
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "8"
+
+- name: apt-get update
+  apt:
+    update_cache: yes
+    cache_valid_time: 900
+
+- name: Install Java8 from backports
+  apt:
+    name:
+      - openjdk-8-jdk
+    state: latest
+    default_release: jessie-backports
+
+- name: Install Maven from backports
+  apt:
+    name: maven
+    state: latest
+    default_release: jessie-backports
+
+- name: Switch default java to JDK 8
+  shell: "/usr/sbin/update-java-alternatives -s java-1.8.0-openjdk-amd64"
+
+- name: Remove JDK 7
+  apt:
+    name:
+      - openjdk-7-jre-headless
+    state: absent
+    purge: yes
+
+- name: Install tomcat8 from backports
+  apt:
+    name:
+      - tomcat8
+      - tomcat8-admin
+      - tomcat8-user
+      - libservlet3.1-java
+    state: latest
+    default_release: jessie-backports
+
+- name: Install Shibboleth from backports
+  apt:
+    name: libapache2-mod-shib2
+    state: latest
+    default_release: jessie-backports
+
+...

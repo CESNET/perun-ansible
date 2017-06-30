@@ -1,5 +1,7 @@
 ---
 # Main perun orchestration playbook
+# you can run a specific part using tags, e.g.:
+#  ansible-playbook -i inventories/prod --ask-become-pass --ask-vault-pass site.yml --tags engine-perun
 - hosts: perun-servers
   pre_tasks:
   - name: Pull in site-specific passwords
@@ -11,6 +13,7 @@
         - "."
         - "group_vars"
         - "site_vars"
+    tags: ['perun','config-perun','apache','tomcat','db','build-perun','engine-perun','wui-perun']
   roles:
     # NECESSARY ROLES
     # ---------------

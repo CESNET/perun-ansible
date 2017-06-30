@@ -9,6 +9,7 @@ apache_modules:
     - proxy
     - proxy_ajp
     - rewrite
+    - shib2
 apache_service:
   Debian: apache2
 
