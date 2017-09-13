@@ -18,12 +18,13 @@
     shell: /bin/bash
     update_password: always
 
-- name: "Add {{ perun_login }} user to sudoers"
-  lineinfile:
-    dest: /etc/sudoers
-    state: present
-    regexp: "^%{{ perun_login }}"
-    line: "%{{ perun_login }} ALL=(ALL:ALL) ALL"
+# This is a security hole! Allows any user in group perun become root.
+#- name: "Add {{ perun_login }} user to sudoers"
+#  lineinfile:
+#    dest: /etc/sudoers
+#    state: present
+#    regexp: "^%{{ perun_login }}"
+#    line: "%{{ perun_login }} ALL=(ALL:ALL) ALL"
 
 - name: Clone git repository of perun sources to remote server
   become: yes

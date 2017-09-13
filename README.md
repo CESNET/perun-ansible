@@ -30,7 +30,7 @@ This repository serves for easier deployment of Perun server with default config
 ## Set Local variables
 
 - Set variables and paths to your certificates in file **./group_vars/perun-servers.yml**
-- **Copy your certificates for Apache to Perun server (paths you defined in previous step). User tomcat8 should have access to these certificates!**
+- **Copy your certificates for Apache to Perun server (paths you defined in previous step).**
 
 ## Download Oracle DB drivers
 
@@ -69,6 +69,8 @@ Now you need to do stuff, which is not handled by Ansible script:
   - The truststore have to contain certificates of servers, which are contacted by Perun. More precisely, chain of their parent certificates (if they are not distributed with Java / browser). Keytool is used to add them:
   - `keytool -keystore /home/perun/.truststore -importcert -trustcacerts -file /tmp/file_with_cert -alias [cert alias, e.g. rt4.cesnet.cz]`
 
-- **Install slave scripts**
-  - For example: `apt-get install perun-slave-process-passwd` for installation of **passwd service**
-  - For **all services**: `apt-get install perun-slave-full`
+- **Install slave scripts at slave machines**
+  - The slave scripts should be installed at the machines that Perun will control, not at the Perun server!
+  - Add APT repository by creating file /etc/apt/sources.list.d/meta_repo.list containing the line `deb ftp://repo.metacentrum.cz/ all main pilot` and run `apt-get update`
+  - Install slave scripts for each nedeed service, e.g.: `apt-get install perun-slave-process-passwd` for installation of **passwd service**
+  - For **all services** install meta package perun-slave-full: `apt-get install perun-slave-full`
