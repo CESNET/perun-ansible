@@ -23,9 +23,6 @@ ShibCompatValidUser on
   ErrorDocument 500 /maintenance/500.html
   ErrorDocument 503 /maintenance/503.html
 
-  # mod_auth_kerb bug workaround
-  KeepAlive off
-
   #### SSL
 
   SSLEngine on
@@ -37,28 +34,14 @@ ShibCompatValidUser on
   SSLCertificateChainFile {{ apache_certificate_chain_file }}
   {% endif %}
 
-
   SSLVerifyClient optional
   SSLVerifyDepth 5
-  SSLProtocol All -SSLv2 -SSLv3
 
   # Make sure certs are exported in old DN format stored in Perun
   SSLOptions +LegacyDNStringFormat
 
-  SSLHonorCipherOrder On
-  #SSLCipherSuite EECDH+AES:EDH+AES:-SHA1:EECDH+RC4:EDH+RC4:RC4-SHA:EECDH+AES256:EDH+AES256:AES256-SHA:!aNULL:!eNULL:!EXP:!LOW:!MD5
-  SSLCipherSuite ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS
-
-  SSLProxyEngine On
-
   # Note: sometimes, buffer size must be set also in Tomcat and must be lower then this value.
   ProxyIOBufferSize 32192
-
-  BrowserMatch "MSIE [2-6]" \
-  nokeepalive ssl-unclean-shutdown \
-  downgrade-1.0 force-response-1.0
-  # MSIE 7 and newer should be able to use keepalive
-  BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
 
   #### SECURITY
 
@@ -67,7 +50,7 @@ ShibCompatValidUser on
   # FIX: Clickjacking
   Header always set X-Frame-Options DENY
   # FIX: HSTS Missing From HTTPS Server
-  Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+  Header always set Strict-Transport-Security "max-age=63072000"
 
   #### REWRITE
 
