@@ -1,5 +1,3 @@
 ---
 # tasks file for ldap-perun
 - include: "install-{{ ansible_os_family }}.yml"
-- meta: flush_handlers
-- include: "configure-{{ ansible_os_family }}.yml"

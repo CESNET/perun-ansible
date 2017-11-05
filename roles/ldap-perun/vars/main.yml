@@ -3,6 +3,8 @@
 prerequisites:
   Debian:
     - slapd
+    - ldap-utils
+    - python-ldap
   RedHat: []
 
 slapd_service:
@@ -14,3 +16,6 @@ ssl_conf_dir:
   RedHat: []
 
 temporary_dir_path: "/home/{{ perun_login }}/openldap"
+
+slapd_basedn: '{{ "dc=" + slapd_domain.split(".") | join(",dc=") }}'
+slapd_basedn_admin: '{{ "cn=admin," + slapd_basedn }}'

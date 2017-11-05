@@ -1,59 +1,85 @@
 ---
 # Task file for installation of LDAP in Debian distribution
 
-# Debian installation of slapd package
-- name: Install slapd package # command "dpkg-reconfigure slapd" to change configuration
+- name: Configure domain for OpenLDAP
+  debconf:
+    name: 'slapd'
+    question: '{{ item }}'
+    vtype: 'string'
+    value: '{{ slapd_domain }}'
+  with_items: [ 'slapd/domain', 'shared/organization' ]
+
+- name: Configure database backend for OpenLDAP in debconf
+  debconf:
+    name: 'slapd'
+    question: 'slapd/backend'
+    vtype: 'string'
+    value: 'MDB'
+
+- name: Install prerequisites
   package:
     name: "{{ item }}"
     state: present
   with_items: "{{prerequisites[ansible_os_family]}}"
 
-# SSL configuration ldif
-- name: SSL configuration ldif in /etc/ldap/ssl.ldif
-  template:
-    src: ssl_ldif.j2
-    dest: "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
-    owner: openldap
-    group: openldap
-    mode: 0640
+- name: Generate the root password for ldap
+  shell: slappasswd -s {{ password_ldap_olcDatabase }}
+  register: root_password
+
+- name: Make sure we have olcDatabase schema
+  ldap_entry:
+    dn: olcDatabase={1}mdb,cn=config
+    objectClass: olcSchemaConfig
+
+- name: Set up olcDatabase schema
+  ldap_attr:
+    dn: olcDatabase={1}mdb,cn=config
+    name: "{{ item.key }}"
+    values: "{{ item.value }}"
+    state: exact
+  with_dict:
+    olcSuffix: "{{ slapd_basedn }}"
+    olcRootDN: "{{ slapd_basedn_admin }}"
+    olcRootPW: "{{ root_password.stdout }}"
 
 - name: Change group of openldap user to ssl-cert
   user:
     name: openldap
     groups: openldap,ssl-cert
 
-- name: Change group of LDAP CA certificate file to openldap
+- name: Change group of certificate files/key to openldap
   file:
-    path: "{{ ldap_ca_certificate_file }}"
+    path: "{{ item }}"
     group: ssl-cert
     owner: "{{ perun_login }}"
+  with_items:
+    - "{{ ldap_certificate_file }}"
+    - "{{ ldap_ca_certificate_file }}"
+    - "{{ ldap_certificate_key_file }}"
 
-- name: Change group of LDAP certificate file to openldap
-  file:
-    path: "{{ ldap_certificate_file }}"
-    group: ssl-cert
-    owner: "{{ perun_login }}"
-
-- name: Change group of LDAP certificate key file to openldap
-  file:
-    path: "{{ ldap_certificate_key_file }}"
-    group: ssl-cert
-    owner: "{{ perun_login }}"
-
-- name: debug service name
-  debug:
-    var: slapd_service[ansible_os_family]
-
-- name: Restart LDAP
-  service:
-    state: restarted
-    enabled: yes
-    name: "{{ slapd_service[ansible_os_family] }}"
-
-- name: Execute ssl.ldif as root
-  command: ldapmodify -Y EXTERNAL -H ldapi:/// -f "{{ ssl_conf_dir[ansible_os_family] }}/ssl.ldif"
-
-
+- name: Configure LDAP Core TLS Settings
+  ignore_errors: True
+  ldap_attr:
+    dn: "cn=config"
+    name: "{{ item.key }}"
+    values: "{{ item.value }}"
+    state: exact
+  with_dict:
+    olcTLSCertificateKeyFile: "{{ ldap_certificate_key_file }}"
+    olcTLSCACertificateFile: "{{ ldap_ca_certificate_file }}"
+    olcTLSCertificateFile: "{{ ldap_certificate_file }}"
+    
+- name: Configure LDAP Core TLS Settings (again, because of violation of requirements in configuration)
+  ldap_attr:
+    dn: "cn=config"
+    name: "{{ item.key }}"
+    values: "{{ item.value }}"
+    state: exact
+  with_dict:
+    olcTLSCertificateKeyFile: "{{ ldap_certificate_key_file }}"
+    olcTLSCACertificateFile: "{{ ldap_ca_certificate_file }}"
+    olcTLSCertificateFile: "{{ ldap_certificate_file }}"
+    
 - name: Enable secure port in /etc/default/slapd
   lineinfile:
    dest: /etc/default/slapd
@@ -61,73 +87,100 @@
    line: SLAPD_SERVICES="ldaps:/// ldapi:///"
   notify: Restart LDAP
 
+- name: Make sure we have perun schema
+  ldap_entry:
+    dn: cn={4}perun,cn=schema,cn=config
+    objectClass: olcSchemaConfig
 
-- name: Create temporary directory for temporary LDAP files
-  file:
-    state: directory
-    path: "{{ temporary_dir_path }}"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0755
+- name: Set up olcAttributeTypes attribute in perun schema 
+  ldap_attr:
+    dn: cn={4}perun,cn=schema,cn=config
+    state: exact
+    name: olcAttributeTypes
+    values:
+      - >-
+        {0}( 1.3.6.1.4.1.8057.2.80.1 NAME 'perunUserId' DESC 'Unique user identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {1}( 1.3.6.1.4.1.8057.2.80.2 NAME 'perunGroupId' DESC 'Unique group identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {2}( 1.3.6.1.4.1.8057.2.80.3 NAME 'perunVoId' DESC 'Unique VO identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {3}( 1.3.6.1.4.1.8057.2.80.16 NAME 'perunResourceId' DESC 'Unique resource identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {4}( 1.3.6.1.4.1.8057.2.80.17 NAME 'perunFacilityId' DESC 'Unique facilityId identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {5}( 1.3.6.1.4.1.8057.2.80.12 NAME 'isServiceUser' DESC 'If user is Service User then 1, else 0' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {6}( 1.3.6.1.4.1.8057.2.80.11 NAME 'assignedToResourceId' DESC 'Identifier of resource which is group assigned to.' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {7}( 1.3.6.1.4.1.8057.2.80.18 NAME 'assignedGroupId' DESC 'Identifier of group which is assigned to this resource' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {8}( 1.3.6.1.4.1.8057.2.84.7 NAME 'preferredMail' DESC 'RFC1274: RFC822 Mailbox' EQUALITY caseIgnoreIA5Match SUBSTR caseIgnoreIA5SubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+      - >-
+        {9}( 1.3.6.1.4.1.8057.2.80.9 NAME 'login' DESC 'User login for namespace' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+      - >-
+        {10}( 1.3.6.1.4.1.8057.2.80.14 NAME 'perunUniqueGroupName' DESC 'uniqueName of group like "VoName:ParentGroupName:GroupName"' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {11}( 1.3.6.1.4.1.8057.2.80.10 NAME 'eduPersonPrincipalNames' DESC 'User ExtLogin for UserExtSource with Type IDP' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {12}( 1.3.6.1.4.1.11433.2.2.1.9 NAME 'userCertificateSubject' SUP name)
+      - >-
+        {13}( 1.3.6.1.4.1.8057.2.80.8 NAME 'perunParentGroupId' DESC 'identifier (perunGroupId) of the parent group as managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {14}( 1.3.6.1.4.1.8057.2.80.13 NAME 'perunParentGroup' DESC 'Dn of the parentGroup' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+      - >-
+        {15}( 1.3.6.1.4.1.8057.2.80.19 NAME 'memberOfPerunVo' DESC 'Identifier of vo where user has member' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
 
-- name: Copy perun.ldif to remote server
-  template:
-    src: "perun_ldif.j2"
-    dest: "{{ temporary_dir_path }}/perun.ldif"
-    owner: openldap
-    group: openldap
-    mode: 0640
+- name: Set up olcObjectClasses attribute in perun schema 
+  ldap_attr:
+    dn: cn={4}perun,cn=schema,cn=config
+    state: exact
+    name: olcObjectClasses
+    values:
+      - >-
+        {0}( 1.3.6.1.4.1.8057.2.80.4 NAME 'perunUser' DESC 'User managed by Perun' SUP inetOrgPerson STRUCTURAL MUST ( perunUserId $ isServiceUser ) MAY ( preferredMail $ userCertificateSubject $ uidNumber $ login $ eduPersonPrincipalNames $ userPassword $ memberOfPerunVo ) )
+      - >-
+        {1}( 1.3.6.1.4.1.8057.2.80.5 NAME 'perunGroup' DESC 'Group managed by Perun' SUP groupOfUniqueNames STRUCTURAL MUST ( perunGroupId $ perunVoId $ perunUniqueGroupName ) MAY ( perunParentGroup $ perunParentGroupId $ assignedToResourceId ) )
+      - >-
+        {2}( 1.3.6.1.4.1.8057.2.80.6 NAME 'perunVO' DESC 'VO managed by Perun' SUP organization STRUCTURAL MUST perunVoId MAY uniqueMember )
+      - >-
+        {3}( 1.3.6.1.4.1.8057.2.80.15 NAME 'perunResource' DESC 'Resource managed by Perun' SUP groupOfUniqueNames STRUCTURAL MUST ( perunResourceId $ perunVoId $ perunFacilityId ) MAY assignedGroupId )
 
-- name: Copy inetuser.ldif to remote server
-  template:
-    src: "inetuser_ldif.j2"
-    dest: "{{ temporary_dir_path }}/inetuser.ldif"
-    owner: openldap
-    group: openldap
-    mode: 0640
+- name: Make sure we have inetUser schema
+  ldap_entry:
+    dn: cn={5}inetUser,cn=schema,cn=config
+    objectClass: olcSchemaConfig
 
-- name: Copy init-perun.ldif to remote server
-  template:
-    src: "init_perun_ldif.j2"
-    dest: "{{ temporary_dir_path }}/init-perun.ldif"
-    owner: openldap
-    group: openldap
-    mode: 0640
+- name: Set up olcAttributeTypes attribute in inetUser schema 
+  ldap_attr:
+    dn: cn={5}inetUser,cn=schema,cn=config
+    state: exact
+    name: olcAttributeTypes
+    values:
+      - >-
+        {0}( 1.2.840.113556.1.2.102 NAME 'memberOf' DESC 'Group that the entry belongs to' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 X-ORIGIN 'Netscape Delegated Administrator' )
+      - >-
+        {1}( 2.16.840.1.113730.3.1.692 NAME 'inetUserStatus' DESC '"active", "inactive", or "deleted" status of a user' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Netscape subscriber interoperability' )
+      - >-
+        {2}( 2.16.840.1.113730.3.1.693 NAME 'inetUserHttpURL' DESC 'A users Web addresses' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Netscape subscriber interoperability' )
 
-- name: Execute files with ldapadd
-  command: ldapadd -Y EXTERNAL -H ldapi:/// -f {{ item }}
-  args:
-    chdir: "{{ temporary_dir_path }}"
-  with_items:
-    - perun.ldif
-    - inetuser.ldif
-  ignore_errors: true
-  register: ldapadd
-  notify: Restart LDAP
+- name: Set up olcObjectClasses attribute in inetUser schema 
+  ldap_attr:
+    dn: cn={5}inetUser,cn=schema,cn=config
+    state: exact
+    name: olcObjectClasses
+    values: "{0}( 2.16.840.1.113730.3.2.130 NAME 'inetUser' DESC 'Auxiliary class which must be present in an entry for delivery of subscriber services' SUP top AUXILIARY MAY ( uid $ inetUserStatus $ inetUserHTTPURL $ userPassword $ memberOf ) X-ORIGIN 'Netscape subscriber interoperability' )"
 
-- name: debug ldap add
-  debug:
-    var: ldapadd
+- name: Make sure we have an initial parent entry for Perun
+  ldap_entry:
+    dn: "{{ slapd_basedn }}"
+    objectClass: dcObject
 
-- name: Generate the root password for ldap
-  shell: slappasswd -s {{ password_ldap_root }}
-  register: root_password
-
-# Dependency on root_password variable registered from slappasswd command
-- name: Copy settings.ldif to remote server
-  template:
-    src: "settings_ldif.j2"
-    dest: "{{ temporary_dir_path }}/settings.ldif"
-    owner: openldap
-    group: openldap
-    mode: 0640
-
-- name: Execute file init-perun.ldif
-  command: ldapadd -Y EXTERNAL -H ldapi:/// -f {{ item }}
-  args:
-    chdir: "{{ temporary_dir_path }}"
-  with_items:
-    - settings.ldif
-    #- init-perun.ldif
-  ignore_errors: true
-  notify: Restart LDAP
+- name: Make organizational unit for People
+  ldap_entry:
+    dn: ou=People,dc=example,dc=com
+    objectClass: organizationalUnit
+    attributes:
+      description: Perun Management System
+    bind_dn: "{{ slapd_basedn_admin }}"
+    bind_pw: "{{ password_ldap_olcDatabase }}"
