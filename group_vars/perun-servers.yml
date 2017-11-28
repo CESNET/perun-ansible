@@ -42,6 +42,16 @@ apache_certificate_chain_file: ''
 # Path to directory with CA certificates. If you leave it with default value, IGTF certificates will be installed.
 apache_ca_certificate_path: '/etc/grid-security/certificates/'
 
+# LDAP CERTIFICATE
+# Path to LDAP certificate file (olcTLSCertificateFile).
+ldap_certificate_file: "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+# Path to key for LDAP certificate file (olcTLSCertificateKeyFile).
+ldap_certificate_key_file: "/etc/perun/ssl/ssl-cert-snakeoil.key"
+# Path to CA LDAP certificate file (olcTLSCACertificateFile).
+ldap_ca_certificate_file: "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+
+# LDAP DOMAIN
+slapd_domain: 'example.com'
 
 # ORACLE DB DRIVERS
 # Path to ojdbc8 file on your system with Ansible
