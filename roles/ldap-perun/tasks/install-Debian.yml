@@ -41,6 +41,7 @@
     olcSuffix: "{{ slapd_basedn }}"
     olcRootDN: "{{ slapd_basedn_admin }}"
     olcRootPW: "{{ root_password.stdout }}"
+  notify: Restart LDAP
 
 - name: Change group of openldap user to ssl-cert
   user:
@@ -178,7 +179,7 @@
 
 - name: Make organizational unit for People
   ldap_entry:
-    dn: ou=People,dc=example,dc=com
+    dn: "ou=People,{{ slapd_basedn }}"
     objectClass: organizationalUnit
     attributes:
       description: Perun Management System

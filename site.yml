@@ -34,4 +34,4 @@
     # This role will deploy new web user interface of Perun on your server.
     - { role: wui-perun, become: true, tags: wui-perun}
     # This role will deploy new LDAP server configuration.
-    - { role: ldap-perun, become: true, tags: wui-perun}
+    - { role: ldap-perun, become: true, tags: ldap-perun}
