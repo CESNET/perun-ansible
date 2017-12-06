@@ -34,9 +34,6 @@ ShibCompatValidUser on
   SSLCertificateChainFile {{ apache_certificate_chain_file }}
   {% endif %}
 
-  SSLVerifyClient optional
-  SSLVerifyDepth 5
-
   # Make sure certs are exported in old DN format stored in Perun
   SSLOptions +LegacyDNStringFormat
 
