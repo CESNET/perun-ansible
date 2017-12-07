@@ -123,8 +123,6 @@
 
 # Rehash certificates for user identification
 - name: Use c_rehash to your certificates
-  become: yes
-  become_user: "{{ perun_login }}"
   command: c_rehash .
   args:
     chdir: "{{ apache_ca_certificate_path }}"
