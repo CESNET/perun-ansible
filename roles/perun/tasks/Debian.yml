@@ -17,6 +17,7 @@
     password: "{{ password_user_hash.stdout }}"
     shell: /bin/bash
     update_password: always
+    system: yes
 
 # This is a security hole! Allows any user in group perun become root.
 #- name: "Add {{ perun_login }} user to sudoers"

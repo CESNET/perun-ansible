@@ -1,14 +1,8 @@
 ---
 # vars file for configuration-perun
 
-# Main Perun folder
-perun_config_dir: /etc/perun
-
 # Perun folder for SSL certificates
 perun_ssl_dir: "{{ perun_config_dir }}/ssl"
-
-# Variables log folder for Perun
-perun_log_dir: /var/log/perun
 
 # Owner of configuration files
 config_files_owner: "{{ perun_login }}"
@@ -67,3 +61,11 @@ perun_web_gui_properties_file: "{{ perun_config_dir }}/perun-web-gui.properties"
 # Template file and destination in remote system for perun-extSources.xml
 perun_ext_sources_xml_template: perun_extSources_xml.j2
 perun_ext_sources_xml_file: "{{ perun_config_dir }}/perun-extSources.xml"
+
+# Template file and destination in remote system for perun-ldapc.properties
+perun_ldapc_properties_template: perun_ldapc_properties.j2
+perun_ldapc_properties_file: "{{ perun_config_dir }}/perun-ldapc.properties"
+
+# Template file and destination in remote system for logback-ldapc.xml
+logback_ldapc_xml_template: logback_ldapc_xml.j2
+logback_ldapc_xml_file: "{{ perun_config_dir }}/logback-ldapc.xml"
