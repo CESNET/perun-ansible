@@ -10,13 +10,20 @@
   shell: mkpasswd -m sha-512 "{{ password_user | default (lookup('password')) }}"
   register: password_user_hash
 
+- name: "Create {{ perun_group }} group"
+  group:
+    name: "{{ perun_group }}"
+    system: yes
+    
 - name: "Create {{ perun_login }} user"
   user:
     name: "{{ perun_login }}"
+    group: "{{ perun_group }}"
     comment: "{{ perun_name }}"
     password: "{{ password_user_hash.stdout }}"
     shell: /bin/bash
     update_password: always
+    system: yes
 
 # This is a security hole! Allows any user in group perun become root.
 #- name: "Add {{ perun_login }} user to sudoers"
