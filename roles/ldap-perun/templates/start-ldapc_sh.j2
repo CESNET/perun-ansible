@@ -1,0 +1,27 @@
+#!/bin/bash
+
+LAST_PROCESSED_ID=$1
+
+PIDFILE={{ perun_ldapc_folder }}/pid
+JAR={{ ldapc_jar }}
+LOGFILE={{ ldapc_log_file }}
+LOGFILE_CONF={{ ldapc_config_file }}
+
+# Kill running ldapc
+if [ -s $PIDFILE ]; then
+  PID=`cat $PIDFILE`
+  if [ -d "/proc/$PID" ]; then
+    kill $PID
+  fi
+fi
+
+cd {{ perun_ldapc_folder }}
+
+if [ $LAST_PROCESSED_ID ]; then
+  java "-Dlogback.configurationFile=$LOGFILE_CONF" -jar $JAR $LAST_PROCESSED_ID >> $LOGFILE 2>&1  &
+else
+  java "-Dlogback.configurationFile=$LOGFILE_CONF" -jar $JAR >> $LOGFILE 2>&1  &
+fi
+
+# Save the PID
+echo $! > $PIDFILE

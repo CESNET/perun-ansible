@@ -1,0 +1,43 @@
+---
+# Task file for installation of LDAPc in Debian distribution
+
+- name: Create perun-ldapc folder in perun's home repository
+  file:
+    path: "{{ perun_ldapc_folder }}"
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0755
+
+#- name: Copy builded perun-ldapc jar file to perun-ldapc repository
+#  command: cp "{{ ldapc_jar_origin }}" "{{ perun_ldapc_folder }}"
+
+#- name: Copy builded perun-ldapc-initializer jar file to perun-ldapc repository
+#  command: cp "{{ ldapc_init_jar_origin }}" "{{ perun_ldapc_folder }}"
+
+- name: Copy builded perun-ldapc jar file to perun-ldapc repository
+  copy:
+    src: "{{ ldapc_jar_origin }}"
+    dest: "{{ perun_ldapc_folder }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    remote_src: yes
+    mode: 0644
+
+- name: Copy builded perun-ldapc-initializer jar file to perun-ldapc repository
+  copy:
+    src: "{{ ldapc_init_jar_origin }}"
+    dest: "{{ perun_ldapc_folder }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    remote_src: yes
+    mode: 0644
+
+- name: Copy scripts and ldif for ldapc
+  template:
+    src: "{{ item.value.template }}"
+    dest: "{{ item.value.path }}"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: "{{ item.value.mode }}"
+  with_dict: "{{ script_files }}"

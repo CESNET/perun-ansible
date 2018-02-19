@@ -23,15 +23,24 @@
   with_items: "{{prerequisites[ansible_os_family]}}"
 
 - name: Generate the root password for ldap
-  shell: slappasswd -s {{ password_ldap_olcDatabase }}
+  shell: slappasswd -s {{ password_ldap_data_tree }}
   register: root_password
 
-- name: Make sure we have olcDatabase schema
-  ldap_entry:
-    dn: olcDatabase={1}mdb,cn=config
-    objectClass: olcSchemaConfig
+- name: Generate the password for config admin
+  shell: slappasswd -s {{ password_ldap_config }}
+  register: config_admin_password_hash
 
-- name: Set up olcDatabase schema
+- name: Set up admin to manage config
+  ldap_attr:
+    dn: olcDatabase={0}config,cn=config
+    name: "{{ item.key }}"
+    values: "{{ item.value }}"
+    state: exact
+  with_dict:
+    olcRootPW: "{{ config_admin_password_hash.stdout }}"
+  notify: Restart LDAP
+
+- name: Set up admin to manage data tree
   ldap_attr:
     dn: olcDatabase={1}mdb,cn=config
     name: "{{ item.key }}"
@@ -85,7 +94,7 @@
   lineinfile:
    dest: /etc/default/slapd
    regexp: ^SLAPD_SERVICES=
-   line: SLAPD_SERVICES="ldaps:/// ldapi:///"
+   line: SLAPD_SERVICES="ldaps:/// ldapi:/// ldap://127.0.0.1/"
   notify: Restart LDAP
 
 - name: Make sure we have perun schema
@@ -93,7 +102,7 @@
     dn: cn={4}perun,cn=schema,cn=config
     objectClass: olcSchemaConfig
 
-- name: Set up olcAttributeTypes attribute in perun schema 
+- name: Set up olcAttributeTypes attribute in perun schema
   ldap_attr:
     dn: cn={4}perun,cn=schema,cn=config
     state: exact
@@ -102,13 +111,13 @@
       - >-
         {0}( 1.3.6.1.4.1.8057.2.80.1 NAME 'perunUserId' DESC 'Unique user identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
-        {1}( 1.3.6.1.4.1.8057.2.80.2 NAME 'perunGroupId' DESC 'Unique group identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+        {1}( 1.3.6.1.4.1.8057.2.80.16 NAME 'perunResourceId' DESC 'Unique resource identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
-        {2}( 1.3.6.1.4.1.8057.2.80.3 NAME 'perunVoId' DESC 'Unique VO identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+        {2}( 1.3.6.1.4.1.8057.2.80.17 NAME 'perunFacilityId' DESC 'Unique facilityId identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
-        {3}( 1.3.6.1.4.1.8057.2.80.16 NAME 'perunResourceId' DESC 'Unique resource identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+        {3}( 1.3.6.1.4.1.8057.2.80.2 NAME 'perunGroupId' DESC 'Unique group identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
-        {4}( 1.3.6.1.4.1.8057.2.80.17 NAME 'perunFacilityId' DESC 'Unique facilityId identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+        {4}( 1.3.6.1.4.1.8057.2.80.3 NAME 'perunVoId' DESC 'Unique VO identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
         {5}( 1.3.6.1.4.1.8057.2.80.12 NAME 'isServiceUser' DESC 'If user is Service User then 1, else 0' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
@@ -124,28 +133,40 @@
       - >-
         {11}( 1.3.6.1.4.1.8057.2.80.10 NAME 'eduPersonPrincipalNames' DESC 'User ExtLogin for UserExtSource with Type IDP' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
       - >-
-        {12}( 1.3.6.1.4.1.11433.2.2.1.9 NAME 'userCertificateSubject' SUP name)
+        {12}( 1.3.6.1.4.1.11433.2.2.1.9 NAME 'userCertificateSubject' DESC 'User certificate subject' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
       - >-
         {13}( 1.3.6.1.4.1.8057.2.80.8 NAME 'perunParentGroupId' DESC 'identifier (perunGroupId) of the parent group as managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
       - >-
         {14}( 1.3.6.1.4.1.8057.2.80.13 NAME 'perunParentGroup' DESC 'Dn of the parentGroup' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
       - >-
         {15}( 1.3.6.1.4.1.8057.2.80.19 NAME 'memberOfPerunVo' DESC 'Identifier of vo where user has member' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {16}( 1.3.6.1.4.1.8057.2.80.20 NAME 'libraryIDs' DESC 'IDs of library and users in external library system' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {17}( 1.3.6.1.4.1.8057.2.80.21 NAME 'entityID' DESC 'ID of entity in Resource' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {18}( 1.3.6.1.4.1.8057.2.80.22 NAME 'isSponsoredUser' DESC 'If user is Sponsored User then 1, else 0' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {19}( 1.3.6.1.4.1.8057.2.80.23 NAME 'schacHomeOrganizations' DESC 'Home organizations of the user in Perun' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {20}( 1.3.6.1.4.1.8057.2.80.24 NAME 'eduPersonScopedAffiliations' DESC 'EDU Person scoped affilations' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {21}( 1.3.6.1.4.1.8057.2.80.25 NAME 'bonaFideStatus' DESC 'bona fide status' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
 
-- name: Set up olcObjectClasses attribute in perun schema 
+- name: Set up olcObjectClasses attribute in perun schema
   ldap_attr:
     dn: cn={4}perun,cn=schema,cn=config
     state: exact
     name: olcObjectClasses
     values:
       - >-
-        {0}( 1.3.6.1.4.1.8057.2.80.4 NAME 'perunUser' DESC 'User managed by Perun' SUP inetOrgPerson STRUCTURAL MUST ( perunUserId $ isServiceUser ) MAY ( preferredMail $ userCertificateSubject $ uidNumber $ login $ eduPersonPrincipalNames $ userPassword $ memberOfPerunVo ) )
+        {0}( 1.3.6.1.4.1.8057.2.80.4 NAME 'perunUser' DESC 'User managed by Perun' SUP inetOrgPerson STRUCTURAL MUST ( perunUserId $ isServiceUser $ isSponsoredUser ) MAY ( preferredMail $ userCertificateSubject $ uidNumber $ login $ eduPersonPrincipalNames $ userPassword $ memberOfPerunVo $ libraryIDs $ schacHomeOrganizations $ eduPersonScopedAffiliations $ bonaFideStatus ) )
       - >-
-        {1}( 1.3.6.1.4.1.8057.2.80.5 NAME 'perunGroup' DESC 'Group managed by Perun' SUP groupOfUniqueNames STRUCTURAL MUST ( perunGroupId $ perunVoId $ perunUniqueGroupName ) MAY ( perunParentGroup $ perunParentGroupId $ assignedToResourceId ) )
+        {1}( 1.3.6.1.4.1.8057.2.80.5 NAME 'perunGroup' DESC 'Group managed by Perun' SUP top  STRUCTURAL MUST ( cn $ perunGroupId $ perunVoId $ perunUniqueGroupName ) MAY ( uniqueMember $ businessCategory $ seeAlso $ owner $ ou $ o $ description $ perunParentGroup $ perunParentGroupId $ assignedToResourceId ))
       - >-
-        {2}( 1.3.6.1.4.1.8057.2.80.6 NAME 'perunVO' DESC 'VO managed by Perun' SUP organization STRUCTURAL MUST perunVoId MAY uniqueMember )
+        {2}( 1.3.6.1.4.1.8057.2.80.15 NAME 'perunResource' DESC 'Resource managed by Perun' SUP top STRUCTURAL MUST ( cn $  perunResourceId $ perunVoId $ perunFacilityId ) MAY (uniqueMember $ businessCategory $ seeAlso $ owner $ ou $ o $ description $ assignedGroupId  $ entityID) )
       - >-
-        {3}( 1.3.6.1.4.1.8057.2.80.15 NAME 'perunResource' DESC 'Resource managed by Perun' SUP groupOfUniqueNames STRUCTURAL MUST ( perunResourceId $ perunVoId $ perunFacilityId ) MAY assignedGroupId )
+        {3}( 1.3.6.1.4.1.8057.2.80.6 NAME 'perunVO' DESC 'VO managed by Perun' SUP organization STRUCTURAL MUST perunVoId MAY uniqueMember )
 
 - name: Make sure we have inetUser schema
   ldap_entry:
@@ -172,10 +193,19 @@
     name: olcObjectClasses
     values: "{0}( 2.16.840.1.113730.3.2.130 NAME 'inetUser' DESC 'Auxiliary class which must be present in an entry for delivery of subscriber services' SUP top AUXILIARY MAY ( uid $ inetUserStatus $ inetUserHTTPURL $ userPassword $ memberOf ) X-ORIGIN 'Netscape subscriber interoperability' )"
 
+- name: Set olcAttributeOptions attribute
+  ldap_attr:
+    dn: cn=config
+    name: "olcAttributeOptions"
+    values: "ns-x-"
+    state: exact
+
 - name: Make sure we have an initial parent entry for Perun
   ldap_entry:
     dn: "{{ slapd_basedn }}"
     objectClass: dcObject
+    bind_dn: "{{ slapd_basedn_admin }}"
+    bind_pw: "{{ password_ldap_data_tree }}"
 
 - name: Make organizational unit for People
   ldap_entry:
@@ -184,4 +214,23 @@
     attributes:
       description: Perun Management System
     bind_dn: "{{ slapd_basedn_admin }}"
-    bind_pw: "{{ password_ldap_olcDatabase }}"
+    bind_pw: "{{ password_ldap_data_tree }}"
+
+- name: Set indexes (olcDbIndex attribute)
+  ldap_attr:
+    dn: olcDatabase={1}mdb,cn=config
+    name: olcDbIndex
+    values: "{{ item }}"
+    state: present
+  with_items:
+    - cn,uid eq
+    - uidNumber,gidNumber eq
+    - member,memberUid eq
+    - uniqueMember eq
+    - perunVoId eq
+    - eduPersonPrincipalNames eq
+    - entryCSN,entryUUID eq
+    - login eq
+    - memberOfPerunVo eq
+    - userCertificateSubject eq
+  notify: Restart LDAP

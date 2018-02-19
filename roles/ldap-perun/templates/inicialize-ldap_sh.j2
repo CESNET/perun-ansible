@@ -1,0 +1,171 @@
+#!/bin/sh
+
+#############################################################
+## LDAP initialization from PERUN - remove all and add new ##
+#############################################################
+# This one is used when you want to preserve everything     #
+# except data from perun. Script will delete all perun      #
+# data and then add new and actual.                         #
+#                                                           #
+# 1] prepare data for initialization                        #
+# 2] block port 389 and 363 from outside on firewall        #
+# 3] prepare DNs data for deleting old perun data           #
+# 4] create sorted DNs data for deleting old perun data     #
+# 5] delete old perun data by ldapdelete from file with DNs #
+# 6] ldapadd all prepared data from perun (1)               #
+# 7] unblock ports 389 and 636                              #
+#############################################################
+
+# Unblock_ldap - should unblock ports 636 and 389 from outer network (if they are already blocked)
+#
+# - START PUPPET
+# - REMOVE REJECTING RULES FOR 636 a 389 ports if exists
+# - Ends with error if unblocking process ends with error.
+unblock_ldap() {
+	#set reject for IPv4 to IPtables if not exists yet
+        iptables -L INPUT -n -v --line-numbers | grep 389 | grep 636 | grep -q REJECT
+	if [ "$?" -eq "0" ]; then
+		iptables -D INPUT -p tcp -m multiport --dports 389,636 -m comment --comment "Reject ports 636 and 389 from TCP" -j REJECT
+		if [ "$?" -ne "0" ]; then
+			echo "ERROR: Removing REJECT rule (389,636 ports) for IPv4 iptable ends with error! Please check manually status of both (IPv4, IPv6) iptables!" 1>&2
+			exit 12
+		fi
+	else
+		echo "INFO: Rejecting rule for IPv4 not exists, so we can continue without removing it!"
+	fi
+
+	#set reject for IPv6 to IPtables if not exists yet
+        ip6tables -L INPUT -n -v --line-numbers | grep 389 | grep 636 | grep -q REJECT
+	if [ "$?" -eq "0" ]; then
+		ip6tables -D INPUT -p tcp -m multiport --dports 389,636 -m comment --comment "Reject ports 636 and 389 from TCP" -j REJECT
+		if [ "$?" -ne "0" ]; then
+			echo "ERROR: Removing REJECT rule (389,636 ports) for IPv6 iptable ends with error! Please check manually status of both (IPv4, IPv6) iptables!" 1>&2
+			exit 12
+		fi
+        else
+                echo "INFO: Rejecting rule for IPv4 not exists, so we can continue without removing it!"
+        fi	
+
+	#start puppet again
+	puppet-start
+
+	echo "INFO: Puppet started and ports 636 and 389 set to default (not REJECTED by our rules) successfully!"
+}
+
+# Block_ldap - should block ports 636 and 389 from outer network (if they are not blocked yet)
+#
+# - STOP PUPPET
+# - REJECT 636 and 389 from OUT (not localhost) to this server on both IPv6 and IPv4
+# - Ends with error if anything unexpected happens (try to reverse all settings in this case, if it is possible)
+block_ldap() { 
+        #stop puppet, because it would return iptables back in 30 minutes if running 
+        echo "INFO: Stopping puppet!"
+        puppet-stop "Reinicializace LDAP, zmeny v IPtables pro uzavreni portu 389 a 636"
+
+        #set reject for IPv4 to IPtables if not exists yet
+        iptables -L INPUT -n -v --line-numbers | grep 389 | grep 636 | grep -q REJECT
+        if [ "$?" -ne "0" ]; then
+                IP_RULE_4=`iptables -L INPUT -n -v --line-numbers | grep 389 | grep 636 | grep ACCEPT`
+                if [ "$?" -ne "0" ]; then
+                        echo "ERROR: Can't block LDAP ports by automatic because expected line for ipv4 iptables is missing, we need to do it manually or change this mechanic!" 1>&2
+                        #unblock_ldap
+                        exit 10
+                fi
+                IP4_RULE_LINE_NUMBER=`echo "$IP_RULE_4" | awk -F " " '{print $1}'`
+                iptables -I INPUT "$IP4_RULE_LINE_NUMBER" -p tcp -m multiport --dports 389,636 -m comment --comment "Reject ports 636 and 389 from TCP" -j REJECT
+        else
+                echo "INFO: Ports for IPv4 are already rejected, we can continue!"
+        fi
+
+        #set reject for IPv6 to IPtables if not exists yet
+        ip6tables -L INPUT -n -v --line-numbers | grep 389 | grep 636 | grep -q REJECT
+        if [ "$?" -ne "0" ]; then
+                IP_RULE_6=`ip6tables -L INPUT -n -v --line-numbers | grep 389 | grep 636 | grep ACCEPT`
+                if [ "$?" -ne "0" ]; then
+                        echo "ERROR: Can't block LDAP ports by automatic because expected line for ipv6 iptables is missing, we need to do it manually or change this mechanic!" 1>&2
+                        echo "INFO: Starting puppet again!"
+                        #unblock_ldap
+                        exit 11
+                fi
+                IP6_RULE_LINE_NUMBER=`echo "$IP_RULE_6" | awk -F " " '{print $1}'`
+                ip6tables -I INPUT "$IP6_RULE_LINE_NUMBER" -p tcp -m multiport --dports 389,636 -m comment --comment "Reject ports 636 and 389 from TCP" -j REJECT
+        else
+                echo "INFO: Ports for IPv6 are already rejected, we can continue!"
+        fi
+
+        echo "INFO: Puppet stopted and ports 636 and 389 set to REJECT from TCP successfully!"
+}
+
+###
+### This part of code is for initializing of first structure of LDAP
+###
+#ldapadd -x -h localhost -f {{ perun_ldapc_folder }}/init-perun.ldif -D "{{ slapd_basedn_admin }}" -w `grep '^ldap\.password=' {{ perun_config_dir }}/perun-ldapc.properties | sed -e 's/^.*=//'`
+
+echo "Preparing data for initializing ldap, it may take a while..."
+
+PERUN_LDAP_INITIALIZATOR={{ ldapc_init_jar }}
+
+TMP_LDIF=/tmp/ldif.tmp
+TMP_DNS=/tmp/ldap-perun-dns.tmp
+TMP_SORTED_DNS=/tmp/ldap-perun-sorted-dns.tmp
+AUDITER_INFO=/tmp/auditer_info.tmp
+
+OPTIONS=" -Dspring.profiles.default=production"
+
+# Generate tmp file with ldif first
+java $OPTIONS -jar $PERUN_LDAP_INITIALIZATOR $TMP_LDIF 2>$AUDITER_INFO
+if [ $? -ne 0 ]; then
+  echo "Java generating file failed" 1>&2
+  exit 1
+fi
+
+# Test if ldif file really exists
+if [ ! -e $TMP_LDIF ]; then
+  echo "Tmp file with ldif not exists" 1>&2
+  exit 1
+fi
+
+# Set removing temp files on exit
+trap 'rm -r -f "$TMP_LDIF" "$TMP_DNS" "$TMP_SORTED_DNS"' EXIT
+
+# Set IP tables which prevents anyone to connect to the LDAP from the outside
+block_ldap
+
+#Create file with all possible DNs
+ldapsearch -x -h localhost -p 389 -b "{{ slapd_basedn }}" -D "{{ slapd_basedn_admin }}" -w `grep '^ldap\.password=' {{ perun_config_dir }}/perun-ldapc.properties | sed -e 's/^.*=//'` "(|(|(objectClass=perunUser)(objectClass=perunVO))(|(objectClass=perunResource)(objectClass=perunGroup)))" | grep "^dn:" | sed -e 's/^dn: //' > "$TMP_DNS"
+
+if [ $? -ne 0 ]; then
+  echo "Preparing DNs for delete failed. Unblocking LDAP, exit initialization." 1>&2
+  unblock_ldap
+  exit 2
+fi
+
+#create file in reverse variant
+tac "$TMP_DNS" > "$TMP_SORTED_DNS"
+
+#Remove all DNs from LDAP by ldapdelete
+ldapdelete -x -h localhost -p 389 -D "{{ slapd_basedn_admin }}" -w `grep '^ldap\.password=' {{ perun_config_dir }}/perun-ldapc.properties | sed -e 's/^.*=//'` -c -f "$TMP_SORTED_DNS"
+
+if [ $? -ne 0 ]; then
+  echo "Deleting entities from LDAP failded, LDAP stay blocked, exit initialization!" 1>&2
+  #do not unblock LDAP again, because there should be some inconsistence
+  exit 3
+fi
+
+echo "start date" >> $AUDITER_INFO
+date >> $AUDITER_INFO
+
+#insert all data from ldif to ldap
+cat "$TMP_LDIF" | ldapadd -x -h localhost -D "{{ slapd_basedn_admin }}" -w `grep '^ldap\.password=' {{ perun_config_dir }}/perun-ldapc.properties | sed -e 's/^.*=//'`
+if [ $? -ne 0 ]; then
+  echo "Data import failded, LDAP will be blocked in firewall!" 1>&2
+  #not ublocked ldap in firewall if data import failed
+  exit 4
+fi
+echo "end date" >> $AUDITER_INFO
+date >> $AUDITER_INFO
+
+echo "LDAP was filled ok. (Information about messages are in file ${AUDITER_INFO})"
+
+# Unblock access to the LDAP
+unblock_ldap
