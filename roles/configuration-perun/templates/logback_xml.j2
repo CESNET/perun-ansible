@@ -2,7 +2,7 @@
     You can load another file by e.g.
      -Dlogback.configurationFile=file:///etc/perun/logback.xml
     and change the directory for log files by e.g.
-     -Dperun.log=/var/log/perun/
+     -Dperun.log={{ perun_log_dir }}
 
     For documentation see https://logback.qos.ch/manual/configuration.html#syntax
     -->
@@ -17,7 +17,7 @@
 	<contextName>perun-base</contextName>
 
 	<!-- variable defining the directory where log files will be put, takes system property perun.log -->
-	<variable name="LOGDIR" value="${perun.log:-/var/log/perun/}"/>
+	<variable name="LOGDIR" value="${perun.log:-{{ perun_log_dir }}/}"/>
 
 	<!-- production setting for format of log lines -->
 	<variable name="ENCODER_PATTERN" value="%date [%thread] %-5level %logger{35} - %msg%n"/>

@@ -1,7 +1,7 @@
 # Allow perun-engine to call Perun using BA
 
 export PERUN_USER=perun-engine/{{ password_perun_engine }}
-export PERUN_URL=https://{{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}/ba/rpc/
+export PERUN_URL=https://{{ perun_hostname }}/ba/rpc/
 export PERL5LIB=/opt/perun-cli/lib/
 # remove on production or set to 1
 export PERL_LWP_SSL_VERIFY_HOSTNAME=0
