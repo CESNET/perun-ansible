@@ -1,16 +1,17 @@
 ---
 # Task file for tomcat installation on Debian distribution
 
-- name: Add user tomcat8 to group perun
+- name: Add user tomcat8 to groups perun,tomcat8
   user:
     name: tomcat8
-    groups: perun
+    groups: "{{ perun_group }},tomcat8"
     append: yes
 
-#- name: Disable autostart of system-wide tomcat when machine is rebooted
-#  service:
-#    enabled: no
-#    name: tomcat8
+- name: Add user "{{ perun_login }}" to group tomcat8
+  user:
+    name: "{{ perun_login }}"
+    groups: tomcat8
+    append: yes
 
 - name: Copy tomcat-users.xml and server.xml to tomcat 
   template:

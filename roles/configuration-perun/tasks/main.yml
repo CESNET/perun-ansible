@@ -129,3 +129,19 @@
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
     mode: 0644
+
+- name: Create file "{{ perun_ldapc_properties_file }}"
+  template:
+    src: "{{ perun_ldapc_properties_template }}"
+    dest: "{{ perun_ldapc_properties_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Create file "{{ logback_ldapc_xml_file }}"
+  template:
+    src: "{{ logback_ldapc_xml_template }}"
+    dest: "{{ logback_ldapc_xml_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0644

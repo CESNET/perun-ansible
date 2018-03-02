@@ -1,4 +1,4 @@
-perun.rpc.lib.perun.url = https://{{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}/ba/rpc/
+perun.rpc.lib.perun.url = https://{{ perun_hostname }}/ba/rpc/
 
-perun.rpc.lib.username = {{ perun_rpc_username }}
-perun.rpc.lib.password = {{ password_rpc }}
+perun.rpc.lib.username = {{ perun_login }}
+perun.rpc.lib.password = {{ password_perun_admin }}

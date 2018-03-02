@@ -1,5 +1,5 @@
 # URL to perun instance
-perunUrl=https://{{ hostvars[groups['perun-servers'][0]]['ansible_default_ipv4']['address']}}
+perunUrl=https://{{ perun_hostname }}
 
 # Secret key for authentication messages
 secretKey={{ registrar_secret_key }}
