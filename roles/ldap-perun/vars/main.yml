@@ -15,34 +15,44 @@ ssl_conf_dir:
   Debian: '/etc/ldap'
   RedHat: []
 
-temporary_dir_path: "/home/{{ perun_login }}/openldap"
-
 slapd_config_admin_dn: 'cn=admin,cn=config'
 
 
 ldapc_log_file: "{{ perun_log_dir }}/perun-ldapc-out.log"
 ldapc_config_file: "{{ perun_config_dir }}/logback-ldapc.xml"
 
-ldapc_jar_origin: "{{ perun_folder }}/perun-ldapc/target/perun-ldapc-3.0.1-SNAPSHOT-production.jar"
-ldapc_init_jar_origin: "{{ perun_folder }}/perun-ldapc-initializer/target/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
-
-ldapc_jar: "{{ perun_ldapc_folder }}/perun-ldapc-3.0.1-SNAPSHOT-production.jar"
-ldapc_init_jar: "{{ perun_ldapc_folder }}/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
+ldapc_utils: "{{ perun_folder }}/perun-utils/ldapc-scripts"
 
 script_files:
   start:
-    template: start-ldapc_sh.j2
-    path: "{{ perun_ldapc_folder }}/start-ldapc.sh"
+    source: "{{ ldapc_utils }}/start-ldapc.sh"
+    destination: "{{ perun_ldapc_folder }}/start-ldapc.sh"
     mode: "0744"
   stop:
-    template: stop-ldapc_sh.j2
-    path: "{{ perun_ldapc_folder }}/stop-ldapc.sh"
+    source: "{{ ldapc_utils }}/stop-ldapc.sh"
+    destination: "{{ perun_ldapc_folder }}/stop-ldapc.sh"
     mode: "0744"
-  inicialize:
-    template: inicialize-ldap_sh.j2
-    path: "{{ perun_ldapc_folder }}/inicialize-ldap.sh"
+  initialize:
+    source: "{{ ldapc_utils }}/initialize-ldap.sh"
+    destination: "{{ perun_ldapc_folder }}/initialize-ldap.sh"
     mode: "0744"
-  init:
-    template: init_perun_ldif.j2
-    path: "{{ perun_ldapc_folder }}/init-perun.ldif"
+  ldifDiff:
+    source: "{{ ldapc_utils }}/ldifdiff.pl"
+    destination: "{{ perun_ldapc_folder }}/ldifdiff.pl"
+    mode: "0744"
+  ldifDiffSort:
+    source: "{{ ldapc_utils }}/ldifdiff-sort.pl"
+    destination: "{{ perun_ldapc_folder }}/ldifdiff-sort.pl"
+    mode: "0744"
+  ldifSort:
+    source: "{{ ldapc_utils }}/ldifsort.pl"
+    destination: "{{ perun_ldapc_folder }}/ldifsort.pl"
+    mode: "0744"
+  ldapcJar:
+    source: "{{ perun_folder }}/perun-ldapc/target/perun-ldapc-3.0.1-SNAPSHOT-production.jar"
+    destination: "{{ perun_ldapc_folder }}/perun-ldapc-3.0.1-SNAPSHOT-production.jar"
+    mode: "0644"
+  ldapcInitializerJar:
+    source: "{{ perun_folder }}/perun-ldapc-initializer/target/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
+    destination: "{{ perun_ldapc_folder }}/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
     mode: "0644"
