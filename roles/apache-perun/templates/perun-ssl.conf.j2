@@ -79,6 +79,21 @@ ShibCompatValidUser on
  #RewriteRule .* /maintenance/maintenance.html [R,L]
 
  ####################################
+ ##    DEPLOY TO TOMCAT          ####
+ ####################################
+
+ <Location "/tomcat-manager/">
+   ProxyPass http://127.0.0.1:18443/ nocanon
+   ProxyPassReverse http://127.0.0.1:18443/
+   # set bigger buffer, since we deploy 50MB WAR
+   SSLRenegBufferSize 52428800
+   # restrict access to our deploy server only
+   #Order deny,allow
+   #Deny from all
+   #Allow from your.deploy.server.com
+ </Location>
+
+ ####################################
  ##     RPC                      ####
  ####################################
 
