@@ -8,6 +8,7 @@ apache_modules:
     - ssl
     - proxy
     - proxy_ajp
+    - proxy_http
     - rewrite
     - shib2
 apache_service:
