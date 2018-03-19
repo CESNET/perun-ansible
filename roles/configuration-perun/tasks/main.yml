@@ -10,7 +10,7 @@
   file:
     path: "{{ perun_log_dir }}"
     state: directory
-    mode: 0775
+    mode: 0770
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
@@ -18,7 +18,7 @@
   file:
     path: "{{ perun_config_dir }}"
     state: directory
-    mode: 0755
+    mode: 0750
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
 
@@ -26,7 +26,7 @@
   file:
     path: "{{ perun_ssl_dir }}"
     state: directory
-    mode: 0755
+    mode: 0750
 
 - name: Create file "{{ logback_xml_file }}"
   template:
@@ -34,7 +34,7 @@
     dest: "{{ logback_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ logback_engine_xml_file }}"
   template:
@@ -42,7 +42,7 @@
     dest: "{{ logback_engine_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ jdbc_properties_file }}"
   template:
@@ -50,7 +50,7 @@
     dest: "{{ jdbc_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_notification_properties_file }}"
   template:
@@ -58,7 +58,7 @@
     dest: "{{ perun_notification_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_cabinet_properties_file }}"
   template:
@@ -66,7 +66,7 @@
     dest: "{{ perun_cabinet_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_dispatcher_properties_file }}"
   template:
@@ -74,13 +74,15 @@
     dest: "{{ perun_dispatcher_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_engine_file }}"
   template:
     src: "{{ perun_engine_template }}"
     dest: "{{ perun_engine_file }}"
-    mode: 0644
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0640
 
 - name: Create file "{{ perun_engine_properties_file }}"
   template:
@@ -88,7 +90,7 @@
     dest: "{{ perun_engine_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_registrar_lib_properties_file }}"
   template:
@@ -96,7 +98,7 @@
     dest: "{{ perun_registrar_lib_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_rpc_lib_properties_file }}"
   template:
@@ -104,7 +106,7 @@
     dest: "{{ perun_rpc_lib_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_web_gui_properties_file }}"
   template:
@@ -112,7 +114,7 @@
     dest: "{{ perun_web_gui_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_ext_sources_xml_file }}"
   template:
@@ -120,7 +122,7 @@
     dest: "{{ perun_ext_sources_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_properties_file }}"
   template:
@@ -128,7 +130,7 @@
     dest: "{{ perun_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ perun_ldapc_properties_file }}"
   template:
@@ -136,7 +138,7 @@
     dest: "{{ perun_ldapc_properties_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Create file "{{ logback_ldapc_xml_file }}"
   template:
@@ -144,4 +146,4 @@
     dest: "{{ logback_ldapc_xml_file }}"
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640

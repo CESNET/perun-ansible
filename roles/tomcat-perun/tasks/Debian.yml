@@ -29,7 +29,7 @@
     dest: "/home/{{ perun_login }}/input.txt"
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
-    mode: 0644
+    mode: 0640
 
 - name: Export certificate of machine (Apache) into format .p12
   command: openssl pkcs12 -passout "file:/home/{{ perun_login }}/input.txt" -export -out "{{ apache_p12_file }}" -in "{{ apache_certificate_file }}" -inkey "{{ apache_certificate_key_file }}"
