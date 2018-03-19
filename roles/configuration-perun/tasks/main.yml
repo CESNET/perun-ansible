@@ -80,6 +80,8 @@
   template:
     src: "{{ perun_engine_template }}"
     dest: "{{ perun_engine_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
     mode: 0640
 
 - name: Create file "{{ perun_engine_properties_file }}"
