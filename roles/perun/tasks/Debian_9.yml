@@ -31,10 +31,4 @@
       - tomcat8-user
       - libservlet3.1-java
     state: latest
-
-- name: Install Shibboleth
-  apt:
-    name: libapache2-mod-shib2
-    state: latest
-
 ...
