@@ -11,7 +11,7 @@ This repository serves for easier deployment of Perun server with default config
 ## Installation of Ansible
 
 - First you need to install Ansible to your system ([Installation of Ansible](http://docs.ansible.com/ansible/intro_installation.html)), which will be used to install Perun to remote server (or localhost).
-- **The minimal version of Ansible is 2.3!**
+- **The minimal version of Ansible is 2.4!**
 - **Your public SSH key must be placed in authorized_keys file in .ssh/ folder of root on the remote server!**
 - **SSH must be installed on both sides of communication.**
 

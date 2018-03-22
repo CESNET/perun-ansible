@@ -12,7 +12,17 @@
       - ansible_distribution == "Debian"
       - ansible_distribution_major_version in ["8","9"]
     msg: "Only Debian 8,9 are supported"
+
+- name:  Ansible 2.4+ required
+  assert:
+    that:
+      - ansible_version is defined
+      - ansible_version.full|version_compare('2.4', '>=')
+    msg: "Required Ansible version is 2.4+ which contains xml task"
+
 # specific tasks
 - include: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
 # common tasks
 - include: "{{ ansible_distribution }}.yml"
+# Shibboleth
+- include: "shibboleth.yml"

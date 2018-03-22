@@ -51,10 +51,4 @@
     state: latest
     default_release: jessie-backports
 
-- name: Install Shibboleth from backports
-  apt:
-    name: libapache2-mod-shib2
-    state: latest
-    default_release: jessie-backports
-
 ...
