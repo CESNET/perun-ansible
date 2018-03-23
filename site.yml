@@ -13,7 +13,7 @@
         - "."
         - "group_vars"
         - "site_vars"
-    tags: ['perun','config-perun','apache','tomcat','db','build-perun','engine-perun','wui-perun']
+    tags: ['perun','config-perun','shibboleth','apache','tomcat','db','build-perun','engine-perun','wui-perun']
   roles:
     # NECESSARY ROLES
     # ---------------
@@ -21,6 +21,8 @@
     - { role: perun, become: true, tags: perun }
     # This role will copy configuration files of Perun on your server.
     - { role: configuration-perun, become: true, tags: config-perun}
+    # This role will install Apache on your server.
+    - { role: shibboleth-perun, become: true, tags: shibboleth }
     # This role will install Apache on your server.
     - { role: apache-perun, become: true, tags: apache }
     # This role will install Tomcat on your server.

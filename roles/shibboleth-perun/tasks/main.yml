@@ -1,28 +1,81 @@
 ---
 # tasks file for shibboleth-perun
-
-- name: Install Shibboleth module for Apache
-  package:
-    name: libapache2-mod-shib2
+- name: SWITCH repo key
+  apt_key:
+    id: 15B76742
+    url: "http://pkg.switch.ch/switchaai/SWITCHaai-swdistrib.asc"
     state: present
 
-# WARNING: Apache2 has problem with shib2 name of module and it throws error. It should be fixed soon.
-- name: Enable Shibboleth module
-  apache2_module:
-    name: shib2
+- name: SWITCH repo
+  apt_repository:
+    repo: "deb http://pkg.switch.ch/switchaai/debian {{ ansible_distribution_release }} main"
     state: present
-  ignore_errors: true
+    filename: 'switch'
+    update_cache: yes
 
-- name: Copy default site configuration with Shibboleth included
-  template:
-    src: settings.j2
-    dest: '/etc/apache2/sites-enabled/perun.conf'
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0644
+- name: Install Shibboleth
+  apt:
+    name: shibboleth
+    state: latest
+    install_recommends: yes
 
-- name: restart Apache
-  service:
-    state: restarted
-    state: reloaded
-    name: apache2
+- name: Generate Shibboleth key and cert
+  command: shib-keygen
+  args:
+    chdir: /etc/shibboleth
+    creates: /etc/shibboleth/sp-key.pem
+
+- name: python-lxml
+  apt:
+    name: python-lxml
+
+- name: shibboleth2.xml add attribute prefix AJP_
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults
+    namespaces:
+      conf: urn:mace:shibboleth:2.0:native:sp:config
+    attribute: attributePrefix
+    value: "AJP_"
+
+- name: shibboleth2.xml add epuid to REMOTE_USER
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults
+    namespaces:
+      conf: urn:mace:shibboleth:2.0:native:sp:config
+    attribute: REMOTE_USER
+    value: "epuid eppn persistent-id targeted-id"
+
+- name: shibboleth2.xml set handlerSSL="true"
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults/conf:Sessions
+    namespaces:
+      conf: urn:mace:shibboleth:2.0:native:sp:config
+    attribute: handlerSSL
+    value: "true"
+
+- name: shibboleth2.xml set cookieProps="https"
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults/conf:Sessions
+    namespaces:
+      conf: urn:mace:shibboleth:2.0:native:sp:config
+    attribute: cookieProps
+    value: "https"
+
+- name: attribute-map.xml add epuid
+  blockinfile:
+    path: /etc/shibboleth/attribute-map.xml
+    insertbefore: "</Attributes>"
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    content: |
+        <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.13" id="epuid">
+            <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
+        </Attribute>
+        <Attribute name="urn:mace:dir:attribute-def:eduPersonUniqueId" id="epuid">
+            <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
+        </Attribute>
+    backup: yes
+...
