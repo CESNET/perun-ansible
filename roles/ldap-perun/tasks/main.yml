@@ -1,4 +1,4 @@
 ---
 # tasks file for ldap-perun
-- include: "install-ldap-{{ ansible_os_family }}.yml"
-- include: "install-ldapc-{{ ansible_os_family }}.yml"
+- include_tasks: "install-ldap-{{ ansible_os_family }}.yml"
+- include_tasks: "install-ldapc-{{ ansible_os_family }}.yml"

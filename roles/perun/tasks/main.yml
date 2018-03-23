@@ -21,8 +21,6 @@
     msg: "Required Ansible version is 2.4+ which contains xml task"
 
 # specific tasks
-- include: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+- include_tasks: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
 # common tasks
-- include: "{{ ansible_distribution }}.yml"
-# Shibboleth
-- include: "shibboleth.yml"
+- include_tasks: "{{ ansible_distribution }}.yml"
