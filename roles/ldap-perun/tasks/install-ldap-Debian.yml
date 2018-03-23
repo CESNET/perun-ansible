@@ -157,6 +157,10 @@
         {20}( 1.3.6.1.4.1.8057.2.80.24 NAME 'eduPersonScopedAffiliations' DESC 'EDU Person scoped affilations' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
       - >-
         {21}( 1.3.6.1.4.1.8057.2.80.25 NAME 'bonaFideStatus' DESC 'bona fide status' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {22}( 1.3.6.1.4.1.8057.2.80.26 NAME 'groupNames' DESC 'Names of groups where user is member' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+      - >-
+        {23}( 1.3.6.1.4.1.8057.2.80.27 NAME 'OIDCClientID' DESC 'ClientID for OIDC of Resource on Facility' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
 
 - name: Set up olcObjectClasses attribute in perun schema
   ldap_attr:
@@ -198,28 +202,41 @@
     name: olcObjectClasses
     values: "{0}( 2.16.840.1.113730.3.2.130 NAME 'inetUser' DESC 'Auxiliary class which must be present in an entry for delivery of subscriber services' SUP top AUXILIARY MAY ( uid $ inetUserStatus $ inetUserHTTPURL $ userPassword $ memberOf ) X-ORIGIN 'Netscape subscriber interoperability' )"
 
+- name: Make sure we have tenOperEntry schema
+  ldap_entry:
+    dn: cn=tenOperEntry,cn=schema,cn=config
+    objectClass: olcSchemaConfig
+
+- name: Set up olcAttributeTypes attribute in tenOperEntry schema 
+  ldap_attr:
+    dn: cn={6}tenOperEntry,cn=schema,cn=config
+    state: exact
+    name: olcAttributeTypes
+    values:
+      - >-
+        {0}( 1.3.6.1.4.1.8057.2.84.1 NAME 'entryStatus' DESC 'status of the entry' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {1}( 1.3.6.1.4.1.8057.2.84.2 NAME 'entryStatusTimestamp' DESC 'time of last modification of entryStatus' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+      - >-
+        {2}( 1.3.6.1.4.1.8057.2.84.3 NAME 'entryStatusModifier' DESC 'entry that performed tha last modification of entryStatus' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 SINGLE-VALUE )
+      - >-
+        {3}( 1.3.6.1.4.1.8057.2.84.4 NAME 'sponsor' DESC 'Sponsor' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
+      - >-
+        {4}( 1.3.6.1.4.1.8057.2.84.5 NAME 'sponsorshipApprovedUntil' DESC 'Expiry of sponsorship' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
+
+- name: Set up olcObjectClasses attribute tenOperEntry schema 
+  ldap_attr:
+    dn: cn={6}tenOperEntry,cn=schema,cn=config
+    state: exact
+    name: olcObjectClasses
+    values: "{0}( 1.3.6.1.4.1.8057.2.84.6 NAME 'tenOperEntry' DESC 'entry operational description' AUXILIARY MUST entryStatus MAY ( entryStatusModifier $ entryStatusTimestamp $ sponsor $ sponsorshipApprovedUntil ) )"
+
 - name: Set olcAttributeOptions attribute
   ldap_attr:
     dn: cn=config
     name: "olcAttributeOptions"
     values: "ns-x-"
     state: exact
-
-- name: Make sure we have an initial parent entry for Perun
-  ldap_entry:
-    dn: "{{ slapd_basedn }}"
-    objectClass: dcObject
-    bind_dn: "{{ slapd_basedn_admin }}"
-    bind_pw: "{{ password_ldap_data_tree }}"
-
-- name: Make organizational unit for People
-  ldap_entry:
-    dn: "ou=People,{{ slapd_basedn }}"
-    objectClass: organizationalUnit
-    attributes:
-      description: Perun Management System
-    bind_dn: "{{ slapd_basedn_admin }}"
-    bind_pw: "{{ password_ldap_data_tree }}"
 
 - name: Set indexes (olcDbIndex attribute)
   ldap_attr:
@@ -239,3 +256,12 @@
     - memberOfPerunVo eq
     - userCertificateSubject eq
   notify: Restart LDAP
+
+- name: Change o attribute to perun in root dn
+  ldap_attr:
+    dn: "{{ slapd_basedn }}"
+    name: o
+    values: perun
+    state: exact
+    bind_dn: "{{ slapd_basedn_admin }}"
+    bind_pw: "{{ password_ldap_data_tree }}"
