@@ -9,11 +9,15 @@
 
 # Fake Snake Oil if ssl_certificate_file variable is not filled
 - name: Make fake Snake Oil certificate for testing purposes
-  command: make-ssl-cert generate-default-snakeoil --force-overwrite
+  command: make-ssl-cert generate-default-snakeoil
+  args:
+    creates: /etc/perun/ssl/ssl-cert-snakeoil.pem
   when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
 
 - name: Copy Snake Oil certificate to /etc/perun/ssl folder
   command: cp /etc/ssl/certs/ssl-cert-snakeoil.pem /etc/ssl/private/ssl-cert-snakeoil.key /etc/perun/ssl/
+  args:
+    creates: /etc/perun/ssl/ssl-cert-snakeoil.pem
   when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
 
 - name: Check rights on certificate
@@ -27,61 +31,51 @@
   file:
     path: "{{ apache_certificate_key_file }}"
     owner: root
-    group: root
+    group: ssl-cert
     mode: 0640
-
-- name: Get status for perun.conf
-  stat:
-    path: /etc/apache2/sites-enabled/perun.conf
-  register: status_perun
-
-- name: Get status for perun-ssl.conf
-  stat:
-    path: /etc/apache2/sites-enabled/perun-ssl.conf
-  register: status_perun_ssl
-
-- name: Get status for 000-default.conf
-  stat:
-    path: /etc/apache2/sites-enabled/000-default.conf
-  register: status_default
 
 - name: Install Apache
   package:
     name: "{{ apache_package[ansible_os_family] }}"
     state: present
 
-- name: Disable perun.conf if enabled
-  shell:  a2dissite perun
-  when: status_perun.stat.islnk is defined
-
-- name: Disable perun-ssl.conf if enabled
-  shell:  a2dissite perun-ssl
-  when: status_perun_ssl.stat.islnk is defined
-
-- name: Disable 000-default.conf if enabled
-  shell:  a2dissite 000-default
-  when: status_default.stat.islnk is defined
-
 - name: Enable modules
   apache2_module:
     name: "{{ item }}"
     state: present
   with_items: "{{ apache_modules[ansible_os_family] }}"
+  notify:
+    - "restart webserver"
 
-- name: Copy Apache configuration files to /etc/apache2/sites-available/
+- name: Remove default Apache site
+  file:
+    path: "/etc/apache2/sites-enabled/{{ item }}"
+    state: absent
+  with_items:
+    - 000-default.conf
+    - default-ssl.conf
+  notify:
+    - "restart webserver"
+
+- name: Create Apache configuration files in /etc/apache2/sites-available/
   template:
     src: "{{ item }}.j2"
     dest: "/etc/apache2/sites-available/{{ item }}"
+    force: no
     mode: 0644
   with_items:
     - perun.conf
     - perun-ssl.conf
 
 - name: Enable Perun sites in Apache
-  shell:  a2ensite "{{ item }}"
+  command:  a2ensite "{{ item }}"
+  args:
+    creates: "/etc/apache2/sites-enabled/{{ item }}"
   with_items:
     - perun.conf
     - perun-ssl.conf
+  notify:
+    - "restart webserver"
 
 - name: Create directory for maintenance files
   file:
@@ -120,6 +114,8 @@
     state: latest
     update_cache: yes
   when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+  notify:
+    - "restart webserver"
 
 # Rehash certificates for user identification
 - name: Use c_rehash to your certificates
@@ -127,6 +123,8 @@
   args:
     chdir: "{{ apache_ca_certificate_path }}"
   when: apache_ca_certificate_path != "/etc/grid-security/certificates/"
+  notify:
+    - "restart webserver"
 
 - name: Enable JSON data comprimation in Apache
   lineinfile:
@@ -135,8 +133,6 @@
     line: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
     regexp: "\t\t# Perun\n\t\tAddOutputFilterByType DEFLATE text/javascript"
     backrefs: yes
+  notify:
+    - "restart webserver"
 
-- name: Restart Apache
-  service:
-    state: restarted
-    name: "{{ apache_service[ansible_os_family] }}"
