@@ -20,7 +20,7 @@
     install_recommends: yes
 
 - name: Generate Shibboleth key and cert
-  command: shib-keygen
+  command: shib-keygen -h {{ perun_hostname }} -e {{ shibboleth_sp_entityID }}
   args:
     chdir: /etc/shibboleth
     creates: /etc/shibboleth/sp-key.pem
@@ -28,6 +28,15 @@
 - name: python-lxml
   apt:
     name: python-lxml
+
+- name: shibboleth2.xml set SP entity id
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults
+    namespaces:
+      conf: urn:mace:shibboleth:2.0:native:sp:config
+    attribute: entityID
+    value: "{{ shibboleth_sp_entityID }}"
 
 - name: shibboleth2.xml add attribute prefix AJP_
   xml:
@@ -65,6 +74,24 @@
     attribute: cookieProps
     value: "https"
 
+- name: shibboleth2.xml set default IdP entityID
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults/conf:Sessions/conf:SSO
+    namespaces:
+      conf: urn:mace:shibboleth:2.0:native:sp:config
+    attribute: entityID
+    value: "{{ shibboleth_idp_entityID }}"
+
+- name: shibboleth2.xml add IdP metadata
+  blockinfile:
+    path: /etc/shibboleth/shibboleth2.xml
+    insertafter: '<Errors supportContact="root@localhost" helpLocation="/about.html" styleSheet="/shibboleth-sp/main.css"/>'
+    marker: "<!-- {mark} ANSIBLE IdP metadata MANAGED BLOCK -->"
+    content: |
+        <MetadataProvider type="XML" uri="{{ shibboleth_idp_metadata_url }}"
+                        backingFilePath="proxyidp.xml" reloadInterval="1800" />
+
 - name: attribute-map.xml add epuid
   blockinfile:
     path: /etc/shibboleth/attribute-map.xml
@@ -77,5 +104,4 @@
         <Attribute name="urn:mace:dir:attribute-def:eduPersonUniqueId" id="epuid">
             <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
         </Attribute>
-    backup: yes
 ...
