@@ -24,6 +24,8 @@
   args:
     chdir: /etc/shibboleth
     creates: /etc/shibboleth/sp-key.pem
+  notify:
+    - "restart shibd"
 
 - name: python-lxml
   apt:
@@ -37,6 +39,8 @@
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: entityID
     value: "{{ shibboleth_sp_entityID }}"
+  notify:
+    - "restart shibd"
 
 - name: shibboleth2.xml add attribute prefix AJP_
   xml:
@@ -46,6 +50,8 @@
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: attributePrefix
     value: "AJP_"
+  notify:
+    - "restart shibd"
 
 - name: shibboleth2.xml add epuid to REMOTE_USER
   xml:
@@ -55,6 +61,8 @@
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: REMOTE_USER
     value: "epuid eppn persistent-id targeted-id"
+  notify:
+    - "restart shibd"
 
 - name: shibboleth2.xml set handlerSSL="true"
   xml:
@@ -64,6 +72,8 @@
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: handlerSSL
     value: "true"
+  notify:
+    - "restart shibd"
 
 - name: shibboleth2.xml set cookieProps="https"
   xml:
@@ -73,6 +83,8 @@
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: cookieProps
     value: "https"
+  notify:
+    - "restart shibd"
 
 - name: shibboleth2.xml set default IdP entityID
   xml:
@@ -82,6 +94,8 @@
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: entityID
     value: "{{ shibboleth_idp_entityID }}"
+  notify:
+    - "restart shibd"
 
 - name: shibboleth2.xml add IdP metadata
   blockinfile:
@@ -91,6 +105,8 @@
     content: |
         <MetadataProvider type="XML" uri="{{ shibboleth_idp_metadata_url }}"
                         backingFilePath="proxyidp.xml" reloadInterval="1800" />
+  notify:
+    - "restart shibd"
 
 - name: attribute-map.xml add epuid
   blockinfile:
@@ -104,4 +120,6 @@
         <Attribute name="urn:mace:dir:attribute-def:eduPersonUniqueId" id="epuid">
             <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
         </Attribute>
+  notify:
+    - "restart shibd"
 ...
