@@ -11,7 +11,7 @@ perun_name: 'Perun'
 perun_email: 'admin@example.com'
 
 # Hostname of the server (or IP adress)
-perun_hostname: 'example.com'
+perun_hostname: 'perun.example.com'
 # If your server has alias for its hostname, put it here (ServerAlias variable in Apache config). If not, leave it empty.
 perun_hostname_alias: ''
 
@@ -76,6 +76,11 @@ fed_authz: 'fed'
 # Comma separated list of entityIDs of proxy IdPs which is infront of Perun.
 # So Perun can work with them differently.
 proxy_idps: ''
+
+# Shibboleth SP
+shibboleth_sp_entityID: "https://{{perun_hostname}}/sp/shibboleth"
+shibboleth_idp_entityID: "https://login.example.com/proxy/saml2/idp/metadata.php"
+shibboleth_idp_metadata_url: "https://login.example.com/proxy/saml2/idp/metadata.php"
 
 # Perun instance Name and ID
 instance_name: 'GENERIC'

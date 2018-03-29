@@ -1,7 +1,7 @@
 ---
 # Main perun orchestration playbook
 # you can run a specific part using tags, e.g.:
-#  ansible-playbook -i inventories/prod --ask-become-pass --ask-vault-pass site.yml --tags engine-perun
+#  ansible-playbook -i inventories/prod --ask-become-pass --ask-vault-pass site.yml --tags shibboleth
 - hosts: perun-servers
   pre_tasks:
   - name: Pull in site-specific passwords
@@ -13,14 +13,14 @@
         - "."
         - "group_vars"
         - "site_vars"
-    tags: ['perun','config-perun','shibboleth','apache','tomcat','db','build-perun','engine-perun','wui-perun']
+    tags: ['perun','config','shibboleth','apache','tomcat','db','build','engine','wui', 'ldap']
   roles:
     # NECESSARY ROLES
     # ---------------
     # This role will create user perun and download all packages and GIT repositories you will need in installation process.
     - { role: perun, become: true, tags: perun }
     # This role will copy configuration files of Perun on your server.
-    - { role: configuration-perun, become: true, tags: config-perun}
+    - { role: configuration-perun, become: true, tags: config }
     # This role will install Apache on your server.
     - { role: shibboleth-perun, become: true, tags: shibboleth }
     # This role will install Apache on your server.
@@ -30,10 +30,10 @@
     # This role will deploy Postgre DB on your server and prepares DB tables.
     - { role: postgre-perun, become: true, tags: db}
     # This role will build Perun on your server.
-    - { role: build-perun, become: true, tags: build-perun }
+    - { role: build-perun, become: true, tags: build }
     # This role will build engine of Perun on your server.
-    - { role: engine-perun, become: true, tags: engine-perun}
+    - { role: engine-perun, become: true, tags: engine }
     # This role will deploy new web user interface of Perun on your server.
-    - { role: wui-perun, become: true, tags: wui-perun}
+    - { role: wui-perun, become: true, tags: wui}
     # This role will deploy new LDAP server configuration.
-    - { role: ldap-perun, become: true, tags: ldap-perun}
+    - { role: ldap-perun, become: true, tags: ldap }
