@@ -56,3 +56,9 @@ script_files:
     source: "{{ perun_folder }}/perun-ldapc-initializer/target/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
     destination: "{{ perun_ldapc_folder }}/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
     mode: "0644"
+
+init_d_script:
+  Debian:
+    source: "{{ perun_folder }}/perun-utils/init.d-scripts/perun-ldapc.debian"
+    destination: "/etc/init.d/perun-ldapc"
+    mode: "0755"

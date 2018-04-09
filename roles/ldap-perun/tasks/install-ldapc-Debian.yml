@@ -19,6 +19,15 @@
     remote_src: yes
   with_dict: "{{ script_files }}"
 
+- name: Copy init.d script for perun-ldapc
+  copy:
+    src: "{{ init_d_script[ansible_os_family].source }}"
+    dest: "{{ init_d_script[ansible_os_family].destination }}"
+    owner: root
+    group: root
+    mode: "{{ init_d_script[ansible_os_family].mode }}"
+    remote_src: yes
+
 - name: Create truststore in perun-ldapc folder if you use snake-oil certificate
   java_cert:
     cert_path: "{{ apache_certificate_file }}"
