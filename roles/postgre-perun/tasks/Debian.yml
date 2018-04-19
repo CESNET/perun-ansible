@@ -24,9 +24,35 @@
     name: postgres
     password: "{{ password_postgre }}"
     state: present
-  notify: Ensure the PostgreSQL service is running
+  register: postgres_password
 
-- meta: flush_handlers
+- name: "Add rows to pg_hba.conf"
+  become: yes
+  become_user: postgres
+  blockinfile:
+    dest: "/etc/postgresql/{{ postgre_version }}/main/pg_hba.conf"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    insertafter: '# Database administrative login by Unix domain socket'
+    block: |
+        local   {{ db_name }} {{ db_user }} ident
+        host    {{ db_name }} {{ db_user }} 127.0.0.1/32 md5
+        hostssl all   all   all          md5
+  register: pg_hba
+
+- name: Set max_connections = 150
+  lineinfile:
+    path: "/etc/postgresql/{{ postgre_version }}/main/postgresql.conf"
+    regexp: '^max_connections = 100(.*)$'
+    line: 'max_connections = 150\1'
+    backrefs: yes
+  register: max_conns
+
+- name: Restart PostgreSQL
+  become: true
+  when: pg_hba.changed or postgres_password.changed or max_conns.changed
+  service:
+    state: reloaded
+    name: postgresql
 
 - name: Create user "{{ db_user }}" without superuser and createdb privileges
   become: yes
@@ -53,26 +79,6 @@
     database: "{{ db_name }}"
     name: "{{ db_user }}"
     owner: "{{ db_user }}"
-
-- name: "Add rows to pg_hba.conf"
-  become: yes
-  become_user: postgres
-  blockinfile:
-    dest: "/etc/postgresql/{{ postgre_version }}/main/pg_hba.conf"
-    marker: "# {mark} ANSIBLE MANAGED BLOCK"
-    insertafter: '# Database administrative login by Unix domain socket'
-    block: |
-        local   {{ db_name }} {{ db_user }} ident
-        host    {{ db_name }} {{ db_user }} 127.0.0.1/32 md5
-        hostssl all   all   all          md5
-  register: pg_hba
-
-- name: Restart PostgreSQL after changing pg_hba.conf
-  become: true
-  when: pg_hba.changed
-  service:
-    state: reloaded
-    name: postgresql
 
 - name: Add unaccent extension
   become: yes

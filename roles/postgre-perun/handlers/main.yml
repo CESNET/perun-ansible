@@ -1,7 +1,2 @@
 ---
 # handlers file for postgre-perun
-- name: Ensure the PostgreSQL service is running
-  service:
-    name: postgresql
-    state: restarted
-    enabled: yes
