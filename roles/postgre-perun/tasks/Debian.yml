@@ -1,5 +1,8 @@
 ---
-# Task file for postgre database installation in Debian distribution
+# Task file for postgres database installation in Debian distribution
+- name:
+  include_vars:
+    file: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
 
 - name: Install postgresql package
   become: true
@@ -21,52 +24,7 @@
     name: postgres
     password: "{{ password_postgre }}"
     state: present
-  notify: Ensure the PostgreSQL service is running
-
-- meta: flush_handlers
-
-- name: Ensure database "{{ db_name }}" is created
-  become: yes
-  become_user: postgres
-  postgresql_db:
-    name: "{{ db_name }}"
-    encoding: 'UTF-8'
-    template: 'template0'
-    state: present
-
-- name: Ensure user has access to the database
-  become: yes
-  become_user: postgres
-  postgresql_user:
-    db: "{{ db_name }}"
-    name: "{{ db_user }}"
-    password: "{{ password_db }}"
-    priv: ALL
-    state: present
-
-- name: Ensure user "{{ db_user }}" does not have unnecessary privileges
-  become: yes
-  become_user: postgres
-  postgresql_user:
-    name: "{{ db_user }}"
-    role_attr_flags: NOSUPERUSER,NOCREATEDB
-    state: present
-
-- name: Drop schema perun if exists
-  become: yes
-  become_user: postgres
-  command: psql -d "{{ db_name }}" -c "DROP SCHEMA IF EXISTS perun CASCADE;"
-
-- name: Creating of schema perun
-  become: yes
-  become_user: "{{ db_user }}"
-  command: psql -d "{{ db_name }}" -c "CREATE SCHEMA perun authorization {{ db_user }};"
-
-# Setting access to database for user perun
-# -----------------------------------------
-- name:
-  include_vars:
-    file: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+  register: postgres_password
 
 - name: "Add rows to pg_hba.conf"
   become: yes
@@ -76,42 +34,75 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK"
     insertafter: '# Database administrative login by Unix domain socket'
     block: |
-        local perun perun ident
-        host perun perun 127.0.0.1/32 md5
+        local   {{ db_name }} {{ db_user }} ident
+        host    {{ db_name }} {{ db_user }} 127.0.0.1/32 md5
+        hostssl all   all   all          md5
+  register: pg_hba
+
+- name: Set max_connections = 150
+  lineinfile:
+    path: "/etc/postgresql/{{ postgre_version }}/main/postgresql.conf"
+    regexp: '^max_connections = 100(.*)$'
+    line: 'max_connections = 150\1'
+    backrefs: yes
+  register: max_conns
 
 - name: Restart PostgreSQL
   become: true
+  when: pg_hba.changed or postgres_password.changed or max_conns.changed
   service:
     state: reloaded
     name: postgresql
 
-- name: Make user "{{ db_user }}" temporary superuser
+- name: Create user "{{ db_user }}" without superuser and createdb privileges
   become: yes
   become_user: postgres
   postgresql_user:
     name: "{{ db_user }}"
-    role_attr_flags: SUPERUSER
+    password: "{{ password_db }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB
     state: present
 
-- name: Add extension to schema perun by user perun
+- name: Create database "{{ db_name }}" owned by user "{{ db_user }}"
+  become: yes
+  become_user: postgres
+  postgresql_db:
+    name: "{{ db_name }}"
+    encoding: 'UTF-8'
+    owner: "{{ db_user }}"
+    state: present
+
+- name: Create schema "{{ db_user }}" in database "{{ db_name }}"
+  become: yes
+  become_user: postgres
+  postgresql_schema:
+    database: "{{ db_name }}"
+    name: "{{ db_user }}"
+    owner: "{{ db_user }}"
+
+- name: Add unaccent extension
+  become: yes
+  become_user: postgres
+  postgresql_ext:
+    db: "{{ db_name }}"
+    name: unaccent
+
+- name: Detect whether table users exists and contains rows
   become: yes
   become_user: "{{ db_user }}"
-  command: psql -d "{{ db_name }}" -c "CREATE EXTENSION unaccent SCHEMA perun;"
+  changed_when: False
+  failed_when: False
+  command: psql -d "{{ db_name }}" --tuples-only -P format=unaligned -c "select count(*) from users;"
+  register: table_users
 
-- name: Remove user "{{ db_user }}" superuser privileges
-  become: yes
-  become_user: postgres
-  postgresql_user:
-    name: "{{ db_user }}"
-    role_attr_flags: NOSUPERUSER
-    state: present
-
-- name: Create empty table schema
+- name: Create tables
   become: yes
   become_user: "{{ db_user }}"
   command: psql -d "{{ db_name }}" -f "{{ postgres_conf_file_path }}"
+  when: table_users.rc == 1
 
-- name: Create initial user in database
+- name: Create initial users in database
   become: yes
   become_user: "{{ db_user }}"
-  command: psql -c "insert into perun.ext_sources (id,name,type) values (nextval('ext_sources_id_seq'),'INTERNAL','cz.metacentrum.perun.core.impl.ExtSourceInternal');insert into perun.users (id, first_name, last_name) values (nextval('users_id_seq'),'{{ init_user_first_name }}','{{ init_user_last_name }}');insert into perun.user_ext_sources (id, user_id, login_ext, ext_sources_id, loa) values (nextval('user_ext_sources_id_seq'), currval('users_id_seq'), 'perun', currval('ext_sources_id_seq'), 0);insert into perun.auditer_consumers (id, name, last_processed_id) values (nextval('auditer_consumers_id_seq'), 'ldapcConsumer', 0);"
+  command: psql -d "{{ db_name }}" -c "insert into perun.ext_sources (id,name,type) values (nextval('ext_sources_id_seq'),'INTERNAL','cz.metacentrum.perun.core.impl.ExtSourceInternal');insert into perun.users (id, first_name, last_name) values (nextval('users_id_seq'),'{{ init_user_first_name }}','{{ init_user_last_name }}');insert into perun.user_ext_sources (id, user_id, login_ext, ext_sources_id, loa) values (nextval('user_ext_sources_id_seq'), currval('users_id_seq'), 'perun', currval('ext_sources_id_seq'), 0);insert into perun.auditer_consumers (id, name, last_processed_id) values (nextval('auditer_consumers_id_seq'), 'ldapcConsumer', 0);";
+  when: table_users.rc == 0 and table_users.stdout == '0'
