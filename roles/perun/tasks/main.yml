@@ -5,20 +5,6 @@
 # ansible_distribution_major_version - OS version, e.g. "8"
 # ansible_distribution_release - e.g. "jessie"
 
-# Debian 7 has only Apache 2.2 and Shibboleth 2.5, which have incopatible config files with Apache 2.4 and Shibboleth 2.6
-- name: Require Debian 8,9
-  assert:
-    that:
-      - ansible_distribution == "Debian"
-      - ansible_distribution_major_version in ["8","9"]
-    msg: "Only Debian 8,9 are supported"
-
-- name:  Ansible 2.4+ required
-  assert:
-    that:
-      - ansible_version is defined
-      - ansible_version.full|version_compare('2.4', '>=')
-    msg: "Required Ansible version is 2.4+ which contains xml task"
 
 # specific tasks
 - include_tasks: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"

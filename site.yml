@@ -1,9 +1,28 @@
 ---
 # Main perun orchestration playbook
 # you can run a specific part using tags, e.g.:
-#  ansible-playbook -i inventories/prod --ask-become-pass --ask-vault-pass site.yml --tags shibboleth
+#  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags shibboleth
 - hosts: perun-servers
   pre_tasks:
+
+  # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
+  - name: Require Debian 8,9
+    assert:
+      that:
+        - ansible_distribution == "Debian"
+        - ansible_distribution_major_version in ["8","9"]
+      msg: "Only Debian 8,9 are supported"
+    tags: ['always']
+
+  # editing the file shibboleth2.xml requires xml task available since Ansible 2.4
+  - name:  Ansible 2.4+ required
+    assert:
+      that:
+        - ansible_version is defined
+        - ansible_version.full is version_compare('2.4', '>=')
+      msg: "Required Ansible version is 2.4+ which contains xml task"
+    tags: ['shibboleth']
+
   - name: Pull in site-specific passwords
     include_vars: "{{ item }}"
     with_first_found:
@@ -14,6 +33,7 @@
         - "group_vars"
         - "site_vars"
     tags: ['perun','config','shibboleth','apache','tomcat','db','build','engine','wui', 'ldap']
+
   roles:
     # NECESSARY ROLES
     # ---------------
