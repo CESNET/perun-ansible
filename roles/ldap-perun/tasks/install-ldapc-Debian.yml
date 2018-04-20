@@ -28,6 +28,7 @@
     mode: "{{ init_d_script[ansible_os_family].mode }}"
     remote_src: yes
 
+
 - name: Create truststore in perun-ldapc folder if you use snake-oil certificate
   java_cert:
     cert_path: "{{ apache_certificate_file }}"
@@ -51,7 +52,8 @@
   become: yes
   become_user: "{{ perun_login }}"
 
-- name: Start LDAPc
-  command: "{{ script_files.start.destination }}"
-  become: yes
-  become_user: "{{ perun_login }}"
+- name: Start LDAPc and enable it to start after reboot
+  service:
+    name: perun-ldapc
+    state: started
+    enabled: yes

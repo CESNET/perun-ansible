@@ -105,8 +105,8 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
-- name: Start perun-engine
-  systemd:
+- name: Start perun-engine and enable it to start after reboot
+  service:
     name: perun-engine
     state: started
-    daemon_reload: yes
+    enabled: yes
