@@ -85,3 +85,6 @@ shibboleth_idp_metadata_url: "https://login.example.com/proxy/saml2/idp/metadata
 # Perun instance Name and ID
 instance_name: 'GENERIC'
 instance_id: 'GENERIC01A02B03C'
+
+# Install Yubikeys? Modify the settings in the encrypted vault group_vars/passwords-default.yml
+install_yubikeys: True
