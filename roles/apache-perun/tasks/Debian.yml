@@ -34,6 +34,12 @@
     group: ssl-cert
     mode: 0640
 
+- name: Add user {{ perun_login }} to group ssl-cert
+  user:
+      name: "{{ perun_login }}"
+      groups: ssl-cert
+      append: yes
+
 - name: Install Apache
   package:
     name: "{{ apache_package[ansible_os_family] }}"

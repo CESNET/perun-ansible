@@ -61,7 +61,7 @@
   file:
     path: "{{ item }}"
     group: ssl-cert
-    owner: "{{ perun_login }}"
+    owner: root
   with_items:
     - "{{ ldap_certificate_file }}"
     - "{{ ldap_ca_certificate_file }}"
