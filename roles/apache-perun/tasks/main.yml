@@ -1,2 +1,8 @@
 ---
 - include_tasks: "{{ ansible_os_family }}.yml"
+
+- include_tasks: "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "9" 
+
+- name: Restart server if needed
+  meta: flush_handlers

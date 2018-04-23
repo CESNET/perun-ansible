@@ -122,4 +122,7 @@
         </Attribute>
   notify:
     - "restart shibd"
+
+- name: Restart server if needed
+  meta: flush_handlers
 ...

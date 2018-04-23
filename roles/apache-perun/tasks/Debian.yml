@@ -1,11 +1,26 @@
 # Tasks file for apache-perun
 
-# Install ssl-cert for making certificate
-- name: Install ssl-cert package
+- name: Install Apache
   package:
-    name: "{{ ssl_cert_package[ansible_os_family] }}"
+    name: "{{ apache_package[ansible_os_family] }}"
     state: present
-  when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+
+- name: Enable Apache modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ apache_modules[ansible_os_family] }}"
+  notify:
+    - "restart webserver"
+
+# ssl-cert group is created by ssl-cert package, which is dependency of apache2
+# ssl-cert group is used by packages like postgres and openldap which need access to private keys
+# perun user needs access to site key for authentication when uploading to URLs
+- name: Add user {{ perun_login }} to group ssl-cert
+  user:
+    name: "{{ perun_login }}"
+    groups: ssl-cert
+    append: yes
 
 # Fake Snake Oil if ssl_certificate_file variable is not filled
 - name: Make fake Snake Oil certificate for testing purposes
@@ -23,6 +38,7 @@
 - name: Check rights on certificate
   file:
     path: "{{ apache_certificate_file }}"
+    follow: yes
     owner: root
     group: root
     mode: 0644
@@ -30,22 +46,10 @@
 - name: Check rights on certificate key
   file:
     path: "{{ apache_certificate_key_file }}"
+    follow: yes
     owner: root
     group: ssl-cert
     mode: 0640
-
-- name: Install Apache
-  package:
-    name: "{{ apache_package[ansible_os_family] }}"
-    state: present
-
-- name: Enable modules
-  apache2_module:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ apache_modules[ansible_os_family] }}"
-  notify:
-    - "restart webserver"
 
 - name: Remove default Apache site
   file:
