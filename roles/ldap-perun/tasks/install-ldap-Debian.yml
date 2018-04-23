@@ -52,49 +52,39 @@
     olcRootPW: "{{ root_password.stdout }}"
   notify: Restart LDAP
 
-- name: Change group of openldap user to ssl-cert
+- name: Add openldap user to ssl-cert group
   user:
     name: openldap
-    groups: openldap,ssl-cert
-
-- name: Change group of certificate files/key to openldap
-  file:
-    path: "{{ item }}"
-    group: ssl-cert
-    owner: root
-  with_items:
-    - "{{ ldap_certificate_file }}"
-    - "{{ ldap_ca_certificate_file }}"
-    - "{{ ldap_certificate_key_file }}"
+    groups: ssl-cert
+    append: yes
 
 - name: Restart LDAP
   service:
     name: slapd
     state: restarted
 
-- name: Configure LDAP Core TLS Settings
-  ignore_errors: True
-  ldap_attr:
-    dn: "cn=config"
-    name: "{{ item.key }}"
-    values: "{{ item.value }}"
-    state: exact
-  with_dict:
-    olcTLSCertificateKeyFile: "{{ ldap_certificate_key_file }}"
-    olcTLSCACertificateFile: "{{ ldap_ca_certificate_file }}"
-    olcTLSCertificateFile: "{{ ldap_certificate_file }}"
-    
-- name: Configure LDAP Core TLS Settings (again, because of violation of requirements in configuration)
-  ldap_attr:
-    dn: "cn=config"
-    name: "{{ item.key }}"
-    values: "{{ item.value }}"
-    state: exact
-  with_dict:
-    olcTLSCertificateKeyFile: "{{ ldap_certificate_key_file }}"
-    olcTLSCACertificateFile: "{{ ldap_ca_certificate_file }}"
-    olcTLSCertificateFile: "{{ ldap_certificate_file }}"
-    
+- name: Create file for modifying LDAP TLS settings
+  copy:
+    dest: "/etc/ldap/ssl.ldif"
+    content: |
+      dn: cn=config
+      changetype: modify
+      replace: olcTLSCertificateFile
+      olcTLSCertificateFile: {{ ldap_certificate_file }}
+      -
+      replace: olcTLSCertificateKeyFile
+      olcTLSCertificateKeyFile: {{ ldap_certificate_key_file }}
+      -
+      replace: olcTLSCACertificateFile
+      olcTLSCACertificateFile: {{ ldap_certificate_file }}
+      -
+
+  register: ssl_ldif
+
+- name: Change TLS settings
+  command: /usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -D "{{ slapd_basedn_admin }}" -w "{{ password_ldap_config }}" -f /etc/ldap/ssl.ldif
+  when: ssl_ldif.changed
+
 - name: Enable secure port in /etc/default/slapd
   lineinfile:
    dest: /etc/default/slapd
