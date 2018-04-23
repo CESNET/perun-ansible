@@ -1,7 +1,9 @@
 ---
 # vars file for apache-perun
 apache_package:
-  Debian: apache2
+  Debian:
+    - apache2
+    - cronolog
 apache_modules:
   Debian:
     - headers
