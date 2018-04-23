@@ -23,6 +23,7 @@
 - name: Check rights on certificate
   file:
     path: "{{ apache_certificate_file }}"
+    follow: yes
     owner: root
     group: root
     mode: 0644
@@ -30,6 +31,7 @@
 - name: Check rights on certificate key
   file:
     path: "{{ apache_certificate_key_file }}"
+    follow: yes
     owner: root
     group: ssl-cert
     mode: 0640
