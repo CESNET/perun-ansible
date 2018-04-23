@@ -12,6 +12,19 @@
     regexp: "set mouse=a"
     state: absent
 
+- name: fix cmd prompt
+  blockinfile:
+    dest: /root/.bashrc
+    block: |
+     # If this is an xterm set the title to user@host:dir
+     case "$TERM" in
+     xterm*|rxvt*)
+        PS1="\[\e]0;\u@$(hostname --fqdn) \w\a\]\u@$(hostname --fqdn):\w# "
+        ;;
+     *)
+        ;;
+     esac
+
 - name: Use cronolog for error log rotation
   lineinfile:
     path: "/etc/apache2/apache2.conf"
