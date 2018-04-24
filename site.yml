@@ -1,7 +1,9 @@
 ---
 # Main perun orchestration playbook
-# you can run a specific part using tags, e.g.:
-#  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags shibboleth
+
+# you can run only specific parts using tags, e.g.:
+#  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags perun,shibboleth,apache
+
 - hosts: perun-servers
   pre_tasks:
 
@@ -32,7 +34,7 @@
         - "."
         - "group_vars"
         - "site_vars"
-    tags: ['perun','config','shibboleth','apache','tomcat','db','build','engine','wui', 'ldap']
+    tags: ['always']
 
   roles:
     # NECESSARY ROLES
@@ -57,3 +59,5 @@
     - { role: wui-perun, become: true, tags: wui}
     # This role will deploy new LDAP server configuration.
     - { role: ldap-perun, become: true, tags: ldap }
+    # This role will deploy authentication by hardware Yubikeys.
+    - { role: yubikey, become: true, tags: yubikey }

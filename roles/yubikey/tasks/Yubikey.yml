@@ -1,0 +1,79 @@
+---
+
+- name: Install sudo
+  apt:
+    name: sudo
+    state: latest
+
+- name: Install libpam-yubico
+  apt:
+    name: libpam-yubico
+    state: latest
+
+- name: create /etc/yubico
+  file:
+    path: /etc/yubico
+    state: directory
+
+- name: create /etc/yubico/authorized_yubikeys
+  copy:
+    content: ""
+    dest: /etc/yubico/authorized_yubikeys
+    force: no
+
+- name: put users into /etc/yubico/authorized_yubikeys
+  lineinfile:
+    path: /etc/yubico/authorized_yubikeys
+    line: "{{item}}:{{yubikey_users[item].yubikey}}"
+  with_items: "{{ create_yubikey_users }}"
+  
+- name: Add Yubikey to sudo
+  lineinfile:
+    path: "/etc/pam.d/sudo"
+    insertafter: '#%PAM-1.0'
+    line: "auth sufficient pam_yubico.so authfile=/etc/yubico/authorized_yubikeys id={{ yubikey_id }} key={{ yubikey_key }}"
+
+- name: Set permissions on /etc/pam.d/sudo
+  file:
+    path: /etc/pam.d/sudo
+    mode: 0600
+
+- name: create users
+  user:
+    name: "{{ item }}"
+    comment: "{{ yubikey_users[item].name }}"
+    shell: /bin/bash
+  with_items: "{{ create_yubikey_users }}"
+
+- name: create .ssh dirs
+  file:
+    path: "/home/{{ item }}/.ssh"
+    owner: "{{item}}"
+    group: "{{item}}"
+    state: directory
+    mode: 0700
+  with_items: "{{ create_yubikey_users }}"
+
+- name: create .ssh/authorized_keys
+  copy:
+    dest: "/home/{{ item }}/.ssh/authorized_keys"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    content: "{{ yubikey_users[item].sshkey }}"
+  with_items: "{{ create_yubikey_users }}"
+
+- name: Add users to group sudo
+  user:
+    name: "{{item}}"
+    groups: sudo
+    append: yes
+  with_items: "{{sudo_root_users}}"
+
+- name: Disable password for perun
+  command: passwd --lock perun
+
+- name: Add to sudoers
+  lineinfile:
+    path: "/etc/sudoers"
+    line: "{{item}} ALL=(root) /bin/su - {{perun_login}}"
+  with_items: "{{sudo_perun_users}}"
