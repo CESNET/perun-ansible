@@ -61,3 +61,5 @@
     - { role: ldap-perun, become: true, tags: ldap }
     # This role will deploy authentication by hardware Yubikeys.
     - { role: yubikey, become: true, tags: yubikey }
+    # This role will deploy unattended upgrades of Debian OS.
+    - { role: unattended-upgrades, become: true, tags: unattended-upgrades }
