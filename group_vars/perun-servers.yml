@@ -89,3 +89,6 @@ instance_id: 'GENERIC01A02B03C'
 
 # Install Yubikeys? Modify the settings in the encrypted vault group_vars/passwords-default.yml
 install_yubikeys: True
+
+# unattended-upgrades
+root_email_address: 'admin@example.com'
