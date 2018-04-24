@@ -30,7 +30,8 @@ perun_config_dir: "/etc/perun"
 # Variables log folder for Perun
 perun_log_dir: "/var/log/perun"
 
-
+# optional installation of Postgres
+install_postgres: True
 # Database name (we recommend to don't change it)
 db_name: 'perun'
 # Database user (we recommend to don't change it)

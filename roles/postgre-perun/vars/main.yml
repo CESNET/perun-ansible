@@ -1,4 +1,9 @@
 ---
+
+postgres_version:
+  Debian_8: 9.4
+  Debian_9: 9.6
+
 # vars file for postgre-perun
 postgre_packages:
   Debian:
