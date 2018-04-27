@@ -69,8 +69,10 @@
     append: yes
   with_items: "{{sudo_root_users}}"
 
-- name: Disable password for perun
-  command: passwd --lock perun
+- name: Disable direct ssh access to perun
+  file:
+    path: "/home/{{perun_login}}/.ssh/authorized_keys"
+    state: absent
 
 - name: Add to sudoers
   lineinfile:

@@ -75,3 +75,5 @@
     - { role: yubikey, become: true, tags: yubikey }
     # This role will deploy unattended upgrades of Debian OS.
     - { role: unattended-upgrades, become: true, tags: unattended-upgrades }
+    # This role will set working environment to sensible state.
+    - { role: work-env, become: true, tags: work-env }

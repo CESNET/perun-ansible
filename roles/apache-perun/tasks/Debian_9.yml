@@ -6,24 +6,6 @@
       - ansible_distribution_major_version == "9"
     msg: "Debian 9 specific tasks"
 
-- name: fix vim mouse editing
-  lineinfile:
-    path: "/usr/share/vim/vim80/defaults.vim"
-    regexp: "set mouse=a"
-    state: absent
-
-- name: fix cmd prompt
-  blockinfile:
-    dest: /root/.bashrc
-    block: |
-     # If this is an xterm set the title to user@host:dir
-     case "$TERM" in
-     xterm*|rxvt*)
-        PS1="\[\e]0;\u@$(hostname --fqdn) \w\a\]\u@$(hostname --fqdn):\w# "
-        ;;
-     *)
-        ;;
-     esac
 
 - name: Use cronolog for error log rotation
   lineinfile:
