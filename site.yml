@@ -1,11 +1,33 @@
 ---
 # Main perun orchestration playbook
 
-# you can run only specific parts using tags, e.g.:
+# Steps to run:
+# 1. change the inventories/prod file to contain your host name
+# 2. create directory host_vars/<your host name>/ and copy there the files from host_vars/perun.example.com/
+# 3. set all values in host_vars/<your host name>/vars.yml
+# 4. edit vault by executing the command "ansible-vault -edit host_vars/<your host name>/passwords.yml" and set values in the file
+# 5. change vault password by executing the command "ansible-vault rekey host_vars/<your host name>/passwords.yml"
+# 6. run the playbook by executing the command "ansible-playbook -i inventories/prod --ask-vault-pass site.yml"
+
+# you can run only specific parts of this playbook using tags, e.g.:
 #  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags perun,shibboleth,apache
 
 - hosts: perun-servers
   pre_tasks:
+
+  - name: Check that host's variables and passwords are loaded
+    assert:
+      that:
+        - password_perun_admin is defined
+        - perun_login is defined
+        - perun_hostname is defined
+        - perun_email is defined
+        - apache_certificate_file is defined
+        - apache_certificate_key_file is defined
+        - ldap_certificate_file is defined
+        - ldap_certificate_key_file is defined
+      msg: "Create directory host_vars/{{inventory_hostname}}/, copy there files from host_vars/perun.example.com/ and set all values in them"
+    tags: ['always']
 
   # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
   - name: Require Debian 8,9
@@ -25,16 +47,6 @@
       msg: "Required Ansible version is 2.4+ which contains xml task"
     tags: ['shibboleth']
 
-  - name: Pull in site-specific passwords
-    include_vars: "{{ item }}"
-    with_first_found:
-      - files:
-        - "passwords-{{ site_name | default('default') }}.yml"
-        paths:
-        - "."
-        - "group_vars"
-        - "site_vars"
-    tags: ['always']
 
   roles:
     # NECESSARY ROLES
