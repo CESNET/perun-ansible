@@ -6,10 +6,6 @@
     name: "{{ prerequisites[ansible_distribution] }}"
     state: latest
 
-- name: Generate the hash of user's password (SHA-512)
-  shell: mkpasswd -m sha-512 "{{ password_user | default (lookup('password')) }}"
-  register: password_user_hash
-
 - name: "Create {{ perun_group }} group"
   group:
     name: "{{ perun_group }}"
@@ -20,9 +16,7 @@
     name: "{{ perun_login }}"
     group: "{{ perun_group }}"
     comment: "{{ perun_name }}"
-    password: "{{ password_user_hash.stdout }}"
     shell: /bin/bash
-    update_password: always
     system: yes
 
 - name: Clone git repository of perun sources to remote server
