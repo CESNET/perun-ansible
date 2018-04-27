@@ -31,6 +31,7 @@ This repository serves for easier deployment of Perun server with default config
 - At the target machine, preferably in the **/etc/perun/ssl** folder, generate a private key and a certificate request
 - Get TLS certificate from a reputable certification authority together with the CA's chain of certificates from a trusted root CA 
 - Put the certificate and chain files to the folder with the private key. 
+- Install package **ssl-cert** and change the owning group of the private key file to the group **ssl-cert** (needed for LDAP and PostgreSQL servers to access it) 
 
 ## Set address of your server in inventories
 
