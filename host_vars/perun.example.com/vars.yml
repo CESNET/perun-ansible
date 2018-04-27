@@ -1,0 +1,57 @@
+---
+# copy this file to host_vars/<your host name>/vars.yml and set real values!
+
+# Email address of admin of Perun server
+perun_email: 'admin@example.com'
+
+# Hostname of the server (or IP adress)
+perun_hostname: 'perun.example.com'
+# If your server has alias for its hostname, put it here (ServerAlias variable in Apache config). If not, leave it empty.
+perun_hostname_alias: ''
+
+
+# APACHE CERTIFICATE
+# Path to Apache certificate file (SSLCertificateFile). Default is fake snake oil, which will be created. Please change this path.
+apache_certificate_file: '/etc/perun/ssl/ssl-cert-snakeoil.pem'
+# Path to key for Apache certificate file. Default is key to fake snake oil, which will be created. Please change this path.
+apache_certificate_key_file: '/etc/perun/ssl/ssl-cert-snakeoil.key'
+# Path to file with chain of CA  certificates. (SSLCertificateChainFile).
+apache_certificate_chain_file: ''
+
+# Path to directory with CA certificates. If you leave it with default value, IGTF certificates will be installed.
+apache_ca_certificate_path: '/etc/grid-security/certificates/'
+
+# LDAP CERTIFICATE
+# Path to LDAP certificate file (olcTLSCertificateFile).
+ldap_certificate_file: "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+# Path to key for LDAP certificate file (olcTLSCertificateKeyFile).
+ldap_certificate_key_file: "/etc/perun/ssl/ssl-cert-snakeoil.key"
+# Path to CA LDAP certificate file (olcTLSCACertificateFile).
+ldap_ca_certificate_file: "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+
+# LDAP DOMAIN
+slapd_domain: 'example.com'
+slapd_basedn: '{{ "dc=" + slapd_domain.split(".") | join(",dc=") }}'
+slapd_basedn_admin: '{{ "cn=admin," + slapd_basedn }}'
+
+# Comma separated list of entityIDs of proxy IdPs which is infront of Perun.
+# So Perun can work with them differently.
+proxy_idps: ''
+
+# Shibboleth SP
+shibboleth_sp_entityID: "https://{{perun_hostname}}/sp/shibboleth"
+shibboleth_idp_entityID: "https://login.example.com/proxy/saml2/idp/metadata.php"
+shibboleth_idp_metadata_url: "https://login.example.com/proxy/saml2/idp/metadata.php"
+
+# Perun instance Name and ID
+instance_name: 'GENERIC'
+instance_id: 'GENERIC01A02B03C'
+
+# Otional installation of Postgres
+install_postgres: True
+
+# Install Yubikeys? Modify the settings in the encrypted vault host_vars/<your host name>/passwords.yml
+install_yubikeys: True
+
+# unattended-upgrades
+root_email_address: 'admin@example.com'

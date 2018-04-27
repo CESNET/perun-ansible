@@ -1,0 +1,39 @@
+---
+# Variables used through all roles -  values which should not be changed unless you know what you are doing
+
+# Login name of Perun user
+perun_login: 'perun'
+# Group name of Perun user
+perun_group: 'perun'
+# Full name of Perun user
+perun_name: 'Perun'
+
+
+# Path to repository with cloned Perun sources from GIT
+perun_folder: "/home/{{ perun_login }}/perun-sources"
+# Path to repository with cloned Perun services from GIT
+perun_services_folder: "/home/{{ perun_login }}/perun-services"
+# Path to repository with cloned Perun WUI
+perun_wui_folder: "/home/{{ perun_login }}/perun-wui"
+# Path to repository with Perun LDAPc
+perun_ldapc_folder: "/home/{{ perun_login }}/perun-ldapc"
+
+# Main Perun folder
+perun_config_dir: "/etc/perun"
+# Variables log folder for Perun
+perun_log_dir: "/var/log/perun"
+
+# Database name (we recommend to don't change it)
+db_name: 'perun'
+# Database user (we recommend to don't change it)
+db_user: 'perun'
+
+# ORACLE DB DRIVERS
+# Path to ojdbc8 file on your system with Ansible
+ojdbc8_file_path: '~/ojdbc8.jar'
+# Path to orai18n file on your system with Ansible
+orai18n_file_path: '~/orai18n.jar'
+
+# Federative authz
+fed_authz: 'fed'
+
