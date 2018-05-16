@@ -14,7 +14,7 @@
     name: mailutils
     state: present
 
-- name: Set update sources
+- name: Set Origins-Pattern
   blockinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
     insertafter: "Unattended-Upgrade::Origins-Pattern {"
@@ -22,22 +22,27 @@
               "origin=Debian,codename=${distro_codename}";
               "origin=Debian,codename=${distro_codename}-updates";
 
-- name: Set email address
+- name: Set Mail to root
   lineinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
     regexp: '//Unattended-Upgrade::Mail "root";'
     line:   'Unattended-Upgrade::Mail "root";'
     backrefs: yes
 
-- name: Set email address
+- name: Set MailOnlyOnError
   lineinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
     regexp: '//Unattended-Upgrade::MailOnlyOnError "true";'
     line:   'Unattended-Upgrade::MailOnlyOnError "true";'
     backrefs: yes
 
-- name: Set aliases
+- name: Set root mail alias
   blockinfile:
     path: /etc/aliases
     block: |2
       root: {{root_email_address}}
+  register: root_mail_alias
+
+- name: Run newaliases
+  command: /usr/sbin/newaliases
+  when: root_mail_alias.changed
