@@ -22,3 +22,4 @@ prerequisites:
    - whois
    - apache2
    - ntpdate
+   - fail2ban
