@@ -15,10 +15,9 @@
 - hosts: perun-servers
   pre_tasks:
 
-  - name: Check that host's variables and passwords are loaded
+  - name: Check that host's variables are loaded
     assert:
       that:
-        - password_perun_admin is defined
         - perun_login is defined
         - perun_hostname is defined
         - perun_email is defined
@@ -26,8 +25,16 @@
         - apache_certificate_key_file is defined
         - ldap_certificate_file is defined
         - ldap_certificate_key_file is defined
-      msg: "Create directory host_vars/{{inventory_hostname}}/, copy there files from host_vars/perun.example.com/ and set all values in them"
+      msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set all values in it"
     tags: ['always']
+
+  - name: Check that host's passwords are loaded
+    assert:
+      that:
+        - password_perun_admin is defined
+        - yubikey_key is defined
+      msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set all values in it"
+    tags: ['perun', 'config', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap', 'yubikey']
 
   # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
   - name: Require Debian 8,9
@@ -71,6 +78,8 @@
     - { role: wui-perun, become: true, tags: wui}
     # This role will deploy new LDAP server configuration.
     - { role: ldap-perun, become: true, tags: ldap }
+    # This role will set up security measures like firewall.
+    - { role: security, become: true, tags: security }
     # This role will deploy authentication by hardware Yubikeys.
     - { role: yubikey, become: true, tags: yubikey }
     # This role will deploy unattended upgrades of Debian OS.

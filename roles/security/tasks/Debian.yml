@@ -1,0 +1,18 @@
+---
+# tool for setting firewall rules
+- name: Install iptables package
+  package:
+    name: iptables
+    state: present
+
+# tool for saving firewall rules to /etc/iptables/rules.v4 and /etc/iptables/rules.v6 to survive reboot
+- name: Install iptables-persistent package
+  package:
+    name: iptables-persistent
+    state: present
+
+# blocks IP addresses after multiple unsuccessful authentication attempts
+- name: Install fail2ban package
+  package:
+    name: fail2ban
+    state: present
