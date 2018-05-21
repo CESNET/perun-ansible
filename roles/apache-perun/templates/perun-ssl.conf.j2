@@ -58,15 +58,6 @@ ShibCompatValidUser on
   RewriteCond  %{REQUEST_URI}  !^/
   RewriteRule  .*              -    [R=400,L]
 
-  ###################################
-  # Logging                      ####
-  ###################################
-
-  # Following handles also rewrite log
-  LogLevel warn rewrite:warn
-  ErrorLog ${APACHE_LOG_DIR}/error.log
-  CustomLog ${APACHE_LOG_DIR}/access.log combined
-
  ####################################
  ##      MAINTENANCE             ####
  ####################################

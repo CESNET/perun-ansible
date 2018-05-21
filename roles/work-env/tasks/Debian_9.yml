@@ -26,3 +26,4 @@
      *)
         ;;
      esac
+     export EDITOR=vi
