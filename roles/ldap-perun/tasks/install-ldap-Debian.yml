@@ -76,7 +76,7 @@
       olcTLSCertificateKeyFile: {{ ldap_certificate_key_file }}
       -
       replace: olcTLSCACertificateFile
-      olcTLSCACertificateFile: {{ ldap_certificate_file }}
+      olcTLSCACertificateFile: {{ ldap_ca_certificate_file }}
       -
 
   register: ssl_ldif
@@ -91,6 +91,11 @@
    regexp: ^SLAPD_SERVICES=
    line: SLAPD_SERVICES="ldaps:/// ldapi:/// ldap://127.0.0.1/"
   notify: Restart LDAP
+
+- name: Restart LDAP after enabling TLS
+  service:
+    name: slapd
+    state: restarted
 
 - name: Make sure we have perun schema
   ldap_entry:
