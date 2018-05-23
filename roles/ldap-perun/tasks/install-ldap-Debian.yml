@@ -225,7 +225,7 @@
   ldap_attr:
     dn: cn=config
     name: "olcAttributeOptions"
-    values: "ns-x-"
+    values: "x-ns-"
     state: exact
 
 - name: Set indexes (olcDbIndex attribute)
