@@ -46,6 +46,12 @@
     line: 'JAVA_OPTIONS=" -Dspring.profiles.default=production -Djavax.net.ssl.trustStore={{ perun_ldapc_folder }}/truststore -Djavax.net.ssl.trustStorePassword={{ password_ldap_snakeoil_truststore }} -Djavax.net.ssl.trustStoreType=JKS"'
   when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
 
+- name: Change JAVA_OPTIONS in init.d script to use truststore with snake-oil certificate
+  copy:
+    dest: /etc/perun/perun-ldapc
+    content: 'JAVA_OPTS=" -Djavax.net.ssl.trustStore={{ perun_ldapc_folder }}/truststore -Djavax.net.ssl.trustStorePassword={{ password_ldap_snakeoil_truststore }} -Djavax.net.ssl.trustStoreType=JKS"'
+  when: apache_certificate_file == "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+
 - name: Run initialize script
   ignore_errors: True
   command: "{{ script_files.initialize.destination }}"
