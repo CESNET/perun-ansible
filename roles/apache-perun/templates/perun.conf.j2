@@ -1,17 +1,22 @@
 <VirtualHost *:80>
-        ServerAdmin {{ perun_email }}
 
-        RewriteEngine On
-        RewriteCond %{HTTPS} !=on
-        RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+ ServerAdmin {{ perun_email }}
 
-        DocumentRoot /var/www/
+ RewriteEngine On
+ RewriteCond %{HTTPS} !=on
+ RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
 
-        # GENERIC ERRORS
-        ErrorDocument 401 /maintenance/401.html
-        ErrorDocument 403 /maintenance/403.html
-        ErrorDocument 404 /maintenance/404.html
-        ErrorDocument 500 /maintenance/500.html
-        ErrorDocument 503 /maintenance/503.html
+ DocumentRoot /var/www/
+ <Directory "/var/www">
+   Options -Indexes +FollowSymLinks -MultiViews
+   Require all granted
+ </Directory>
+
+ # GENERIC ERRORS
+ ErrorDocument 401 /maintenance/401.html
+ ErrorDocument 403 /maintenance/403.html
+ ErrorDocument 404 /maintenance/404.html
+ ErrorDocument 500 /maintenance/500.html
+ ErrorDocument 503 /maintenance/503.html
 
 </VirtualHost>

@@ -60,7 +60,7 @@
     namespaces:
       conf: urn:mace:shibboleth:2.0:native:sp:config
     attribute: REMOTE_USER
-    value: "epuid eppn persistent-id targeted-id"
+    value: "eppn epuid persistent-id targeted-id"
   notify:
     - "restart shibd"
 
@@ -105,6 +105,18 @@
     content: |
         <MetadataProvider type="XML" uri="{{ shibboleth_idp_metadata_url }}"
                         backingFilePath="proxyidp.xml" reloadInterval="1800" />
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml add Consolidator SP
+  blockinfile:
+    path: /etc/shibboleth/shibboleth2.xml
+    insertbefore: '</ApplicationDefaults>'
+    marker: "<!-- {mark} ANSIBLE Consolidator SP -->"
+    content: |
+        <ApplicationOverride id="consolidator" entityID="https://{{perun_hostname}}/consolidator">
+          <Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/Consolidator.sso" relayState="ss:mem" handlerSSL="true" cookieProps="https" />
+        </ApplicationOverride>
   notify:
     - "restart shibd"
 

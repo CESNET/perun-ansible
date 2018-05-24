@@ -1,11 +1,10 @@
 <IfModule mod_ssl.c>
-# Go ahead and accept connections for these vhosts
-# from non-SNI clients
-SSLStrictSNIVHostCheck off
 
+# Support Federated and Kerberos authz on single instance
+# Shib module otherwise occupy "Require valid-user" option
 ShibCompatValidUser on
 
-<VirtualHost *:443>
+ <VirtualHost *:443>
 
   ServerAdmin {{ perun_email }}
 
@@ -15,6 +14,10 @@ ShibCompatValidUser on
   {% endif %}
 
   DocumentRoot /var/www/
+  <Directory "/var/www">
+    Options -Indexes +FollowSymLinks -MultiViews
+    Require all granted
+  </Directory>
 
   # GENERIC ERRORS
   ErrorDocument 401 /maintenance/401.html
@@ -58,74 +61,108 @@ ShibCompatValidUser on
   RewriteCond  %{REQUEST_URI}  !^/
   RewriteRule  .*              -    [R=400,L]
 
- ####################################
- ##      MAINTENANCE             ####
- ####################################
- #RewriteCond %{REQUEST_URI} !^/.*/rpc/
- #RewriteCond %{REQUEST_URI} !^/cert/.*
- #RewriteCond %{REQUEST_URI} !^/krb/.*
- #RewriteCond %{REQUEST_URI} !^/fed/.*
- #RewriteCond %{REQUEST_URI} !^/maintenance/maintenance.html
- #RewriteCond %{REQUEST_URI} !^/Shibboleth.sso/
- #RewriteRule .* /maintenance/maintenance.html [R,L]
+  ####################################
+  ##      MAINTENANCE             ####
+  ####################################
+  #RewriteCond %{REQUEST_URI} !^/.*/rpc/
+  #RewriteCond %{REQUEST_URI} !^/cert/.*
+  #RewriteCond %{REQUEST_URI} !^/krb/.*
+  #RewriteCond %{REQUEST_URI} !^/fed/.*
+  #RewriteCond %{REQUEST_URI} !^/maintenance/maintenance.html
+  #RewriteCond %{REQUEST_URI} !^/Shibboleth.sso/
+  #RewriteRule .* /maintenance/maintenance.html [R,L]
 
- ####################################
- ##    DEPLOY TO TOMCAT          ####
- ####################################
+  ####################################
+  ##    DEPLOY TO TOMCAT          ####
+  ####################################
 
- <Location "/tomcat-manager/">
-   ProxyPass http://127.0.0.1:18443/ nocanon
-   ProxyPassReverse http://127.0.0.1:18443/
-   # set bigger buffer, since we deploy 50MB WAR
-   SSLRenegBufferSize 52428800
-   # restrict access to our deploy server only
-   #Order deny,allow
-   #Deny from all
-   #Allow from your.deploy.server.com
- </Location>
+  <Location "/tomcat-manager/">
+    ProxyPass http://127.0.0.1:18443/ nocanon
+    ProxyPassReverse http://127.0.0.1:18443/
+    # set bigger buffer, since we deploy 50MB WAR
+    SSLRenegBufferSize 52428800
+  </Location>
 
- ####################################
- ##     RPC                      ####
- ####################################
+  ####################################
+  ##     RPC                      ####
+  ####################################
 
- # General rewrite role
- RewriteRule ^/(.*)/rpc/(.*)$ ajp://localhost:8009/perun-rpc/$2 [P,QSA,E=AJP_SSL_CLIENT_VERIFY:%{SSL:SSL_CLIENT_VERIFY},E=AJP_SSL_CLIENT_I_DN:%{SSL:SSL_CLIENT_I_DN},E=AJP_SSL_CLIENT_S_DN:%{SSL:SSL_CLIENT_S_DN},E=AJP_SSL_CLIENT_CERT:%{SSL:SSL_CLIENT_CERT}]
+  # General rewrite rule
+  RewriteRule ^/(.*)/rpc/(.*)$ ajp://localhost:8009/perun-rpc/$2 [P,QSA,E=AJP_SSL_CLIENT_VERIFY:%{SSL:SSL_CLIENT_VERIFY},E=AJP_SSL_CLIENT_I_DN:%{SSL:SSL_CLIENT_I_DN},E=AJP_SSL_CLIENT_S_DN:%{SSL:SSL_CLIENT_S_DN},E=AJP_SSL_CLIENT_CERT:%{SSL:SSL_CLIENT_CERT}]
 
- ####################################
- ##     GUI                      ####
- ####################################
- RewriteRule ^/(.*)/gui$ https://%{HTTP_HOST}/$1/gui/ [L,R=301]
- RewriteRule ^/(.*)/gui/$ /var/www/perun-web-gui/PerunWeb.html [L]
- RewriteRule ^/(.*)/gui/(.+)$ /var/www/perun-web-gui/$2 [L]
+  ####################################
+  ##     GUI                      ####
+  ####################################
+  RewriteRule ^/(.*)/gui$ https://%{HTTP_HOST}/$1/gui/ [L,R=301]
+  RewriteRule ^/(.*)/gui/$ /var/www/perun-web-gui/PerunWeb.html [L]
+  RewriteRule ^/(.*)/gui/(.+)$ /var/www/perun-web-gui/$2 [L]
 
- ####################################
- ##     Registrar                ####
- ####################################
- RewriteCond %{REQUEST_URI} ^/(.*)/registrar$
- RewriteRule (.*) %{REQUEST_URI}/ [R=301,L]
+  ####################################
+  ##     Registrar                ####
+  ####################################
+  RewriteCond %{REQUEST_URI} ^/(.*)/registrar$
+  RewriteRule (.*) %{REQUEST_URI}/ [R=301,L]
 
- RewriteRule ^/(.*)/registrar/?$ /var/www/perun-wui/PerunRegistrar.html [L]
- RewriteRule ^/(.*)/registrar/(.+)$ /var/www/perun-wui/$2 [L]
+  RewriteRule ^/(.*)/registrar/?$ /var/www/perun-wui/PerunRegistrar.html [L]
+  RewriteRule ^/(.*)/registrar/(.+)$ /var/www/perun-wui/$2 [L]
 
- ####################################
- ##     Password Reset           ####
- ####################################
- RewriteRule ^/(.*)/pwd-reset$ https://%{HTTP_HOST}/$1/pwd-reset/ [L,R=301]
- RewriteRule ^/(.*)/pwd-reset/$ /var/www/perun-wui/PerunPwdReset.html [L]
- RewriteRule ^/(.*)/pwd-reset/(.+)$ /var/www/perun-wui/$2 [L]
+  ####################################
+  ##     Password Reset           ####
+  ####################################
+  RewriteRule ^/(.*)/pwd-reset$ https://%{HTTP_HOST}/$1/pwd-reset/ [L,R=301]
+  RewriteRule ^/(.*)/pwd-reset/$ /var/www/perun-wui/PerunPwdReset.html [L]
+  RewriteRule ^/(.*)/pwd-reset/(.+)$ /var/www/perun-wui/$2 [L]
 
- ####################################
- ##     Identity Consolidator    ####
- ####################################
- RewriteRule ^/(.*)/ic$ https://%{HTTP_HOST}/$1/ic/ [L,R=301]
- RewriteRule ^/(.*)/ic/$ /var/www/perun-wui/PerunConsolidator.html [L]
- RewriteRule ^/(.+)/ic/(.+)$ /var/www/perun-wui/$2 [L]
+  ####################################
+  ##     Identity Consolidator    ####
+  ####################################
 
- ####################################
- ##     AuthN Methods            ####
- ####################################
+  # SP endpoint
+  <Location "/Consolidator.sso">
+    AuthType shibboleth
+    ShibRequestSetting requireSession 1
+    ShibRequestSetting applicationId consolidator
+    Require shib-session
+  </Location>
 
- <LocationMatch "^/cert/">
+  RewriteRule ^/(krb|cert)-ic/ic$ https://%{HTTP_HOST}/$1/ic/ [L,R=301]
+  RewriteRule ^/(krb|cert)-ic/ic/$ /var/www/perun-wui/PerunConsolidator.html [L]
+  RewriteRule ^/(krb|cert)-ic/ic/(.+)$ /var/www/perun-wui/$2 [L]
+
+  RewriteRule ^/(.*)-ic/ic$ https://%{HTTP_HOST}/$1/ic/ [L,R=301]
+  RewriteRule ^/(.*)-ic/ic/$ /var/www/perun-wui/PerunConsolidator.html [L]
+  RewriteRule ^/(.*)-ic/ic/(.+)$ /var/www/perun-wui/$2 [L]
+
+  #must be last
+  RewriteRule ^/(.*)/ic$ https://%{HTTP_HOST}/$1-ic/ic/ [L,R=301]
+  RewriteRule ^/(.*)/ic/(.*)$ https://%{HTTP_HOST}/$1-ic/ic/$2 [L,R=301]
+
+  ####################################
+  ##     PROFILE                  ####
+  ####################################
+  RewriteRule ^/(.*)/profile$ https://%{HTTP_HOST}/$1/wui/ [L,R=301]
+  RewriteRule ^/(.*)/profile/$ /var/www/perun-wui/PerunProfile.html [L]
+  RewriteRule ^/(.*)/profile/(.+)$ /var/www/perun-wui/$2 [L]
+
+  ####################################
+  ##     WUI                      ####
+  ####################################
+  #RewriteRule ^/(.*)/wui$ https://%{HTTP_HOST}/$1/wui/ [L,R=301]
+  #RewriteRule ^/(.*)/wui/$ /var/www/perun-wui/PerunAdmin.html [L]
+  #RewriteRule ^/(.*)/wui/(.+)$ /var/www/perun-wui/$2 [L]
+
+  ####################################
+  ##     PUBLICATIONS             ####
+  ####################################
+  #RewriteRule ^/(.*)/publications$ https://%{HTTP_HOST}/$1/wui/ [L,R=301]
+  #RewriteRule ^/(.*)/publications/$ /var/www/perun-wui/PerunCabinet.html [L]
+  #RewriteRule ^/(.*)/publications/(.+)$ /var/www/perun-wui/$2 [L]
+
+  ####################################
+  ##     AuthN Methods            ####
+  ####################################
+
+  <LocationMatch "(^/cert/|^/cert-ic/)">
     Options FollowSymLinks
     Require all granted
     SSLRequireSSL
@@ -134,16 +171,28 @@ ShibCompatValidUser on
 
     SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceX509
     SetEnvIf _ .* AJP_EXTSOURCELOA=2
- </LocationMatch>
+  </LocationMatch>
 
- <LocationMatch "^/fed/">
+  <LocationMatch "^/fed/">
     AuthType shibboleth
+    ShibRequestSetting applicationId default
     ShibRequestSetting requireSession 1
-    ShibUseHeaders On
-    Require valid-user
- </LocationMatch>
+    # for custom prefixes with multiple session initiators
+    # ShibRequestSetting requireSessionWith fed
+    Require shib-session
+  </LocationMatch>
 
- <LocationMatch "^/non/">
+  <LocationMatch "^/fed-ic/">
+    AuthType shibboleth
+    ShibRequestSetting applicationId consolidator
+    ShibRequestSetting requireSession 1
+    # for custom prefixes with multiple session initiators
+    # ShibRequestSetting requireSessionWith fed
+    ShibRequestSetting forceAuthn On
+    Require shib-session
+  </LocationMatch>
+
+  <LocationMatch "^/non/">
     Options FollowSymLinks
     Require all granted
     SSLRequireSSL
@@ -152,9 +201,9 @@ ShibCompatValidUser on
     SetEnvIf _ .* AJP_EXTSOURCE=LOCAL
     SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceInternal
     SetEnvIf _ .* AJP_EXTSOURCELOA=0
- </LocationMatch>
+  </LocationMatch>
 
- <Location "/ba/rpc/">
+  <LocationMatch "^/ba/">
     Options FollowSymLinks
     SSLRequireSSL
     SSLVerifyClient none
@@ -168,71 +217,71 @@ ShibCompatValidUser on
     SetEnvIf _ .* AJP_EXTSOURCE=INTERNAL
     SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceInternal
     SetEnvIf _ .* AJP_EXTSOURCELOA=0
-  </Location>
+  </LocationMatch>
 
- #<LocationMatch "^/krb/">
- #   Options FollowSymLinks
- #   SSLRequireSSL
- #   AuthType KerberosV5
- #   AuthName "Kerberos META"
- #   Krb5Keytab /etc/apache2/krb5.http.keytab
- #   KrbAuthRealms META
- #   KrbSaveCredentials Off
- #   KrbMethodNegotiate On
- #   KrbMethodK5Passwd On
- #   KrbServiceName Any
- #   KrbVerifyKDC Off
+  #<LocationMatch "(^/krb/|^/krb-ic/)">
+  #   Options FollowSymLinks
+  #   SSLRequireSSL
+  #   AuthType KerberosV5
+  #   AuthName "Kerberos META"
+  #   Krb5Keytab /etc/apache2/krb5.http.keytab
+  #   KrbAuthRealms META
+  #   KrbSaveCredentials Off
+  #   KrbMethodNegotiate On
+  #   KrbMethodK5Passwd On
+  #   KrbServiceName Any
+  #   KrbVerifyKDC Off
 
- #   Require valid-user
+  #   Require valid-user
 
-    # Definice externiho overeni uzivatelu
- #   SetEnvIf _ .* AJP_EXTSOURCE=META
- #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
- #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
- #</LocationMatch>
+  # Perun ExtSource definition matching this authz method
+  #   SetEnvIf _ .* AJP_EXTSOURCE=META
+  #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
+  #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
+  #</LocationMatch>
 
- #<LocationMatch "^/krbe/">
- #   Options FollowSymLinks
- #   SSLRequireSSL
- #   SSLVerifyClient none
- #   SSLOptions +StdEnvVars +ExportCertData
- #   AuthType KerberosV5
- #   AuthName "Kerberos EINFRA"
- #   Require valid-user
- #   Krb5Keytab /etc/apache2/krb5.http.keytab
- #   KrbAuthRealms EINFRA
- #   KrbSaveCredentials Off
- #   KrbMethodNegotiate On
- #   KrbMethodK5Passwd On
- #   KrbServiceName Any
- #   KrbVerifyKDC Off
+  #<LocationMatch "^/krbe/">
+  #   Options FollowSymLinks
+  #   SSLRequireSSL
+  #   SSLVerifyClient none
+  #   SSLOptions +StdEnvVars +ExportCertData
+  #   AuthType KerberosV5
+  #   AuthName "Kerberos EINFRA"
+  #   Require valid-user
+  #   Krb5Keytab /etc/apache2/krb5.http.keytab
+  #   KrbAuthRealms EINFRA
+  #   KrbSaveCredentials Off
+  #   KrbMethodNegotiate On
+  #   KrbMethodK5Passwd On
+  #   KrbServiceName Any
+  #   KrbVerifyKDC Off
 
-    # Definice externiho overeni uzivatelu
- #   SetEnvIf _ .* AJP_EXTSOURCE=EINFRA
- #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
- #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
- #</LocationMatch>
+  # Perun ExtSource definition matching this authz method
+  #   SetEnvIf _ .* AJP_EXTSOURCE=EINFRA
+  #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
+  #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
+  #</LocationMatch>
 
- #<LocationMatch "^/krbes/">
- #   Options FollowSymLinks
- #   SSLRequireSSL
- #   SSLVerifyClient none
- #   AuthType KerberosV5
- #   AuthName "Kerberos EINFRA-SERVICES"
- #   Require valid-user
- #   Krb5Keytab /etc/apache2/krb5.http.keytab
- #   KrbAuthRealms EINFRA-SERVICES
- #   KrbSaveCredentials Off
- #   KrbMethodNegotiate On
- #   KrbMethodK5Passwd On
- #   KrbServiceName Any
- #   KrbVerifyKDC Off
+  #<LocationMatch "^/krbes/">
+  #   Options FollowSymLinks
+  #   SSLRequireSSL
+  #   SSLVerifyClient none
+  #   AuthType KerberosV5
+  #   AuthName "Kerberos EINFRA-SERVICES"
+  #   Require valid-user
+  #   Krb5Keytab /etc/apache2/krb5.http.keytab
+  #   KrbAuthRealms EINFRA-SERVICES
+  #   KrbSaveCredentials Off
+  #   KrbMethodNegotiate On
+  #   KrbMethodK5Passwd On
+  #   KrbServiceName Any
+  #   KrbVerifyKDC Off
 
-    # Definice externiho overeni uzivatelu
- #   SetEnvIf _ .* AJP_EXTSOURCE=EINFRA-SERVICES
- #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
- #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
- #</LocationMatch>
+  # Perun ExtSource definition matching this authz method
+  #   SetEnvIf _ .* AJP_EXTSOURCE=EINFRA-SERVICES
+  #   SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceKerberos
+  #   SetEnvIf _ .* AJP_EXTSOURCELOA=0
+  #</LocationMatch>
 
  </VirtualHost>
 </IfModule>
