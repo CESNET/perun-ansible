@@ -1,7 +1,5 @@
 <IfModule mod_ssl.c>
 
-# Go ahead and accept connections for these vhosts from non-SNI clients
-SSLStrictSNIVHostCheck off
 # Support Federated and Kerberos authz on single instance
 # Shib module otherwise occupy "Require valid-user" option
 ShibCompatValidUser on
