@@ -82,7 +82,7 @@
   register: ssl_ldif
 
 - name: Change TLS settings
-  command: /usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -D "{{ slapd_basedn_admin }}" -w "{{ password_ldap_config }}" -f /etc/ldap/ssl.ldif
+  command: /usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f /etc/ldap/ssl.ldif
   when: ssl_ldif.changed
 
 - name: Enable secure port in /etc/default/slapd
@@ -90,141 +90,43 @@
    dest: /etc/default/slapd
    regexp: ^SLAPD_SERVICES=
    line: SLAPD_SERVICES="ldaps:/// ldapi:/// ldap://127.0.0.1/"
-  notify: Restart LDAP
+  register: secure_port_enabled
 
 - name: Restart LDAP after enabling TLS
   service:
     name: slapd
     state: restarted
+  when: secure_port_enabled.changed or ssl_ldif.changed
 
-- name: Make sure we have perun schema
+- name: Create perun schema entry
   ldap_entry:
     dn: cn={4}perun,cn=schema,cn=config
     objectClass: olcSchemaConfig
+  register: perun_schema
 
-- name: Set up olcAttributeTypes attribute in perun schema
-  ldap_attr:
-    dn: cn={4}perun,cn=schema,cn=config
-    state: exact
-    name: olcAttributeTypes
-    values:
-      - >-
-        {0}( 1.3.6.1.4.1.8057.2.80.1 NAME 'perunUserId' DESC 'Unique user identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {1}( 1.3.6.1.4.1.8057.2.80.16 NAME 'perunResourceId' DESC 'Unique resource identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {2}( 1.3.6.1.4.1.8057.2.80.17 NAME 'perunFacilityId' DESC 'Unique facilityId identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {3}( 1.3.6.1.4.1.8057.2.80.2 NAME 'perunGroupId' DESC 'Unique group identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {4}( 1.3.6.1.4.1.8057.2.80.3 NAME 'perunVoId' DESC 'Unique VO identifier managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {5}( 1.3.6.1.4.1.8057.2.80.12 NAME 'isServiceUser' DESC 'If user is Service User then 1, else 0' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {6}( 1.3.6.1.4.1.8057.2.80.11 NAME 'assignedToResourceId' DESC 'Identifier of resource which is group assigned to.' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {7}( 1.3.6.1.4.1.8057.2.80.18 NAME 'assignedGroupId' DESC 'Identifier of group which is assigned to this resource' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {8}( 1.3.6.1.4.1.8057.2.84.7 NAME 'preferredMail' DESC 'RFC1274: RFC822 Mailbox' EQUALITY caseIgnoreIA5Match SUBSTR caseIgnoreIA5SubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
-      - >-
-        {9}( 1.3.6.1.4.1.8057.2.80.9 NAME 'login' DESC 'User login for namespace' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
-      - >-
-        {10}( 1.3.6.1.4.1.8057.2.80.14 NAME 'perunUniqueGroupName' DESC 'uniqueName of group like "VoName:ParentGroupName:GroupName"' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {11}( 1.3.6.1.4.1.8057.2.80.10 NAME 'eduPersonPrincipalNames' DESC 'User ExtLogin for UserExtSource with Type IDP' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {12}( 1.3.6.1.4.1.11433.2.2.1.9 NAME 'userCertificateSubject' DESC 'User certificate subject' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {13}( 1.3.6.1.4.1.8057.2.80.8 NAME 'perunParentGroupId' DESC 'identifier (perunGroupId) of the parent group as managed by Perun' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {14}( 1.3.6.1.4.1.8057.2.80.13 NAME 'perunParentGroup' DESC 'Dn of the parentGroup' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
-      - >-
-        {15}( 1.3.6.1.4.1.8057.2.80.19 NAME 'memberOfPerunVo' DESC 'Identifier of vo where user has member' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {16}( 1.3.6.1.4.1.8057.2.80.20 NAME 'libraryIDs' DESC 'IDs of library and users in external library system' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {17}( 1.3.6.1.4.1.8057.2.80.21 NAME 'entityID' DESC 'ID of entity in Resource' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {18}( 1.3.6.1.4.1.8057.2.80.22 NAME 'isSponsoredUser' DESC 'If user is Sponsored User then 1, else 0' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {19}( 1.3.6.1.4.1.8057.2.80.23 NAME 'schacHomeOrganizations' DESC 'Home organizations of the user in Perun' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {20}( 1.3.6.1.4.1.8057.2.80.24 NAME 'eduPersonScopedAffiliations' DESC 'EDU Person scoped affilations' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {21}( 1.3.6.1.4.1.8057.2.80.25 NAME 'bonaFideStatus' DESC 'bona fide status' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {22}( 1.3.6.1.4.1.8057.2.80.26 NAME 'groupNames' DESC 'Names of groups where user is member' EQUALITY caseExactMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
-      - >-
-        {23}( 1.3.6.1.4.1.8057.2.80.27 NAME 'OIDCClientID' DESC 'ClientID for OIDC of Resource on Facility' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15)
+- name: Set up perun schema attributes
+  command: "/usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f  {{perun_folder}}/perun-utils/ldapc-scripts/schemas/perun-schema.ldif"
+  when: perun_schema.changed
 
-- name: Set up olcObjectClasses attribute in perun schema
-  ldap_attr:
-    dn: cn={4}perun,cn=schema,cn=config
-    state: exact
-    name: olcObjectClasses
-    values:
-      - >-
-        {0}( 1.3.6.1.4.1.8057.2.80.4 NAME 'perunUser' DESC 'User managed by Perun' SUP inetOrgPerson STRUCTURAL MUST ( perunUserId $ isServiceUser $ isSponsoredUser ) MAY ( preferredMail $ userCertificateSubject $ uidNumber $ login $ eduPersonPrincipalNames $ userPassword $ memberOfPerunVo $ libraryIDs $ schacHomeOrganizations $ eduPersonScopedAffiliations $ bonaFideStatus ) )
-      - >-
-        {1}( 1.3.6.1.4.1.8057.2.80.5 NAME 'perunGroup' DESC 'Group managed by Perun' SUP top  STRUCTURAL MUST ( cn $ perunGroupId $ perunVoId $ perunUniqueGroupName ) MAY ( uniqueMember $ businessCategory $ seeAlso $ owner $ ou $ o $ description $ perunParentGroup $ perunParentGroupId $ assignedToResourceId ))
-      - >-
-        {2}( 1.3.6.1.4.1.8057.2.80.15 NAME 'perunResource' DESC 'Resource managed by Perun' SUP top STRUCTURAL MUST ( cn $  perunResourceId $ perunVoId $ perunFacilityId ) MAY (uniqueMember $ businessCategory $ seeAlso $ owner $ ou $ o $ description $ assignedGroupId  $ entityID) )
-      - >-
-        {3}( 1.3.6.1.4.1.8057.2.80.6 NAME 'perunVO' DESC 'VO managed by Perun' SUP organization STRUCTURAL MUST perunVoId MAY uniqueMember )
-
-- name: Make sure we have inetUser schema
+- name: Create inetUser schema entry
   ldap_entry:
     dn: cn={5}inetUser,cn=schema,cn=config
     objectClass: olcSchemaConfig
+  register: inetUser_schema
 
-- name: Set up olcAttributeTypes attribute in inetUser schema 
-  ldap_attr:
-    dn: cn={5}inetUser,cn=schema,cn=config
-    state: exact
-    name: olcAttributeTypes
-    values:
-      - >-
-        {0}( 1.2.840.113556.1.2.102 NAME 'memberOf' DESC 'Group that the entry belongs to' EQUALITY distinguishedNameMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 X-ORIGIN 'Netscape Delegated Administrator' )
-      - >-
-        {1}( 2.16.840.1.113730.3.1.692 NAME 'inetUserStatus' DESC '"active", "inactive", or "deleted" status of a user' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'Netscape subscriber interoperability' )
-      - >-
-        {2}( 2.16.840.1.113730.3.1.693 NAME 'inetUserHttpURL' DESC 'A users Web addresses' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Netscape subscriber interoperability' )
+- name: Set up inetUser schema attributes
+  command: "/usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f  {{perun_folder}}/perun-utils/ldapc-scripts/schemas/inetUser-schema.ldif"
+  when: inetUser_schema.changed
 
-- name: Set up olcObjectClasses attribute in inetUser schema 
-  ldap_attr:
-    dn: cn={5}inetUser,cn=schema,cn=config
-    state: exact
-    name: olcObjectClasses
-    values: "{0}( 2.16.840.1.113730.3.2.130 NAME 'inetUser' DESC 'Auxiliary class which must be present in an entry for delivery of subscriber services' SUP top AUXILIARY MAY ( uid $ inetUserStatus $ inetUserHTTPURL $ userPassword $ memberOf ) X-ORIGIN 'Netscape subscriber interoperability' )"
-
-- name: Make sure we have tenOperEntry schema
+- name: Create tenOperEntry schema entry
   ldap_entry:
-    dn: cn=tenOperEntry,cn=schema,cn=config
-    objectClass: olcSchemaConfig
-
-- name: Set up olcAttributeTypes attribute in tenOperEntry schema 
-  ldap_attr:
     dn: cn={6}tenOperEntry,cn=schema,cn=config
-    state: exact
-    name: olcAttributeTypes
-    values:
-      - >-
-        {0}( 1.3.6.1.4.1.8057.2.84.1 NAME 'entryStatus' DESC 'status of the entry' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {1}( 1.3.6.1.4.1.8057.2.84.2 NAME 'entryStatusTimestamp' DESC 'time of last modification of entryStatus' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
-      - >-
-        {2}( 1.3.6.1.4.1.8057.2.84.3 NAME 'entryStatusModifier' DESC 'entry that performed tha last modification of entryStatus' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 SINGLE-VALUE )
-      - >-
-        {3}( 1.3.6.1.4.1.8057.2.84.4 NAME 'sponsor' DESC 'Sponsor' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 )
-      - >-
-        {4}( 1.3.6.1.4.1.8057.2.84.5 NAME 'sponsorshipApprovedUntil' DESC 'Expiry of sponsorship' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 SINGLE-VALUE )
+    objectClass: olcSchemaConfig
+  register: tenOperEntry_schema
 
-- name: Set up olcObjectClasses attribute tenOperEntry schema 
-  ldap_attr:
-    dn: cn={6}tenOperEntry,cn=schema,cn=config
-    state: exact
-    name: olcObjectClasses
-    values: "{0}( 1.3.6.1.4.1.8057.2.84.6 NAME 'tenOperEntry' DESC 'entry operational description' AUXILIARY MUST entryStatus MAY ( entryStatusModifier $ entryStatusTimestamp $ sponsor $ sponsorshipApprovedUntil ) )"
+- name: Set up tenOperEntry schema attributes
+  command: "/usr/bin/ldapmodify -Q -H ldapi:/// -Y EXTERNAL -f  {{perun_folder}}/perun-utils/ldapc-scripts/schemas/tenOperEntry-schema.ldif"
+  when: tenOperEntry_schema.changed
 
 - name: Set olcAttributeOptions attribute
   ldap_attr:
