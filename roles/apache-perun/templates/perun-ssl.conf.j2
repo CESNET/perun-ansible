@@ -32,10 +32,13 @@ ShibCompatValidUser on
 
   SSLCertificateFile {{ apache_certificate_file }}
   SSLCertificateKeyFile {{ apache_certificate_key_file }}
-  SSLCACertificatePath {{ apache_ca_certificate_path }}
-  {% if apache_certificate_chain_file is defined and apache_certificate_chain_file|length > 0 %}
+{% if apache_certificate_chain_file is defined and apache_certificate_chain_file|length > 0 %}
   SSLCertificateChainFile {{ apache_certificate_chain_file }}
-  {% endif %}
+{% endif %}
+  # SSL certificates authentication - change "optional" to "none" for disabling
+  SSLCACertificatePath {{ apache_ca_certificate_path }}
+  SSLVerifyDepth 5
+  SSLVerifyClient optional
 
   # Make sure certs are exported in old DN format stored in Perun
   SSLOptions +LegacyDNStringFormat
@@ -164,9 +167,7 @@ ShibCompatValidUser on
 
   <LocationMatch "(^/cert/|^/cert-ic/)">
     Options FollowSymLinks
-    Require all granted
-    SSLRequireSSL
-    SSLVerifyClient require
+    Require expr "%{SSL_CLIENT_VERIFY} == 'SUCCESS'"
     SSLOptions +StdEnvVars +ExportCertData +LegacyDNStringFormat
 
     SetEnvIf _ .* AJP_EXTSOURCETYPE=cz.metacentrum.perun.core.impl.ExtSourceX509
