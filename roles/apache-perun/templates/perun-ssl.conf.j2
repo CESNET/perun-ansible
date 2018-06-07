@@ -137,8 +137,8 @@ ShibCompatValidUser on
   RewriteRule ^/(.*)-ic/ic/(.+)$ /var/www/perun-wui/$2 [L]
 
   #must be last
-  RewriteRule ^/(.*)/ic$ https://%{HTTP_HOST}/$1-ic/ic/ [L,R=301]
-  RewriteRule ^/(.*)/ic/(.*)$ https://%{HTTP_HOST}/$1-ic/ic/$2 [L,R=301]
+  RewriteRule ^/(.*)/ic$ https://%{HTTP_HOST}/$1-ic/ic/ [L,NE,R=301]
+  RewriteRule ^/(.*)/ic/(.*)$ https://%{HTTP_HOST}/$1-ic/ic/$2 [L,NE,R=301]
 
   ####################################
   ##     PROFILE                  ####
