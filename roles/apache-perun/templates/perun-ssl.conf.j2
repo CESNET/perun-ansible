@@ -54,6 +54,10 @@ ShibCompatValidUser on
   Header always set X-Frame-Options DENY
   # FIX: HSTS Missing From HTTPS Server
   Header always set Strict-Transport-Security "max-age=63072000"
+  # FIX: Don't let browser to guess content type
+  Header always set X-Content-Type-Options nosniff
+  # FIX: Allow browsers to block xss (if they believe its xss).
+  Header always set X-XSS-Protection "1; mode=block"
 
   #### REWRITE
 
