@@ -59,6 +59,11 @@ ShibCompatValidUser on
   # FIX: Allow browsers to block xss (if they believe its xss).
   Header always set X-XSS-Protection "1; mode=block"
 
+  # Disable browser caching for our html/rpc resources
+  Header always set Cache-Control "no-cache, no-store, max-age=0, must-revalidate" "expr=%{REQUEST_URI} =~ m#^/(.*)/(gui|pwd-reset|wui|ic|registrar|publications|profile|rpc)/(.*)$#"
+  Header always set Pragma no-cache "expr=%{REQUEST_URI} =~ m#^/(.*)/(gui|pwd-reset|wui|ic|registrar|publications|profile|rpc)/(.*)$#"
+  Header always set Expires 0 "expr=%{REQUEST_URI} =~ m#^/(.*)/(gui|pwd-reset|wui|ic|registrar|publications|profile|rpc)/(.*)$#"
+
   #### REWRITE
 
   RewriteEngine On
