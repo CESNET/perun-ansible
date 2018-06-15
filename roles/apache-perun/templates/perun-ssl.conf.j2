@@ -54,6 +54,15 @@ ShibCompatValidUser on
   Header always set X-Frame-Options DENY
   # FIX: HSTS Missing From HTTPS Server
   Header always set Strict-Transport-Security "max-age=63072000"
+  # FIX: Don't let browser to guess content type
+  Header always set X-Content-Type-Options nosniff
+  # FIX: Allow browsers to block xss (if they believe its xss).
+  Header always set X-XSS-Protection "1; mode=block"
+
+  # Disable browser caching for our html/rpc resources
+  Header always set Cache-Control "no-cache, no-store, max-age=0, must-revalidate" "expr=%{REQUEST_URI} =~ m#^/(.*)/((gui|pwd-reset|wui|ic|registrar|publications|profile)(/|(.*).nocache.js)|rpc/(.*))$#"
+  Header always set Pragma no-cache "expr=%{REQUEST_URI} =~ m#^/(.*)/((gui|pwd-reset|wui|ic|registrar|publications|profile)(/|(.*).nocache.js)|rpc/(.*))$#"
+  Header always set Expires 0 "expr=%{REQUEST_URI} =~ m#^/(.*)/((gui|pwd-reset|wui|ic|registrar|publications|profile)(/|(.*).nocache.js)|rpc/(.*))$#"
 
   #### REWRITE
 
