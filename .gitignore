@@ -1,3 +1,7 @@
+# Ignore machine settings
+host_vars/
+inventories/
+
 # Ignore Java project files #
 *.class
 *.jar
