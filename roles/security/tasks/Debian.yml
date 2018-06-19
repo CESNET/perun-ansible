@@ -29,7 +29,7 @@
 - name: Set up firewall rules
   template:
     backup: true
-    force: true
+    force: "{{ overwrite_firewall_rules }}"
     src: rules.j2
     dest: "{{ item }}"
   with_items:

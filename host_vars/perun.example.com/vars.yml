@@ -16,18 +16,18 @@ apache_certificate_file: '/etc/perun/ssl/ssl-cert-snakeoil.pem'
 # Path to key for Apache certificate file. Default is key to fake snake oil, which will be created. Please change this path.
 apache_certificate_key_file: '/etc/perun/ssl/ssl-cert-snakeoil.key'
 # Path to file with chain of CA  certificates. (SSLCertificateChainFile).
-apache_certificate_chain_file: ''
+apache_certificate_chain_file: '/etc/perun/ssl/ssl-cert-snakeoil.pem'
 
 # Path to directory with CA certificates. If you leave it with default value, IGTF certificates will be installed.
 apache_ca_certificate_path: '/etc/grid-security/certificates/'
 
 # LDAP CERTIFICATE
 # Path to LDAP certificate file (olcTLSCertificateFile).
-ldap_certificate_file: "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+ldap_certificate_file: "{{apache_certificate_file}}"
 # Path to key for LDAP certificate file (olcTLSCertificateKeyFile).
-ldap_certificate_key_file: "/etc/perun/ssl/ssl-cert-snakeoil.key"
+ldap_certificate_key_file: "{{apache_certificate_key_file}}"
 # Path to CA LDAP certificate file (olcTLSCACertificateFile).
-ldap_ca_certificate_file: "/etc/perun/ssl/ssl-cert-snakeoil.pem"
+ldap_ca_certificate_file: "{{apache_certificate_chain_file}}"
 
 # LDAP DOMAIN
 slapd_domain: 'example.com'
@@ -55,3 +55,8 @@ install_yubikeys: True
 
 # unattended-upgrades
 root_email_address: 'admin@example.com'
+
+# Internal firewall (iptables)
+# True - overwrite internal firewall rules with defaults (only ssh, http(s), ldaps and postgres ports are opened)
+# False - keep current firewall rules
+overwrite_firewall_rules: True
