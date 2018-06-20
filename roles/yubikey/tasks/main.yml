@@ -1,6 +1,17 @@
 ---
 # tasks file for installing access secured by yubikeys
 
+- name: Check that password variables are loaded
+  assert:
+    that:
+      - install_yubikeys is defined
+      - create_yubikey_users is defined
+      - yubikey_id is defined
+      - yubikey_key is defined
+      - sudo_root_users is defined
+      - sudo_perun_users is defined
+    msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set values in it"
+
 - include_tasks: "Yubikey.yml"
   when: install_yubikeys
 
