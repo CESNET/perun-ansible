@@ -1,3 +1,9 @@
 ---
+- name: Check that variables are loaded
+  assert:
+    that:
+      - overwrite_firewall_rules is defined
+    msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set values in it"
+
 - include_tasks: "{{ ansible_distribution }}.yml"
 

@@ -10,7 +10,7 @@
 # 6. run the playbook by executing the command "ansible-playbook -i inventories/prod --ask-vault-pass site.yml"
 
 # you can run only specific parts of this playbook using tags, e.g.:
-#  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags perun,shibboleth,apache
+#  ansible-playbook -i inventories/my --ask-vault-pass site.yml --tags security,yubikey,unattended-upgrades,work-env
 
 - hosts: perun-servers
   pre_tasks:
@@ -26,7 +26,7 @@
         - ldap_certificate_file is defined
         - ldap_certificate_key_file is defined
       msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set all values in it"
-    tags: ['always']
+    tags: ['perun', 'config', 'shibboleth', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap' ]
 
   - name: Check that host's passwords are loaded
     assert:
@@ -34,7 +34,7 @@
         - password_perun_admin is defined
         - yubikey_key is defined
       msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set all values in it"
-    tags: ['perun', 'config', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap', 'yubikey']
+    tags: ['perun', 'config', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap' ]
 
   # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
   - name: Require Debian 8,9
