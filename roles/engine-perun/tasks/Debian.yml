@@ -56,10 +56,10 @@
     path: "/home/{{ perun_login }}/perun-engine"
     state: directory
 
-- name: "Copy perun-engine-3.0.1-SNAPSHOT-production.jar to /home/{{ perun_login }}/perun-engine/"
+- name: "Copy perun-engine.jar to /home/{{ perun_login }}/perun-engine/"
   become: yes
   become_user: "{{ perun_login }}"
-  command: cp perun-engine-3.0.1-SNAPSHOT-production.jar "/home/{{ perun_login }}/perun-engine/"
+  command: cp perun-engine.jar "/home/{{ perun_login }}/perun-engine/"
   args:
     chdir: "{{ perun_folder }}/perun-engine/target/"
 

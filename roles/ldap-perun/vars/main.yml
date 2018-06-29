@@ -41,12 +41,12 @@ script_files:
     destination: "{{ perun_ldapc_folder }}/ldifsort.pl"
     mode: "0744"
   ldapcJar:
-    source: "{{ perun_folder }}/perun-ldapc/target/perun-ldapc-3.0.1-SNAPSHOT-production.jar"
-    destination: "{{ perun_ldapc_folder }}/perun-ldapc-3.0.1-SNAPSHOT-production.jar"
+    source: "{{ perun_folder }}/perun-ldapc/target/perun-ldapc.jar"
+    destination: "{{ perun_ldapc_folder }}/perun-ldapc.jar"
     mode: "0644"
   ldapcInitializerJar:
-    source: "{{ perun_folder }}/perun-ldapc-initializer/target/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
-    destination: "{{ perun_ldapc_folder }}/perun-ldapc-initializer-3.0.1-SNAPSHOT-production.jar"
+    source: "{{ perun_folder }}/perun-ldapc-initializer/target/perun-ldapc-initializer.jar"
+    destination: "{{ perun_ldapc_folder }}/perun-ldapc-initializer.jar"
     mode: "0644"
 
 init_d_script:

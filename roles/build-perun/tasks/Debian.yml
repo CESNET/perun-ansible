@@ -13,6 +13,7 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
+  when: install_oracle
 
 - name: Copy orai18n file to remote server
   copy:
@@ -21,6 +22,7 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
+  when: install_oracle
 
 - name: Install ojdbc8
   become: yes
@@ -28,6 +30,7 @@
   command: mvn install:install-file -Dfile=ojdbc8.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+  when: install_oracle
 
 - name: Install orai18n
   become: yes
@@ -35,6 +38,7 @@
   command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.2.0.1.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+  when: install_oracle
 
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
