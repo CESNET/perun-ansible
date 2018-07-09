@@ -37,13 +37,6 @@
     state: restarted
     name: apache2
 
-- name: "Build engine of Perun. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
-  become: yes
-  become_user: "{{ perun_login }}"
-  command: mvn -pl perun-engine -am package dependency:copy-dependencies -Dproduction -DskipTests
-  args:
-    chdir: "{{ perun_folder }}"
-
 - name: "Delete /home/{{ perun_login }}/perun-engine directory if exists"
   file:
     path: "/home/{{ perun_login }}/perun-engine"
@@ -56,6 +49,7 @@
     path: "/home/{{ perun_login }}/perun-engine"
     state: directory
 
+# the executable jar for perun-engine was already build in the build-perun role
 - name: "Copy perun-engine.jar to /home/{{ perun_login }}/perun-engine/"
   become: yes
   become_user: "{{ perun_login }}"
