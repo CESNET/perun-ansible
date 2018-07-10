@@ -13,6 +13,7 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
+  when: install_oracle
 
 - name: Copy orai18n file to remote server
   copy:
@@ -21,6 +22,7 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
     mode: 0644
+  when: install_oracle
 
 - name: Install ojdbc8
   become: yes
@@ -28,6 +30,7 @@
   command: mvn install:install-file -Dfile=ojdbc8.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+  when: install_oracle
 
 - name: Install orai18n
   become: yes
@@ -35,14 +38,28 @@
   command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.2.0.1.0 -Dpackaging=jar
   args:
     chdir: "/home/{{ perun_login }}"
+  when: install_oracle
+
+# possible locations for JDBC drivers in tomcat:
+# $CATALINA_HOME/shared/ (/usr/share/tomcat8/shared) - used by all tomcat instances
+# $CATALINA_BASE/shared/ (/var/lib/tomcat8/shared) - used only by the system tomcat, not by user tomcats
+- name: Add Oracle JDBC drivers to tomcat
+  copy:
+    remote_src: yes
+    src: "{{ item }}"
+    dest: "/var/lib/tomcat8/shared/"
+  with_items:
+    - "/home/{{ perun_login }}/ojdbc8.jar"
+    - "/home/{{ perun_login }}/orai18n.jar"
+  when: install_oracle
 
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} install -Dproduction > out.log"
+  shell: "mvn --batch-mode install -DskipTests -Doracle={{install_oracle}}  > out.log"
   args:
     chdir: "{{ perun_folder }}"
-    creates: "{{perun_folder}}/target/perun-web-gui-production.war"
+    creates: "{{perun_folder}}/perun-rpc/target/perun-rpc.war"
   register: perun_build
   async: 600
   poll: 5
@@ -69,7 +86,7 @@
     state: absent
 
 - name: Deploy GUI
-  command: cp -r ./perun-web-gui-3.0.1-SNAPSHOT-production /var/www/perun-web-gui
+  command: cp -r ./perun-web-gui /var/www/perun-web-gui
   args:
     chdir: "{{ perun_folder }}/perun-web-gui/target/"
 

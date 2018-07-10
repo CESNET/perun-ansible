@@ -50,6 +50,9 @@ instance_id: 'GENERIC01A02B03C'
 # Otional installation of Postgres
 install_postgres: True
 
+# Optional installation of Oracle drivers
+install_oracle: False
+
 # Install Yubikeys? Modify the settings in the encrypted vault host_vars/<your host name>/passwords.yml
 install_yubikeys: True
 
