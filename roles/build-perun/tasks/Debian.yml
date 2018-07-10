@@ -56,7 +56,7 @@
 - name: "Build all perun components. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  shell: "mvn install -Doracle={{install_oracle}}  > out.log"
+  shell: "mvn --batch-mode install -DskipTests -Doracle={{install_oracle}}  > out.log"
   args:
     chdir: "{{ perun_folder }}"
     creates: "{{perun_folder}}/perun-rpc/target/perun-rpc.war"
