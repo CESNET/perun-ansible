@@ -26,24 +26,29 @@
     state: stopped
   when: ipper.changed
 
-- name: Set up firewall rules
+- name: Set up IPv4 firewall rules
   template:
     backup: true
     force: "{{ overwrite_firewall_rules }}"
     src: rules.j2
-    dest: "{{ item }}"
-  with_items:
-    - /etc/iptables/rules.v4
-    - /etc/iptables/rules.v6
-  when: ipper.changed
+    dest: /etc/iptables/rules.v4
+  register: ipv4_rules
+
+- name: Set up IPv6 firewall rules
+  template:
+    backup: true
+    force: "{{ overwrite_firewall_rules }}"
+    src: rules.j2
+    dest: /etc/iptables/rules.v6
+  register: ipv6_rules
 
 - name: Activate IPv4 firewall rules
   command: /sbin/iptables-restore /etc/iptables/rules.v4
-  when: ipper.changed
+  when: ipv4_rules.changed
 
 - name: Activate IPv6 firewall rules
   command: /sbin/ip6tables-restore /etc/iptables/rules.v6
-  when: ipper.changed
+  when: ipv6_rules.changed
 
 - name: Start fail2ban
   service:
