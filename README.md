@@ -12,7 +12,7 @@ This repository serves for easier deployment of Perun server with default config
 
 - First you need to install Ansible to your system ([Installation of Ansible](http://docs.ansible.com/ansible/intro_installation.html)), which will be used to install Perun to remote server (or localhost).
 - **The minimal version of Ansible is 2.4!**
-- **Your public SSH key must be placed in authorized_keys file in .ssh/ folder of root on the remote server!**
+- **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 
 ## Clone this repo
@@ -20,18 +20,13 @@ This repository serves for easier deployment of Perun server with default config
 - Now you need to download our Ansible repository from our Github
   - [Perun-Ansible repository](https://github.com/CESNET/perun-ansible)
 
-## Download Oracle DB drivers
-
-- Download Oracle DB drivers 'orai18n’ and 'ojdbc8’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-ucp-122-3110062.html) on your system with Ansible (**the system which you will use to run this playbook**).
-- You need to register before downloading these files.
-- Put these file into your home directory (at the machine with Ansible), or set paths to these files in **./group_vars/all/vars.yml** file (variables **ojdbc8_file_path** and **orai18n_file_path**).
-
 ## Install TLS certificates
 
 - At the target machine, preferably in the **/etc/perun/ssl** folder, generate a private key and a certificate request
 - Get TLS certificate from a reputable certification authority together with the CA's chain of certificates from a trusted root CA 
 - Put the certificate and chain files to the folder with the private key. 
 - Install package **ssl-cert** and change the owning group of the private key file to the group **ssl-cert** (needed for LDAP and PostgreSQL servers to access it) 
+- You will have to renew the certificate every couple of years, so we recommend to name the actual files with the certificate, key and chain in a way that marks the year in which they were issued, and to create symbolic links named like cert.pem, key.pem and chain.pem that you will use in all configuration files. In such setup, after renewing the certificate, you will just change the symbolic links instead of all configuration files.
 
 ## Set address of your server in inventories
 
@@ -48,6 +43,13 @@ This repository serves for easier deployment of Perun server with default config
 - Edit the vault file with command `ansible-vault edit passwords.yml` and set real values
 - If you have more than one Perun server, just create a folder with vars.yml and passwords.yml files under the host_vars/ folder for each server.
 
+## Optional Oracle DB drivers
+
+- Download Oracle DB drivers 'orai18n’ and 'ojdbc8’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-ucp-122-3110062.html) on your system with Ansible (**the system which you will use to run this playbook**).
+- You need to register before downloading these files.
+- Put these file into your home directory (at the local machine with Ansible), or set paths to these files in **group_vars/all/vars.yml** file (variables **ojdbc8_file_path** and **orai18n_file_path**).
+- Set the variable **install_oracle: True** in the **vars.yml** file.
+- This will put the drivers into Tomcat and into all the produced executable jars.
 
 ## Run Ansible playbook
 
@@ -73,5 +75,5 @@ Now you need to do stuff, which is not handled by Ansible script:
 - **Install slave scripts at slave machines**
   - The slave scripts should be installed at the machines that Perun will control, not at the Perun server!
   - Add APT repository by creating file /etc/apt/sources.list.d/meta_repo.list containing the line `deb ftp://repo.metacentrum.cz/ all main pilot` and run `apt-get update`
-  - Install slave scripts for each nedeed service, e.g.: `apt-get install perun-slave-process-passwd` for installation of **passwd service**
+  - Install slave scripts for each needed service, e.g.: `apt-get install perun-slave-process-passwd` for installation of **passwd service**
   - For **all services** install meta package perun-slave-full: `apt-get install perun-slave-full`
