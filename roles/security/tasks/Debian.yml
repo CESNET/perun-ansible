@@ -18,14 +18,7 @@
     name: fail2ban
     state: present
 
-# set up FW rules if package iptables-persistent was just installed
-
-- name: Stop fail2ban
-  service:
-    name: fail2ban
-    state: stopped
-  when: ipper.changed
-
+# set up FW rules if overwrite_firewall_rules==True
 - name: Set up IPv4 firewall rules
   template:
     backup: true
@@ -42,6 +35,12 @@
     dest: /etc/iptables/rules.v6
   register: ipv6_rules
 
+- name: Stop fail2ban
+  service:
+    name: fail2ban
+    state: stopped
+  when: ipv4_rules.changed or ipv6_rules.changed
+
 - name: Activate IPv4 firewall rules
   command: /sbin/iptables-restore /etc/iptables/rules.v4
   when: ipv4_rules.changed
@@ -54,7 +53,7 @@
   service:
     name: fail2ban
     state: started
-  when: ipper.changed
+  when: ipv4_rules.changed or ipv6_rules.changed
 
 # lock root password
 - name: Lock root password
