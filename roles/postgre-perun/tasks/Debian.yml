@@ -8,6 +8,12 @@
     state: present
   with_items: "{{postgre_packages[ansible_os_family]}}"
 
+- name: Hold packages from upgrading
+  dpkg_selections:
+    name: "{{item}}-{{postgres_version[ansible_distribution+'_'+ansible_distribution_major_version]}}"
+    selection: hold
+  with_items: "{{postgre_packages[ansible_os_family]}}"
+
 - name: Install python-psycopg2 package
   become: true
   package:

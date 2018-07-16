@@ -1,11 +1,12 @@
 ---
 # Sets working environment on Debian to sensible state
 
-- name: Install vim and htop
+- name: Install vim, htop and locate
   apt:
     name:
       - vim
       - htop
+      - locate
     state: latest
 
 - name: fix vim mouse editing
