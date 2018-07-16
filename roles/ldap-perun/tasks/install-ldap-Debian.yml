@@ -22,6 +22,11 @@
     state: present
   with_items: "{{prerequisites[ansible_os_family]}}"
 
+- name: Hold packages from upgrading
+  dpkg_selections:
+    name: slapd
+    selection: hold
+
 - name: Generate the root password for ldap
   shell: slappasswd -s {{ password_ldap_data_tree }}
   register: root_password
