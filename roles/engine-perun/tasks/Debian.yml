@@ -27,6 +27,20 @@
   args:
     chdir: "{{ perun_folder }}/perun-cli"
 
+- name: Create /opt/perun-cli/bin directory
+  file:
+    path: "/opt/perun-cli/bin"
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+- name: Copy CLI scripts to /opt/perun-cli/bin/ directory
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "Perun" ./* /opt/perun-cli/bin/
+  args:
+    chdir: "{{ perun_folder }}/perun-cli"
+
 - name: Add user perun into Apache
   shell: "htpasswd -b -c /etc/apache2/perun.passwd perun {{ password_perun_admin }}"
 - name: Add user perun-engine into Apache
