@@ -37,7 +37,7 @@
 - name: Copy CLI scripts to /opt/perun-cli/bin/ directory
   become: yes
   become_user: "{{ perun_login }}"
-  command: rsync --exclude "Perun" ./* /opt/perun-cli/bin/
+  shell: "rsync --exclude Perun ./* /opt/perun-cli/bin/"
   args:
     chdir: "{{ perun_folder }}/perun-cli"
 
