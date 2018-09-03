@@ -5,19 +5,21 @@
   become: yes
   become_user: "{{ perun_login }}"
   git:
-    repo: https://github.com/zlamalp/perun-wui.git
+    repo: https://github.com/CESNET/perun-wui.git
     dest: "{{ perun_wui_folder }}"
     version: master
     update: yes
+  register: git_updated
 
 - name: "Build Perun's Web User Interface. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
   become: yes
   become_user: "{{ perun_login }}"
-  shell: "mvn -T {{ maven_parallel_build_threads | default(1) }} install -DskipTests -Dproduction"
+  shell: "mvn clean install -DskipTests"
   args:
     chdir: "{{ perun_wui_folder }}"
   async: 1200
   poll: 5
+  when: git_updated.changed
 
 - name: "Delete /var/www/perun-wui directory if exists"
   file:
@@ -31,27 +33,51 @@
     owner: "{{ perun_login }}"
     group: "{{ perun_group }}"
 
-- name: Deploy WUI
+- name: Deploy WUI - Admin
   become: yes
   become_user: "{{ perun_login }}"
-  command: cp -r "{{ item }}" /var/www/perun-wui/
-  with_items:
-    - "{{ perun_wui_folder }}/perun-wui-admin/target/perun-wui-admin-3.0.1-SNAPSHOT-production/PerunAdmin"
-    - "{{ perun_wui_folder }}/perun-wui-admin/target/perun-wui-admin-3.0.1-SNAPSHOT-production/PerunAdmin.html"
-    - "{{ perun_wui_folder }}/perun-wui-consolidator/target/perun-wui-consolidator-3.0.1-SNAPSHOT-production/PerunConsolidator"
-    - "{{ perun_wui_folder }}/perun-wui-consolidator/target/perun-wui-consolidator-3.0.1-SNAPSHOT-production/PerunConsolidatorElixir.html"
-    - "{{ perun_wui_folder }}/perun-wui-consolidator/target/perun-wui-consolidator-3.0.1-SNAPSHOT-production/PerunConsolidator.html"
-    - "{{ perun_wui_folder }}/perun-wui-consolidator/target/perun-wui-consolidator-3.0.1-SNAPSHOT-production/PerunConsolidatorMU.html"
-    - "{{ perun_wui_folder }}/perun-wui-profile/target/perun-wui-profile-3.0.1-SNAPSHOT-production/PerunProfile"
-    - "{{ perun_wui_folder }}/perun-wui-profile/target/perun-wui-profile-3.0.1-SNAPSHOT-production/PerunProfileElixir.html"
-    - "{{ perun_wui_folder }}/perun-wui-profile/target/perun-wui-profile-3.0.1-SNAPSHOT-production/PerunProfile.html"
-    - "{{ perun_wui_folder }}/perun-wui-pwdreset/target/perun-wui-pwdreset-3.0.1-SNAPSHOT-production/PerunPwdReset"
-    - "{{ perun_wui_folder }}/perun-wui-pwdreset/target/perun-wui-pwdreset-3.0.1-SNAPSHOT-production/PerunPwdResetElixir.html"
-    - "{{ perun_wui_folder }}/perun-wui-pwdreset/target/perun-wui-pwdreset-3.0.1-SNAPSHOT-production/PerunPwdReset.html"
-    - "{{ perun_wui_folder }}/perun-wui-pwdreset/target/perun-wui-pwdreset-3.0.1-SNAPSHOT-production/PerunPwdResetMU.html"
-    - "{{ perun_wui_folder }}/perun-wui-registrar/target/perun-wui-registrar-3.0.1-SNAPSHOT-production/PerunRegistrar"
-    - "{{ perun_wui_folder }}/perun-wui-registrar/target/perun-wui-registrar-3.0.1-SNAPSHOT-production/PerunRegistrarBBMRI.html"
-    - "{{ perun_wui_folder }}/perun-wui-registrar/target/perun-wui-registrar-3.0.1-SNAPSHOT-production/PerunRegistrarElixir.html"
-    - "{{ perun_wui_folder }}/perun-wui-registrar/target/perun-wui-registrar-3.0.1-SNAPSHOT-production/PerunRegistrar.html"
-    - "{{ perun_wui_folder }}/perun-wui-registrar/target/perun-wui-registrar-3.0.1-SNAPSHOT-production/PerunRegistrarMU.html"
-    - "{{ perun_wui_folder }}/perun-wui-registrar/target/perun-wui-registrar-3.0.1-SNAPSHOT-production/PerunRegistrarVSUP.html"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_admin }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunAdmin"
+
+- name: Deploy WUI - Profile
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_profile }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunProfile"
+
+- name: Deploy WUI - Password Reset
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_pwdreset }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunPwdReset"
+
+- name: Deploy WUI - Registrar
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_registrar }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunRegistrar"
+
+- name: Deploy WUI - Set Affiliation
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_setaffiliation }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunSetAffiliation"
+
+- name: Deploy WUI - Identity Consolidator
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_consolidator }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunConsolidator"
+
+- name: Deploy WUI - Cabinet
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: rsync --exclude "WEB-INF" --exclude "META-INF" -avz {{ perun_wui_cabinet }} /var/www/perun-wui/
+  args:
+    creates: "/var/www/perun-wui/PerunCabinet"
