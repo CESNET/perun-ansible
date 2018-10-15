@@ -76,8 +76,8 @@ wayf.spLoginUrl=https://{{perun_hostname}}/Consolidator.sso/Login
 ### User Profile ###
 
 # defines urn of user attributes that should be displayed on personal page
-# you can force showing custom description with each attribute like: urn:perun:user:attribute-def:core:displayName[singleDescription]
-# or translated like: urn:perun:user:attribute-def:core:displayName[English|NativeDescription]
+# you can force showing custom name and/or description like [name]urn[description]
+# or you can have translated like: [English|NativeName]urn:perun:user:attribute-def:core:displayName[English|NativeDescription]
 profile.personal.showAttributes=urn:perun:user:attribute-def:core:displayName, urn:perun:user:attribute-def:def:organization, urn:perun:user:attribute-def:def:preferredMail
 
 ### {pages to hide: 'identities', 'organizations', 'groups', 'resources', 'privacy'}
