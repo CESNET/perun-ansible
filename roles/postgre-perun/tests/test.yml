@@ -1,5 +1,0 @@
----
-- hosts: dev
-  remote_user: root
-  roles:
-    - postre-perun

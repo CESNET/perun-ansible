@@ -1,9 +1,6 @@
 ---
 # vars file for engine-perun
 
-# Address of repository in metacentrum. Don't change this!
-metacentrum_repo: repo.metacentrum.cz
-
 init_d_script:
   Debian:
     source: "{{ perun_folder }}/perun-utils/init.d-scripts/perun-engine.debian"
