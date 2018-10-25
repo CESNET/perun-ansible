@@ -35,10 +35,10 @@ ShibCompatValidUser on
 {% if apache_certificate_chain_file is defined and apache_certificate_chain_file|length > 0 %}
   SSLCertificateChainFile {{ apache_certificate_chain_file }}
 {% endif %}
-  # SSL certificates authentication - change "optional" to "none" for disabling
+  # SSL certificates authentication - change "none" to "optional" for enabling
   SSLCACertificatePath {{ apache_ca_certificate_path }}
   SSLVerifyDepth 5
-  SSLVerifyClient optional
+  SSLVerifyClient none
 
   # Make sure certs are exported in old DN format stored in Perun
   SSLOptions +LegacyDNStringFormat
