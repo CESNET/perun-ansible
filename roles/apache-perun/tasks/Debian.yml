@@ -121,6 +121,20 @@
   notify:
     - "restart webserver"
 
+- name: Install fetch-crl
+  apt:
+    name: fetch-crl
+    state: latest
+    update_cache: yes
+  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+
+- name: Disable error emails from fetch-crl
+  lineinfile:
+    dest: /etc/fetch-crl.conf
+    insertafter: EOF
+    line: "noerrors"
+  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+
 # Rehash certificates for user identification
 - name: Use c_rehash to your certificates
   command: c_rehash .
