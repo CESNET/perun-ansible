@@ -50,7 +50,7 @@ perun.recaptcha.privatekey = 6Lcbdt0SAAAAAL7RQ-re5Emwt2Z0c-7Y3GVEsxYx
 # Perun properties for email validation message
 perun.mailchange.secretKey = {{ key_mailchange }}
 perun.mailchange.backupFrom = {{ perun_email }}
-perun.mailchange.validationWindow = 6
+perun.mailchange.validationWindow = 24
 
 perun.native.language = cs,Česky,Czech
 #perun.native.language = it,Italiano,Italian
@@ -61,7 +61,7 @@ perun.pwdreset.secretKey = {{ pwdreset_secret_key }}
 # Use only hexa characters (0-F) , min. 16 chars/bytes for AES 128
 perun.pwdreset.initVector = {{ pwdreset_init_vector }}
 # Password reset validity window (in hours)
-perun.pwdreset.validationWindow = 6
+perun.pwdreset.validationWindow = 24
 
 # List of login-namespaces which will have value automatically generated from users name.
 perun.loginNamespace.generated=
@@ -91,3 +91,9 @@ perun.proxyIdPs= {{ proxy_idps }}
 
 # Comma separated names of allowed CORS domains
 #perun.allowedCorsDomains=
+
+# IdP/Cert Attributes to update in PERUN
+# (override default settings, comma separated list of attribute names - passed to Tomcat)
+# perun.attributesForUpdate.idp=
+# perun.attributesForUpdate.x509=
+#
