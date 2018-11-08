@@ -45,6 +45,17 @@
     shell: /bin/bash
   with_items: "{{ create_yubikey_users }}"
 
+- name: ensure groups
+  group:
+    name: "{{ item }}"
+  with_items: "{{ create_yubikey_users }}"
+
+- name: ensure users in groups
+  user:
+    name: "{{ item }}"
+    group: "{{ item }}"
+  with_items: "{{ create_yubikey_users }}"
+
 - name: create .ssh dirs
   file:
     path: "/home/{{ item }}/.ssh"
