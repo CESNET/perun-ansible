@@ -25,6 +25,7 @@
         - apache_certificate_key_file is defined
         - ldap_certificate_file is defined
         - ldap_certificate_key_file is defined
+        - install_oracle is defined
       msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set all values in it"
     tags: ['perun', 'config', 'shibboleth', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap' ]
 
@@ -37,12 +38,12 @@
     tags: ['perun', 'config', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap' ]
 
   # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
-  - name: Require Debian 8,9
+  - name: Require Debian 9
     assert:
       that:
         - ansible_distribution == "Debian"
-        - ansible_distribution_major_version in ["8","9"]
-      msg: "Only Debian 8,9 are supported"
+        - ansible_distribution_major_version in ["9"]
+      msg: "Only Debian 9 is supported"
     tags: ['always']
 
   # editing the file shibboleth2.xml requires xml task available since Ansible 2.4
@@ -58,31 +59,51 @@
   roles:
     # NECESSARY ROLES
     # ---------------
-    # This role will create user perun and download all packages and GIT repositories you will need in installation process.
-    - { role: perun, become: true, tags: perun }
-    # This role will copy configuration files of Perun on your server.
-    - { role: configuration-perun, become: true, tags: config }
-    # This role will install Apache on your server.
-    - { role: shibboleth-perun, become: true, tags: shibboleth }
-    # This role will install Apache on your server.
-    - { role: apache-perun, become: true, tags: apache }
-    # This role will install Tomcat on your server.
-    - { role: tomcat-perun, become: true, tags: tomcat }
-    # This role will deploy Postgre DB on your server and prepares DB tables.
+    #
+    # This role will set working environment to a sensible state.
+    - { role: work-env, become: true, tags: work-env }
+    #
+    # This role will create user perun and install basic software packages.
+    - { role: perun, become: true, tags: [ 'perun', 'config', 'tomcat', 'build', 'deploy', 'ldap' ] }
+    #
+    # This role will create configuration files of Perun from templates.
+    - { role: configuration-perun, become: true, tags: [ 'config', 'deploy', 'engine' ] }
+    #
+    # This role will install Shibboleth SP.
+    - { role: shibboleth-perun, become: true, tags: [ 'shibboleth', 'apache' ] }
+    #
+    # This role will install Apache and its config files for Perun, needs Shibboleth.
+    - { role: apache-perun, become: true, tags: [ 'apache', 'deploy'] }
+    #
+    # This role will install Tomcat and its config files for Perun.
+    - { role: tomcat-perun, become: true, tags: [ 'tomcat', 'deploy' ] }
+    #
+    # This role will install Oracle DB drivers to Maven repo and to system Tomcat.
+    - { role: oracle-perun, become: true, tags: oracle }
+    #
+    # This role will deploy PostgreSQL DB and create DB tables.
     - { role: postgre-perun, become: true, tags: db}
-    # This role will build Perun on your server.
-    - { role: build-perun, become: true, tags: build }
-    # This role will build engine of Perun on your server.
+    #
+    # This role will compile and package all Perun modules  
+    - { role: build-perun, become: true, tags: [ 'build', 'deploy', 'engine', 'ldap' ]}
+    #
+    # This role will deploy perun-rpc to Tomcat and perun-web-gui to Apache.
+    - { role: deploy-perun, become: true, tags: deploy }
+    #
+    # This role will deploy engine with GEN/SEND scripts and CLI scripts.
     - { role: engine-perun, become: true, tags: engine }
-    # This role will deploy new web user interface of Perun on your server.
+    #
+    # This role will deploy new web user interface of Perun.
     - { role: wui-perun, become: true, tags: wui}
-    # This role will deploy new LDAP server configuration.
+    #
+    # This role will deploy and configure LDAP server and LDAPc connector.
     - { role: ldap-perun, become: true, tags: ldap }
+    #
     # This role will set up security measures like firewall.
     - { role: security, become: true, tags: security }
+    #
     # This role will deploy authentication by hardware Yubikeys.
     - { role: yubikey, become: true, tags: yubikey }
+    #
     # This role will deploy unattended upgrades of Debian OS.
     - { role: unattended-upgrades, become: true, tags: unattended-upgrades }
-    # This role will set working environment to sensible state.
-    - { role: work-env, become: true, tags: work-env }

@@ -1,18 +1,6 @@
 ---
 # Tasks file for configuration-perun
 
-- name: Include variable files
-  include_vars: "{{ item }}"
-  with_fileglob:
-    - ../vars/*
-
-- name: Make "{{ perun_log_dir }}" directory
-  file:
-    path: "{{ perun_log_dir }}"
-    state: directory
-    mode: 0775
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
 
 - name: Make "{{ perun_config_dir }}" directory
   file:
@@ -21,12 +9,6 @@
     mode: 0755
     owner: "{{ config_files_owner }}"
     group: "{{ perun_group }}"
-
-- name: Make "{{ perun_ssl_dir }}" directory
-  file:
-    path: "{{ perun_ssl_dir }}"
-    state: directory
-    mode: 0755
 
 - name: Create file "{{ logback_xml_file }}"
   template:
@@ -109,15 +91,6 @@
     mode: 0640
     force: no
 
-- name: Create file "{{ perun_rpc_lib_properties_file }}"
-  template:
-    src: "{{ perun_rpc_lib_properties_template }}"
-    dest: "{{ perun_rpc_lib_properties_file }}"
-    owner: "{{ config_files_owner }}"
-    group: "{{ perun_group }}"
-    mode: 0640
-    force: no
-
 - name: Create file "{{ perun_web_gui_properties_file }}"
   template:
     src: "{{ perun_web_gui_properties_template }}"
@@ -145,20 +118,3 @@
     mode: 0640
     force: no
 
-- name: Create file "{{ perun_ldapc_properties_file }}"
-  template:
-    src: "{{ perun_ldapc_properties_template }}"
-    dest: "{{ perun_ldapc_properties_file }}"
-    owner: "{{ config_files_owner }}"
-    group: "{{ perun_group }}"
-    mode: 0640
-    force: no
-
-- name: Create file "{{ logback_ldapc_xml_file }}"
-  template:
-    src: "{{ logback_ldapc_xml_template }}"
-    dest: "{{ logback_ldapc_xml_file }}"
-    owner: "{{ config_files_owner }}"
-    group: "{{ perun_group }}"
-    mode: 0640
-    force: no

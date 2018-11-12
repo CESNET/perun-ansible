@@ -1,9 +1,6 @@
 ---
 # vars file for configuration-perun
 
-# Perun folder for SSL certificates
-perun_ssl_dir: "{{ perun_config_dir }}/ssl"
-
 # Owner of configuration files
 config_files_owner: "{{ perun_login }}"
 
@@ -50,10 +47,6 @@ perun_engine_file: "{{ perun_config_dir }}/perun-engine"
 perun_registrar_lib_properties_template: perun_registrar_lib.j2
 perun_registrar_lib_properties_file: "{{ perun_config_dir }}/perun-registrar-lib.properties"
 
-# Template file and destination in remote system for perun-rpc-lib.properties
-perun_rpc_lib_properties_template: perun_rpc_lib_properties.j2
-perun_rpc_lib_properties_file: "{{ perun_config_dir }}/perun-rpc-lib.properties"
-
 # Template file and destination in remote system for perun-web-gui.properties
 perun_web_gui_properties_template: perun_web_gui_properties.j2
 perun_web_gui_properties_file: "{{ perun_config_dir }}/perun-web-gui.properties"
@@ -62,10 +55,3 @@ perun_web_gui_properties_file: "{{ perun_config_dir }}/perun-web-gui.properties"
 perun_ext_sources_xml_template: perun_extSources_xml.j2
 perun_ext_sources_xml_file: "{{ perun_config_dir }}/perun-extSources.xml"
 
-# Template file and destination in remote system for perun-ldapc.properties
-perun_ldapc_properties_template: perun_ldapc_properties.j2
-perun_ldapc_properties_file: "{{ perun_config_dir }}/perun-ldapc.properties"
-
-# Template file and destination in remote system for logback-ldapc.xml
-logback_ldapc_xml_template: logback_ldapc_xml.j2
-logback_ldapc_xml_file: "{{ perun_config_dir }}/logback-ldapc.xml"

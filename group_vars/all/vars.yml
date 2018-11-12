@@ -20,6 +20,8 @@ perun_ldapc_folder: "/home/{{ perun_login }}/perun-ldapc"
 
 # Main Perun folder
 perun_config_dir: "/etc/perun"
+# Perun folder for SSL certificates
+perun_ssl_dir: "{{ perun_config_dir }}/ssl"
 # Variables log folder for Perun
 perun_log_dir: "/var/log/perun"
 
