@@ -1,6 +1,15 @@
 ---
 # Task file for tomcat installation on Debian distribution
 
+- name: Install tomcat8
+  apt:
+    name:
+    - tomcat8
+    - tomcat8-admin
+    - tomcat8-user
+    - libservlet3.1-java
+    state: latest
+
 - name: Add user tomcat8 to groups perun,tomcat8
   user:
     name: tomcat8
@@ -34,7 +43,7 @@
 - name: Export certificate of machine (Apache) into format .p12
   command: openssl pkcs12 -passout "file:/home/{{ perun_login }}/input.txt" -export -out "{{ apache_p12_file }}" -in "{{ apache_certificate_file }}" -inkey "{{ apache_certificate_key_file }}"
 
-- name: make p12 file readable by tomcat
+- name: Make p12 file readable by tomcat
   file:
     path: "{{ apache_p12_file }}"
     state: file
@@ -46,13 +55,13 @@
     path: "/home/{{ perun_login }}/input.txt"
     state: absent
 
-- name: Copy tomcat8 configuration to remote
+- name: Create tomcat8 configuration file
   template:
     src: tomcat8.j2
     dest: "/etc/default/tomcat8"
     mode: 0644
 
-- name: create dirs to stop tomcat complaining
+- name: Create dirs to stop tomcat complaining
   file:
     path: "{{item}}"
     state: directory

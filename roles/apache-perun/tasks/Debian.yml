@@ -1,5 +1,16 @@
 # Tasks file for apache-perun
 
+- name: Gather package facts
+  package_facts:
+    manager: "apt"
+
+- name: Check that Shibboleth is installed
+  assert:
+    that:
+     - '"shibboleth" in ansible_facts.packages'
+    msg: "Shibboleth is required in Apache config files"
+
+
 - name: Install Apache
   package:
     name: "{{ apache_package[ansible_os_family] }}"
@@ -21,6 +32,12 @@
     name: "{{ perun_login }}"
     groups: ssl-cert
     append: yes
+
+- name: Make "{{ perun_ssl_dir }}" directory
+  file:
+    path: "{{ perun_ssl_dir }}"
+    state: directory
+    mode: 0755
 
 # Fake Snake Oil if ssl_certificate_file variable is not filled
 - name: Make fake Snake Oil certificate for testing purposes
@@ -80,6 +97,29 @@
     - perun-ssl.conf
   notify:
     - "restart webserver"
+
+- name: Install prerequisite for htpasswd task
+  package:
+    name: python-passlib
+    state: present
+
+- name: Add user perun into Apache
+  htpasswd:
+    path: "/etc/apache2/perun.passwd"
+    name: "perun"
+    password: "{{ password_perun_admin }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Add user perun-engine into Apache
+  htpasswd:
+    path: "/etc/apache2/perun.passwd"
+    name: "perun-engine"
+    password: "{{ password_perun_engine }}"
+    owner: root
+    group: root
+    mode: 0644
 
 - name: Create directory for maintenance files
   file:

@@ -1,10 +1,11 @@
 ---
 # Task file for perun role for Debian
 
-- name: Install prerequisites
+- name: Install prerequisities
   package:
-    name: "{{ prerequisites[ansible_distribution] }}"
+    name: "{{ item }}"
     state: latest
+  with_items: "{{prerequisites[ansible_distribution]}}"
 
 - name: "Create {{ perun_group }} group"
   group:
@@ -19,6 +20,9 @@
     shell: /bin/bash
     system: yes
 
+# file "{{ perun_folder }}/perun-db/postgres.sql" is needed by postgre-perun role
+# all  "{{ perun_folder }}/" is needed by build-perun role
+# files "{{ perun_folder }}/perun-utils/ldapc-scripts/*" are needed by ldap-perun role
 - name: Clone git repository of perun sources to remote server
   become: yes
   become_user: "{{ perun_login }}"
@@ -28,12 +32,11 @@
     version: production
     update: yes
 
-- name: Clone git repository of perun services to remote server
-  become: yes
-  become_user: "{{ perun_login }}"
-  git:
-    repo: https://github.com/CESNET/perun-services.git
-    dest: "{{ perun_services_folder }}"
-    version: production
-    update: yes
-
+# used for logs from RPC, engine, ldapc
+- name: Make "{{ perun_log_dir }}" directory
+  file:
+    path: "{{ perun_log_dir }}"
+    state: directory
+    mode: 0775
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"

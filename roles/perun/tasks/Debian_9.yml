@@ -23,12 +23,4 @@
     name: maven
     state: latest
 
-- name: Install tomcat8
-  apt:
-    name:
-      - tomcat8
-      - tomcat8-admin
-      - tomcat8-user
-      - libservlet3.1-java
-    state: latest
 ...

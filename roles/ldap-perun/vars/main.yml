@@ -5,6 +5,7 @@ prerequisites:
     - slapd
     - ldap-utils
     - python-ldap
+    - libnet-ldap-perl
   RedHat: []
 
 slapd_service:
@@ -54,3 +55,16 @@ init_d_script:
     source: "{{ perun_folder }}/perun-utils/init.d-scripts/perun-ldapc.debian"
     destination: "/etc/init.d/perun-ldapc"
     mode: "0755"
+
+# Template file and destination in remote system for perun-ldapc.properties
+perun_ldapc_properties_template: perun_ldapc_properties.j2
+perun_ldapc_properties_file: "{{ perun_config_dir }}/perun-ldapc.properties"
+
+# Template file and destination in remote system for logback-ldapc.xml
+logback_ldapc_xml_template: logback_ldapc_xml.j2
+logback_ldapc_xml_file: "{{ perun_config_dir }}/logback-ldapc.xml"
+
+# Template file and destination in remote system for perun-rpc-lib.properties
+perun_rpc_lib_properties_template: perun_rpc_lib_properties.j2
+perun_rpc_lib_properties_file: "{{ perun_config_dir }}/perun-rpc-lib.properties"
+

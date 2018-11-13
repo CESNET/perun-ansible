@@ -1,0 +1,53 @@
+---
+
+- name: Ensure Maven is installed
+  package:
+    name: maven
+    state: present
+
+- name: Copy ojdbc8 file to remote server
+  copy:
+    src: "{{ ojdbc8_file_path }}"
+    dest: "/home/{{ perun_login }}/ojdbc8.jar"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Copy orai18n file to remote server
+  copy:
+    src: "{{ orai18n_file_path }}"
+    dest: "/home/{{ perun_login }}/orai18n.jar"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Install ojdbc8 to Maven repo
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: mvn install:install-file -Dfile=ojdbc8.jar -DgroupId=com.oracle -DartifactId=ojdbc8 -Dversion=12.2.0.1.0 -Dpackaging=jar
+  args:
+    chdir: "/home/{{ perun_login }}"
+
+- name: Install orai18n to Maven repo
+  become: yes
+  become_user: "{{ perun_login }}"
+  command: mvn install:install-file -Dfile=orai18n.jar -DgroupId=com.oracle -DartifactId=orai18n -Dversion=12.2.0.1.0 -Dpackaging=jar
+  args:
+    chdir: "/home/{{ perun_login }}"
+
+- name: Ensure Tomcat is installed
+  package:
+    name: tomcat8
+    state: present
+
+# possible locations for JDBC drivers in tomcat:
+# $CATALINA_HOME/shared/ (/usr/share/tomcat8/shared) - used by all tomcat instances
+# $CATALINA_BASE/shared/ (/var/lib/tomcat8/shared) - used only by the system tomcat, not by user tomcats
+- name: Add Oracle JDBC drivers to tomcat
+  copy:
+    remote_src: yes
+    src: "{{ item }}"
+    dest: "/var/lib/tomcat8/shared/"
+  with_items:
+    - "/home/{{ perun_login }}/ojdbc8.jar"
+    - "/home/{{ perun_login }}/orai18n.jar"

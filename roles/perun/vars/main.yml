@@ -4,22 +4,11 @@
 prerequisites:
  Debian:
    - git
-   - libswitch-perl
-   - liblwp-authen-negotiate-perl
-   - libjson-any-perl
-   - libtext-asciitable-perl
-   - libterm-readkey-perl
-   - libwww-perl
-   - libcrypt-ssleay-perl
-   - libtext-unidecode-perl
-   - libdate-calc-perl
-   - libnet-ldap-perl
    - ldap-utils
    - ntp
    - rsync
-   - python-passlib
    - sudo
    - whois
-   - apache2
+   - ssl-cert
    - ntp
    - curl

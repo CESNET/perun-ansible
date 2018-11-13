@@ -1,6 +1,41 @@
 ---
 # Task file for installation of LDAPc in Debian distribution
 
+- name: Make "{{ perun_config_dir }}" directory
+  file:
+    path: "{{ perun_config_dir }}"
+    state: directory
+    mode: 0755
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+
+- name: Create file "{{ perun_ldapc_properties_file }}"
+  template:
+    src: "{{ perun_ldapc_properties_template }}"
+    dest: "{{ perun_ldapc_properties_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+    force: no
+
+- name: Create file "{{ logback_ldapc_xml_file }}"
+  template:
+    src: "{{ logback_ldapc_xml_template }}"
+    dest: "{{ logback_ldapc_xml_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+    force: no
+
+- name: Create file "{{ perun_rpc_lib_properties_file }}"
+  template:
+    src: "{{ perun_rpc_lib_properties_template }}"
+    dest: "{{ perun_rpc_lib_properties_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+    force: no
+
 - name: Create perun-ldapc folder in perun's home repository
   file:
     path: "{{ perun_ldapc_folder }}"

@@ -1,6 +1,21 @@
 ---
 # Task file for Debian distribution
 
+- name: Install prerequisites
+  package:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{prerequisites[ansible_distribution]}}"
+
+- name: Clone git repository of perun services 
+  become: yes
+  become_user: "{{ perun_login }}"
+  git:
+    repo: https://github.com/CESNET/perun-services.git
+    dest: "{{ perun_services_folder }}"
+    version: production
+    update: yes
+
 - name: Delete /opt/perun-cli directory if exists
   file:
     path: "/opt/perun-cli"
@@ -40,16 +55,6 @@
   shell: "rsync --exclude Perun ./* /opt/perun-cli/bin/"
   args:
     chdir: "{{ perun_folder }}/perun-cli"
-
-- name: Add user perun into Apache
-  shell: "htpasswd -b -c /etc/apache2/perun.passwd perun {{ password_perun_admin }}"
-- name: Add user perun-engine into Apache
-  shell: "htpasswd -b /etc/apache2/perun.passwd perun-engine {{ password_perun_engine }}"
-
-- name: Restart Apache
-  service:
-    state: restarted
-    name: apache2
 
 - name: "Delete /home/{{ perun_login }}/perun-engine directory if exists"
   file:
