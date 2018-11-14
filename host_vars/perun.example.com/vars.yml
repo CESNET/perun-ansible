@@ -33,6 +33,7 @@ ldap_ca_certificate_file: "{{apache_certificate_chain_file}}"
 slapd_domain: 'example.com'
 slapd_basedn: '{{ "dc=" + slapd_domain.split(".") | join(",dc=") }}'
 slapd_basedn_admin: '{{ "cn=admin," + slapd_basedn }}'
+slapd_password_sasl_login_namespace: 'EXAMPLE'
 
 # Comma separated list of entityIDs of proxy IdPs which is infront of Perun.
 # So Perun can work with them differently.
