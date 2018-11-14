@@ -143,21 +143,21 @@
     id: 3CDBBC71
     url: "https://dist.eugridpma.info/distribution/igtf/current/GPG-KEY-EUGridPMA-RPM-3"
     state: present
-  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+  when: apache_ca_certificate_path is defined and apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
 - name: Add EGI IGTF repository
   apt_repository:
     repo: 'deb http://repository.egi.eu/sw/production/cas/1/current egi-igtf core'
     filename: 'igtf'
     state: present
-  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+  when: apache_ca_certificate_path is defined and apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
 - name: Install latest IGTF certificates
   apt:
     name: ca-policy-egi-core
     state: latest
     update_cache: yes
-  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+  when: apache_ca_certificate_path is defined and apache_ca_certificate_path == "/etc/grid-security/certificates/"
   notify:
     - "restart webserver"
 
@@ -166,21 +166,21 @@
     name: fetch-crl
     state: latest
     update_cache: yes
-  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+  when: apache_ca_certificate_path is defined and apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
 - name: Disable error emails from fetch-crl
   lineinfile:
     dest: /etc/fetch-crl.conf
     insertafter: EOF
     line: "noerrors"
-  when: apache_ca_certificate_path == "/etc/grid-security/certificates/"
+  when: apache_ca_certificate_path is defined and apache_ca_certificate_path == "/etc/grid-security/certificates/"
 
 # Rehash certificates for user identification
 - name: Use c_rehash to your certificates
   command: c_rehash .
   args:
     chdir: "{{ apache_ca_certificate_path }}"
-  when: apache_ca_certificate_path != "/etc/grid-security/certificates/"
+  when: apache_ca_certificate_path is defined and apache_ca_certificate_path != "/etc/grid-security/certificates/"
   notify:
     - "restart webserver"
 
