@@ -18,8 +18,8 @@ apache_certificate_key_file: '/etc/perun/ssl/ssl-cert-snakeoil.key'
 # Path to file with chain of CA  certificates. (SSLCertificateChainFile).
 apache_certificate_chain_file: '/etc/perun/ssl/ssl-cert-snakeoil.pem'
 
-# Path to directory with CA certificates. If you leave it with default value, IGTF certificates will be installed.
-apache_ca_certificate_path: '/etc/grid-security/certificates/'
+# Path to directory with CA certificates. If you uncomment it and leave it with default value, IGTF certificates will be installed.
+# apache_ca_certificate_path: '/etc/grid-security/certificates/'
 
 # LDAP CERTIFICATE
 # Path to LDAP certificate file (olcTLSCertificateFile).
