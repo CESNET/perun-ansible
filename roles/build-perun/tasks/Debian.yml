@@ -1,5 +1,5 @@
 ---
-- name: Ensure prerequisities
+- name: Install prerequisites
   package:
     name: "{{ item }}"
     state: present
