@@ -1,7 +1,7 @@
 ---
 # Task file for perun role for Debian
 
-- name: Install prerequisities
+- name: Install prerequisites
   package:
     name: "{{ item }}"
     state: latest
