@@ -156,7 +156,7 @@ ShibCompatValidUser on
   ####################################
   ##     PROFILE                  ####
   ####################################
-  RewriteRule ^/(.*)/profile$ https://%{HTTP_HOST}/$1/wui/ [L,R=301]
+  RewriteRule ^/(.*)/profile$ https://%{HTTP_HOST}/$1/profile/ [L,R=301]
   RewriteRule ^/(.*)/profile/$ /var/www/perun-wui/PerunProfile.html [L]
   RewriteRule ^/(.*)/profile/(.+)$ /var/www/perun-wui/$2 [L]
 
@@ -170,14 +170,14 @@ ShibCompatValidUser on
   ####################################
   ##     AFFILIATION              ####
   ####################################
-  #RewriteRule ^/(.*)/affiliation$ https://%{HTTP_HOST}/$1/wui/ [L,R=301]
+  #RewriteRule ^/(.*)/affiliation$ https://%{HTTP_HOST}/$1/affiliation/ [L,R=301]
   #RewriteRule ^/(.*)/affiliation/$ /var/www/perun-wui/PerunSetAffiliation.html [L]
   #RewriteRule ^/(.*)/affiliation/(.+)$ /var/www/perun-wui/$2 [L]
 
   ####################################
   ##     PUBLICATIONS             ####
   ####################################
-  #RewriteRule ^/(.*)/publications$ https://%{HTTP_HOST}/$1/wui/ [L,R=301]
+  #RewriteRule ^/(.*)/publications$ https://%{HTTP_HOST}/$1/publications/ [L,R=301]
   #RewriteRule ^/(.*)/publications/$ /var/www/perun-wui/PerunCabinet.html [L]
   #RewriteRule ^/(.*)/publications/(.+)$ /var/www/perun-wui/$2 [L]
 
