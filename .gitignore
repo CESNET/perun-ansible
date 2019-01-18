@@ -1,6 +1,8 @@
 # Ignore machine settings
 host_vars/
 inventories/
+group_vars/eduteams/
+group_vars/all/users.yml
 
 # Ignore Java project files #
 *.class
