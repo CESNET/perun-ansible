@@ -107,3 +107,6 @@
     #
     # This role will deploy unattended upgrades of Debian OS.
     - { role: unattended-upgrades, become: true, tags: unattended-upgrades }
+    #
+    # This role will deploy components needed for passive checks from MetaCentrum's Nagios.
+    - { role: monitoring, become: true, tags: monitoring }
