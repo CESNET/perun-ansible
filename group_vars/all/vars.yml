@@ -39,3 +39,5 @@ orai18n_file_path: '~/orai18n.jar'
 # Federative authz
 fed_authz: 'fed'
 
+jdbc_maximumPoolSize: '150'
+jdbc_minimumIdle: '10'
