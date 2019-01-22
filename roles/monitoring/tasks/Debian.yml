@@ -102,5 +102,20 @@
       - check-mk-agent-logwatch
       - check-mk-agent-meta-checks
       - check-mk-agent-meta-key
+      - time
     state: latest
     update_cache: yes
+
+# needed for working from="aiglos.zcu.cz" in  .ssh/authorized_keys
+- name: Enable DNS host resolving for SSH daemon
+  lineinfile:
+    path: "/etc/ssh/sshd_config"
+    regexp: 'UseDNS'
+    line: 'UseDNS yes'
+  register: sshd_dns
+
+- name: reload SSH daemon
+  service:
+    name: sshd
+    state: reloaded
+  when: sshd_dns.changed
