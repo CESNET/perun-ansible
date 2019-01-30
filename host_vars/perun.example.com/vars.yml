@@ -63,4 +63,4 @@ root_email_address: 'admin@example.com'
 # Internal firewall (iptables)
 # True - overwrite internal firewall rules with defaults (only ssh, http(s), ldaps and postgres ports are opened)
 # False - keep current firewall rules
-overwrite_firewall_rules: True
+overwrite_firewall_rules: False

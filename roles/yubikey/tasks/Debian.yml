@@ -32,6 +32,7 @@
     path: "/etc/pam.d/sudo"
     insertafter: '#%PAM-1.0'
     line: "auth sufficient pam_yubico.so authfile=/etc/yubico/authorized_yubikeys id={{ yubikey_id }} key={{ yubikey_key }}"
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version is version_compare('9', '>=')
 
 - name: Set permissions on /etc/pam.d/sudo
   file:

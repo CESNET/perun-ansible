@@ -1,2 +1,5 @@
+[all:children]
+perun-servers
+
 [perun-servers]
 production-perun.awesomesite.cz ansible_user=root

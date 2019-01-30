@@ -12,7 +12,7 @@
       - sudo_perun_users is defined
     msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set values in it"
 
-- include_tasks: "Yubikey.yml"
+- include_tasks: "{{ ansible_distribution }}.yml"
   when: install_yubikeys
 
 

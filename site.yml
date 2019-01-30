@@ -10,7 +10,24 @@
 # 6. run the playbook by executing the command "ansible-playbook -i inventories/prod --ask-vault-pass site.yml"
 
 # you can run only specific parts of this playbook using tags, e.g.:
-#  ansible-playbook -i inventories/my --ask-vault-pass site.yml --tags security,yubikey,unattended-upgrades,work-env
+#  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags work-env,security,yubikey,unattended-upgrades
+
+- hosts: all
+  remote_user: root
+  roles:
+    # This role will set working environment to a sensible state.
+    - { role: work-env, tags: work-env }
+    # This role will set up security measures like firewall.
+    - { role: security, tags: security }
+    #
+    # This role will deploy authentication by hardware Yubikeys.
+    - { role: yubikey, tags: yubikey }
+    #
+    # This role will deploy unattended upgrades of Debian OS.
+    - { role: unattended-upgrades, tags: unattended-upgrades }
+    #
+    # This role will deploy components needed for passive checks from MetaCentrum's Nagios.
+    - { role: monitoring, tags: monitoring }
 
 - hosts: perun-servers
   pre_tasks:
@@ -44,7 +61,7 @@
         - ansible_distribution == "Debian"
         - ansible_distribution_major_version in ["9"]
       msg: "Only Debian 9 is supported"
-    tags: ['always']
+    tags: ['apache']
 
   # editing the file shibboleth2.xml requires xml task available since Ansible 2.4
   - name:  Ansible 2.4+ required
@@ -59,9 +76,6 @@
   roles:
     # NECESSARY ROLES
     # ---------------
-    #
-    # This role will set working environment to a sensible state.
-    - { role: work-env, become: true, tags: work-env }
     #
     # This role will create user perun and install basic software packages.
     - { role: perun, become: true, tags: [ 'perun', 'config', 'tomcat', 'build', 'deploy', 'ldap' ] }
@@ -99,14 +113,3 @@
     # This role will deploy and configure LDAP server and LDAPc connector.
     - { role: ldap-perun, become: true, tags: ldap }
     #
-    # This role will set up security measures like firewall.
-    - { role: security, become: true, tags: security }
-    #
-    # This role will deploy authentication by hardware Yubikeys.
-    - { role: yubikey, become: true, tags: yubikey }
-    #
-    # This role will deploy unattended upgrades of Debian OS.
-    - { role: unattended-upgrades, become: true, tags: unattended-upgrades }
-    #
-    # This role will deploy components needed for passive checks from MetaCentrum's Nagios.
-    - { role: monitoring, become: true, tags: monitoring }
