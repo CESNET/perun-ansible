@@ -1,13 +1,17 @@
 ---
 
 postgres_version:
-  Debian_8: 9.4
   Debian_9: 9.6
+  Debian_buster/sid: 11
 
-# vars file for postgre-perun
+psql_version: "{{postgres_version[ansible_distribution+'_'+ansible_distribution_major_version]}}"
+
 postgre_packages:
-  Debian:
-    - postgresql
+  Debian_9:
+    - postgresql-9.6
+    - postgresql-contrib-9.6
+  Debian_buster/sid:
+    - postgresql-11
     - postgresql-contrib
 
 

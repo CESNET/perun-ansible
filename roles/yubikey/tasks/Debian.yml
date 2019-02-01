@@ -32,7 +32,7 @@
     path: "/etc/pam.d/sudo"
     insertafter: '#%PAM-1.0'
     line: "auth sufficient pam_yubico.so authfile=/etc/yubico/authorized_yubikeys id={{ yubikey_id }} key={{ yubikey_key }}"
-  when: ansible_distribution == "Debian" and ansible_distribution_major_version is version_compare('9', '>=')
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version != '8'
 
 - name: Set permissions on /etc/pam.d/sudo
   file:
@@ -72,6 +72,13 @@
     owner: "{{ item }}"
     group: "{{ item }}"
     content: "{{ yubikey_users[item].sshkey }}"
+    force: no
+  with_items: "{{ create_yubikey_users }}"
+
+- name: ensure ssh keys in .ssh/authorized_keys
+  lineinfile:
+    path: "/home/{{ item }}/.ssh/authorized_keys"
+    line: "{{yubikey_users[item].sshkey}}"
   with_items: "{{ create_yubikey_users }}"
 
 - name: Add users to group sudo

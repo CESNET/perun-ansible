@@ -1,4 +1,3 @@
 ---
-# tasks file for postgre-perun
 - include_tasks: "{{ ansible_os_family }}.yml"
   when: install_postgres

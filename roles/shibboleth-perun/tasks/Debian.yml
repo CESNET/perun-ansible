@@ -1,0 +1,132 @@
+---
+# tasks file for shibboleth-perun
+- name: python-lxml
+  apt:
+    name: python-lxml
+
+- debug:
+    msg: "shib_xml_namespace is {{shib_xml_namespace}}"
+
+- name: shibboleth2.xml set SP entity id
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults
+    namespaces:
+      conf: "{{shib_xml_namespace}}"
+    attribute: entityID
+    value: "{{ shibboleth_sp_entityID }}"
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml add attribute prefix AJP_
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults
+    namespaces:
+      conf: "{{shib_xml_namespace}}"
+    attribute: attributePrefix
+    value: "AJP_"
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml add epuid to REMOTE_USER
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults
+    namespaces:
+      conf: "{{shib_xml_namespace}}"
+    attribute: REMOTE_USER
+    value: "eppn epuid persistent-id targeted-id"
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml set handlerSSL="true"
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults/conf:Sessions
+    namespaces:
+      conf: "{{shib_xml_namespace}}"
+    attribute: handlerSSL
+    value: "true"
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml set cookieProps="https"
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults/conf:Sessions
+    namespaces:
+      conf: "{{shib_xml_namespace}}"
+    attribute: cookieProps
+    value: "https"
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml set default IdP entityID
+  xml:
+    path: /etc/shibboleth/shibboleth2.xml
+    xpath: /conf:SPConfig/conf:ApplicationDefaults/conf:Sessions/conf:SSO
+    namespaces:
+      conf: "{{shib_xml_namespace}}"
+    attribute: entityID
+    value: "{{ shibboleth_idp_entityID }}"
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml add IdP metadata
+  blockinfile:
+    path: /etc/shibboleth/shibboleth2.xml
+    insertafter: '<Errors supportContact="root@localhost" helpLocation="/about.html" styleSheet="/shibboleth-sp/main.css"/>'
+    marker: "<!-- {mark} ANSIBLE IdP metadata MANAGED BLOCK -->"
+    content: |
+      <MetadataProvider type="XML" uri="{{ shibboleth_idp_metadata_url }}"
+                      backingFilePath="proxyidp.xml" reloadInterval="1800" />
+  notify:
+    - "restart shibd"
+
+- name: shibboleth2.xml add Consolidator SP
+  blockinfile:
+    path: /etc/shibboleth/shibboleth2.xml
+    insertbefore: '</ApplicationDefaults>'
+    marker: "<!-- {mark} ANSIBLE Consolidator SP -->"
+    content: |
+      <ApplicationOverride id="consolidator" entityID="https://{{perun_hostname}}/consolidator">
+        <Sessions lifetime="28800" timeout="3600" checkAddress="false" handlerURL="/Consolidator.sso" relayState="ss:mem" handlerSSL="true" cookieProps="https" />
+      </ApplicationOverride>
+  notify:
+    - "restart shibd"
+
+- name: attribute-map.xml add epuid
+  blockinfile:
+    path: /etc/shibboleth/attribute-map.xml
+    insertbefore: "</Attributes>"
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK -->"
+    content: |
+      <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.13" id="epuid">
+          <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
+      </Attribute>
+      <Attribute name="urn:mace:dir:attribute-def:eduPersonUniqueId" id="epuid">
+          <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
+      </Attribute>
+
+      <Attribute name="urn:cesnet:proxyidp:attribute:sourceIdPEntityID" id="sourceIdPEntityID"/>
+
+      <!-- Source IdP Organization name -->
+      <Attribute name="urn:cesnet:proxyidp:attribute:IdPOrganizationName" id="IdPOrganizationName" />
+      <!-- Source IdP name -->
+      <Attribute name="urn:cesnet:proxyidp:attribute:sourceIdPName" id="sourceIdPName" />
+
+  notify:
+    - "restart shibd"
+
+- name: Generate Shibboleth key and cert
+  command: shib-keygen -h {{ perun_hostname }} -e {{ shibboleth_sp_entityID }}
+  args:
+    chdir: /etc/shibboleth
+    creates: /etc/shibboleth/sp-key.pem
+  notify:
+    - "restart shibd"
+
+- name: Restart server if needed
+  meta: flush_handlers
+...

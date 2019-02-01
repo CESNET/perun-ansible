@@ -1,7 +1,7 @@
 # Ignore machine settings
 host_vars/
 inventories/
-group_vars/eduteams/
+group_vars/
 group_vars/all/users.yml
 
 # Ignore Java project files #
@@ -74,3 +74,4 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+/group_vars/lifescience/vars.yml

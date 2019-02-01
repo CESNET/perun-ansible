@@ -20,7 +20,7 @@
     shell: /bin/bash
     system: yes
 
-# file "{{ perun_folder }}/perun-db/postgres.sql" is needed by postgre-perun role
+# file "{{ perun_folder }}/perun-db/postgres.sql" is needed by postgres-perun role
 # all  "{{ perun_folder }}/" is needed by build-perun role
 # files "{{ perun_folder }}/perun-utils/ldapc-scripts/*" are needed by ldap-perun role
 - name: Clone git repository of perun sources to remote server
