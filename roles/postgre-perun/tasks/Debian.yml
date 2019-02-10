@@ -45,8 +45,8 @@
 - name: Set listen_addresses=* in postgresql.conf
   lineinfile:
     path: "/etc/postgresql/{{ postgres_version[ansible_distribution+'_'+ansible_distribution_major_version] }}/main/postgresql.conf"
-    regexp: "^#listen_addresses = \'localhost\'(.*)$"
-    line: "listen_addresses = \'*\'\\1"
+    regexp: "^#listen_addresses = 'localhost'(.*)$"
+    line: "listen_addresses = '*'\\1"
     backrefs: yes
   register: listen_addresses
 
