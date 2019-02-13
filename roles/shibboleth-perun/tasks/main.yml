@@ -132,6 +132,14 @@
         <Attribute name="urn:mace:dir:attribute-def:eduPersonUniqueId" id="epuid">
             <AttributeDecoder xsi:type="ScopedAttributeDecoder"/>
         </Attribute>
+
+        <Attribute name="urn:cesnet:proxyidp:attribute:sourceIdPEntityID" id="sourceIdPEntityID"/>
+
+        <!-- Source IdP Organization name -->
+        <Attribute name="urn:cesnet:proxyidp:attribute:IdPOrganizationName" id="IdPOrganizationName" />
+        <!-- Source IdP name -->
+        <Attribute name="urn:cesnet:proxyidp:attribute:sourceIdPName" id="sourceIdPName" />
+
   notify:
     - "restart shibd"
 
