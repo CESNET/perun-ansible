@@ -216,6 +216,7 @@
 - name: Create HTTP2 module config
   copy:
     dest: "/etc/apache2/mods-available/http2.conf"
+    force: no
     content: |
       Protocols h2 http/1.1
 
