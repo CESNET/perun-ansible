@@ -50,6 +50,10 @@ instance_id: 'GENERIC01A02B03C'
 
 # Otional installation of Postgres
 install_postgres: True
+postgres_certificate_file: "{{apache_certificate_file}}"
+postgres_certificate_key_file: "{{apache_certificate_key_file}}"
+postgres_certificate_chain_file: "{{apache_certificate_chain_file}}"
+
 
 # Optional installation of Oracle drivers
 install_oracle: False

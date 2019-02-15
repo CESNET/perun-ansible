@@ -14,6 +14,14 @@
 
 - hosts: all
   remote_user: root
+  pre_tasks:
+    - name: Require Debian
+      assert:
+        that:
+          - ansible_distribution == "Debian"
+          - ansible_distribution_major_version in ["8", "9","buster/sid"]
+        msg: "Only Debian 8+ is supported"
+
   roles:
     #
     # This role will set working environment to a sensible state.
@@ -79,8 +87,11 @@
     # NECESSARY ROLES
     # ---------------
     #
+    # This role will check or create SSL/TLS certificates.
+    - { role: certs-perun, become: true, tags: [ 'apache', 'postgres', 'ldap' ] }
+    #
     # This role will create user perun and install basic software packages.
-    - { role: perun, become: true, tags: [ 'perun', 'config', 'tomcat', 'build', 'deploy', 'ldap' ] }
+    - { role: perun, become: true, tags: [ 'perun', 'config', 'tomcat', 'postgres', 'build', 'deploy', 'ldap' ] }
     #
     # This role will create configuration files of Perun from templates.
     - { role: configuration-perun, become: true, tags: [ 'config', 'deploy', 'engine' ] }
