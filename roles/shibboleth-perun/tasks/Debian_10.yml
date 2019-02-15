@@ -1,0 +1,7 @@
+---
+
+- name: Install Shibboleth
+  apt:
+    name: libapache2-mod-shib
+    state: latest
+    install_recommends: yes

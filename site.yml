@@ -9,14 +9,16 @@
 # 5. change vault password by executing the command "ansible-vault rekey host_vars/<your host name>/passwords.yml"
 # 6. run the playbook by executing the command "ansible-playbook -i inventories/prod --ask-vault-pass site.yml"
 
-# you can run only specific parts of this playbook using tags, e.g.:
-#  ansible-playbook -i inventories/prod --ask-vault-pass site.yml --tags work-env,security,yubikey,unattended-upgrades
+# you can run only specific parts of this playbook using --tags, and limit execution to selceted hosts using --limit, e.g.:
+#  ansible-playbook -i inventories/all --ask-vault-pass site.yml --tags work-env,security,yubikey,unattended-upgrades --limit eduteams
 
 - hosts: all
   remote_user: root
   roles:
+    #
     # This role will set working environment to a sensible state.
     - { role: work-env, tags: work-env }
+    #
     # This role will set up security measures like firewall.
     - { role: security, tags: security }
     #
@@ -44,7 +46,7 @@
         - ldap_certificate_key_file is defined
         - install_oracle is defined
       msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set all values in it"
-    tags: ['perun', 'config', 'shibboleth', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap' ]
+    tags: ['perun', 'config', 'shibboleth', 'apache', 'tomcat', 'postgres', 'build', 'engine', 'wui', 'ldap' ]
 
   - name: Check that host's passwords are loaded
     assert:
@@ -52,16 +54,16 @@
         - password_perun_admin is defined
         - yubikey_key is defined
       msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set all values in it"
-    tags: ['perun', 'config', 'apache', 'tomcat', 'db', 'build', 'engine', 'wui', 'ldap' ]
+    tags: ['perun', 'config', 'apache', 'tomcat', 'postgres', 'build', 'engine', 'wui', 'ldap' ]
 
   # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
   - name: Require Debian 9
     assert:
       that:
         - ansible_distribution == "Debian"
-        - ansible_distribution_major_version in ["9"]
-      msg: "Only Debian 9 is supported"
-    tags: ['apache']
+        - ansible_distribution_major_version in ["9","buster/sid"]
+      msg: "Only Debian 9+ is supported"
+    tags: ['apache','postgres']
 
   # editing the file shibboleth2.xml requires xml task available since Ansible 2.4
   - name:  Ansible 2.4+ required
@@ -96,7 +98,7 @@
     - { role: oracle-perun, become: true, tags: oracle }
     #
     # This role will deploy PostgreSQL DB and create DB tables.
-    - { role: postgre-perun, become: true, tags: db}
+    - { role: postgres-perun, become: true, tags: postgres}
     #
     # This role will compile and package all Perun modules  
     - { role: build-perun, become: true, tags: [ 'build', 'deploy', 'engine', 'ldap' ]}

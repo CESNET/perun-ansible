@@ -93,7 +93,7 @@
     state: present
   with_items:
     - "deb ftp://repo.metacentrum.cz/ all main pilot"
-    - "deb ftp://repo.metacentrum.cz/ {{ansible_distribution_release}} main pilot"
+#    - "deb ftp://repo.metacentrum.cz/ {{ansible_distribution_release}} main pilot"
 
 - name: Install check_mk packages
   apt:

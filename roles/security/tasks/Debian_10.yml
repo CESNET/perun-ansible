@@ -1,0 +1,15 @@
+---
+#TODO migrate to nftables
+
+# blocks IP addresses after multiple unsuccessful authentication attempts
+- name: Install fail2ban package
+  package:
+    name: fail2ban
+    state: present
+
+
+# lock root password
+- name: Lock root password
+  user:
+    name: root
+    password: "*"
