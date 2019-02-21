@@ -95,6 +95,12 @@
     - "deb ftp://repo.metacentrum.cz/ all main pilot"
 #    - "deb ftp://repo.metacentrum.cz/ {{ansible_distribution_release}} main pilot"
 
+- name: enable FTP Debian repositories
+  copy:
+    dest: '/etc/apt/apt.conf.d/85enable-ftp'
+    content: 'Dir::Bin::Methods::ftp "ftp";'
+    force: no
+
 - name: Install check_mk packages
   apt:
     name:

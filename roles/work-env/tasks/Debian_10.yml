@@ -13,7 +13,8 @@
   lineinfile:
     path: "/usr/share/vim/vim81/defaults.vim"
     regexp: "set mouse=a"
-    state: absent
+    line: '  set mouse=n'
+    backrefs: yes
 
 - name: create /root/.bashrc if it does not exist
   copy:

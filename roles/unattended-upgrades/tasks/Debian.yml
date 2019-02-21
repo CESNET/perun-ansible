@@ -23,6 +23,12 @@
               "origin=Debian,codename=${distro_codename}-updates";
               "origin=meta@cesnet.cz,a=stable";
 
+- name: Enable periodic updates
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    src: /usr/share/unattended-upgrades/20auto-upgrades
+    remote_src: yes
+
 - name: Set Mail to root
   lineinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
