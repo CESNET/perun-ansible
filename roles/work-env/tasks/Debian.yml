@@ -1,0 +1,38 @@
+---
+# Sets working environment on Debian to sensible state
+
+- name: Install Czech locale
+  locale_gen:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - "en_US.UTF-8"
+    - "cs_CZ.UTF-8"
+
+- name: Install vim, htop and locate
+  apt:
+    name:
+      - vim
+      - htop
+      - locate
+    state: latest
+
+- name: create /root/.bashrc if it does not exist
+  copy:
+    content: ""
+    dest: /root/.bashrc
+    force: no
+
+- name: fix cmd prompt
+  blockinfile:
+    dest: /root/.bashrc
+    block: |
+      # If this is an xterm set the title to user@host:dir
+      case "$TERM" in
+      xterm*|rxvt*)
+         PS1="\[\e]0;\u@$(hostname --fqdn) \w\a\]\u@$(hostname --fqdn):\w# "
+         ;;
+      *)
+         ;;
+      esac
+      export EDITOR=vi

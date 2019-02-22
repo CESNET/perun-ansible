@@ -1,37 +1,9 @@
 ---
 # Sets working environment on Debian to sensible state
 
-- name: Install vim, htop and locate
-  apt:
-    name:
-      - vim
-      - htop
-      - locate
-    state: latest
-
 - name: fix vim mouse editing
   lineinfile:
     path: "/usr/share/vim/vim81/defaults.vim"
     regexp: "set mouse=a"
-    line: '  set mouse=n'
+    line: '  set mouse=r'
     backrefs: yes
-
-- name: create /root/.bashrc if it does not exist
-  copy:
-    content: ""
-    dest: /root/.bashrc
-    force: no
-
-- name: fix cmd prompt
-  blockinfile:
-    dest: /root/.bashrc
-    block: |
-     # If this is an xterm set the title to user@host:dir
-     case "$TERM" in
-     xterm*|rxvt*)
-        PS1="\[\e]0;\u@$(hostname --fqdn) \w\a\]\u@$(hostname --fqdn):\w# "
-        ;;
-     *)
-        ;;
-     esac
-     export EDITOR=vi
