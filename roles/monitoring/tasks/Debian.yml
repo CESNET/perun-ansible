@@ -1,6 +1,13 @@
 ---
 # tasks file for installing components needed for passive checks from MetaCentrum's Nagios
 
+- name: Install apt-transport-https and lsb-release
+  apt:
+    name:
+      - apt-transport-https
+      - lsb-release
+    state: latest
+
 - name: Add MetaCentrum repository key
   apt_key:
     id: A385CDB0
@@ -92,8 +99,8 @@
     filename: 'meta_repo'
     state: present
   with_items:
-    - "deb ftp://repo.metacentrum.cz/ all main pilot"
-#    - "deb ftp://repo.metacentrum.cz/ {{ansible_distribution_release}} main pilot"
+    - "deb https://repo.metacentrum.cz/ all main pilot"
+    - "deb https://repo.metacentrum.cz/ {{ansible_lsb.codename}} main pilot"
 
 - name: enable FTP Debian repositories
   copy:
