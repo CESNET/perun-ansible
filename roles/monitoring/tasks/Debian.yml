@@ -99,8 +99,8 @@
     filename: 'meta_repo'
     state: present
   with_items:
-    - "deb https://repo.metacentrum.cz/ all main pilot"
-    - "deb https://repo.metacentrum.cz/ {{ansible_lsb.codename}} main pilot"
+    - "deb ftp://repo.metacentrum.cz/ all main pilot"
+    - "deb ftp://repo.metacentrum.cz/ {{ansible_lsb.codename}} main pilot"
 
 - name: enable FTP Debian repositories
   copy:

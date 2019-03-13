@@ -1,3 +1,12 @@
 ---
+
+- name: Check that variables are loaded
+  assert:
+    that:
+      - postgres_certificate_file is defined
+      - postgres_certificate_key_file is defined
+      - postgres_certificate_chain_file is defined
+    msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set values in it"
+
 - include_tasks: "{{ ansible_os_family }}.yml"
   when: install_postgres
