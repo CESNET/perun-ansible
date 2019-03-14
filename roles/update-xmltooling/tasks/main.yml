@@ -1,0 +1,16 @@
+---
+# fixes security bug in Shibboleth SP
+- name: Update xml packages for shibd
+  apt:
+    name:
+      - libxmltooling7
+      - xmltooling-schemas
+    state: latest
+    update_cache: yes
+  register: xmlupdate
+
+- name: restart shibd
+  service:
+    state: restarted
+    name: shibd
+  when: xmlupdate.changed

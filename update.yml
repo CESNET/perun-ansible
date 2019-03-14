@@ -1,0 +1,19 @@
+---
+#  Ad-hoc role for updating a security vulnerability in Shibboleth SP
+#  run with:
+#  ansible-playbook -i inventories/all --ask-vault-pass update.yml
+
+- hosts: all
+  remote_user: root
+  pre_tasks:
+    - name: Require Debian
+      assert:
+        that:
+          - ansible_distribution == "Debian"
+          - ansible_distribution_major_version in ["8", "9","buster/sid"]
+        msg: "Only Debian 8+ is supported"
+  roles:
+    #
+    # This role will set working environment to a sensible state.
+    - { role: update-xmltooling, tags: xmltooling }
+    #
