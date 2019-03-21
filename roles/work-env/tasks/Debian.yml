@@ -9,12 +9,13 @@
     - "en_US.UTF-8"
     - "cs_CZ.UTF-8"
 
-- name: Install vim, htop and locate
+- name: Install vim, htop, locate, debian-goodies
   apt:
     name:
       - vim
       - htop
       - locate
+      - debian-goodies
     state: latest
 
 - name: create /root/.bashrc if it does not exist
