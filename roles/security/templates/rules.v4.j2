@@ -3,13 +3,11 @@
 :INPUT ACCEPT [0:0]
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
--4 -A INPUT -p icmp -m comment --comment "accept all icmp" -j ACCEPT
--6 -A INPUT -p icmpv6 -m comment --comment "accept all icmpv6" -j ACCEPT
+-A INPUT -p icmp -m comment --comment "accept all icmp" -j ACCEPT
 -A INPUT -i lo -j ACCEPT -m comment --comment "accept all on loopback"
 -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment "accept existing connections"
 -A INPUT -m conntrack --ctstate INVALID -j DROP -m comment --comment "drop invalid packets"
--4 -A INPUT -s 127.0.0.0/8 ! -i lo -j DROP -m comment --comment "block remote packets claiming to be from a loopback address"
--6 -A INPUT -s ::1/128 ! -i lo -j DROP -m comment --comment "block remote packets claiming to be from a loopback address"
+-A INPUT -s 127.0.0.0/8 ! -i lo -j DROP -m comment --comment "block remote packets claiming to be from a loopback address"
 -A INPUT -s 147.251.0.0/16  -p tcp -m tcp --dport 22 -j ACCEPT -m comment --comment "accept ssh from MUNI"
 -A INPUT -s 147.228.0.0/16  -p tcp -m tcp --dport 22 -j ACCEPT -m comment --comment "accept ssh from ZCU"
 -A INPUT -s 147.231.0.0/16  -p tcp -m tcp --dport 22 -j ACCEPT -m comment --comment "accept ssh from CAS"

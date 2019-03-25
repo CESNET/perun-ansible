@@ -23,7 +23,7 @@
   template:
     backup: true
     force: "{{ overwrite_firewall_rules }}"
-    src: rules.j2
+    src: rules.v4.j2
     dest: /etc/iptables/rules.v4
   register: ipv4_rules
 
@@ -31,7 +31,7 @@
   template:
     backup: true
     force: "{{ overwrite_firewall_rules }}"
-    src: rules.j2
+    src: rules.v6.j2
     dest: /etc/iptables/rules.v6
   register: ipv6_rules
 

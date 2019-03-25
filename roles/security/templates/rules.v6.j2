@@ -1,0 +1,17 @@
+# Created by Ansible
+*filter
+:INPUT ACCEPT [0:0]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+-A INPUT -p icmpv6 -m comment --comment "accept all icmpv6" -j ACCEPT
+-A INPUT -i lo -j ACCEPT -m comment --comment "accept all on loopback"
+-A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT -m comment --comment "accept existing connections"
+-A INPUT -m conntrack --ctstate INVALID -j DROP -m comment --comment "drop invalid packets"
+-A INPUT -s ::1/128 ! -i lo -j DROP -m comment --comment "block remote packets claiming to be from a loopback address"
+-A INPUT -s 2001:718::/32 -p tcp -m tcp --dport 22 -j ACCEPT -m comment --comment "accept ssh from CESNET provider"
+-A INPUT -p tcp -m tcp --dport 80 -j ACCEPT -m comment --comment "accept http"
+-A INPUT -p tcp -m tcp --dport 443 -j ACCEPT -m comment --comment "accept https"
+-A INPUT -p tcp -m tcp --dport 636 -j ACCEPT -m comment --comment "accept ldaps"
+-A INPUT -p tcp -m tcp --dport 5432 -j ACCEPT -m comment --comment "accept postgres"
+-A INPUT -j REJECT
+COMMIT
