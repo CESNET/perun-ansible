@@ -37,3 +37,29 @@
          ;;
       esac
       export EDITOR=vi
+
+- name: create /root/.vimrc if it does not exist
+  copy:
+    content: ""
+    dest: /root/.vimrc
+    force: no
+
+- name: fix vim
+  blockinfile:
+    dest: /root/.vimrc
+    marker: '" {mark} ANSIBLE MANAGED BLOCK'
+    block: |
+      " fix mouse
+      set mouse=r
+      " syntax highlighting
+      syntax on
+      set background=dark
+      " better search
+      set incsearch
+      " When editing a file, always jump to the last known cursor position.
+      " Don't do it when the position is invalid or when inside an event handler
+      " (happens when dropping a file on gvim).
+      autocmd BufReadPost *
+        \ if line("'\"") > 1 && line("'\"") <= line("$") |
+        \   exe "normal! g`\"" |
+        \ endif

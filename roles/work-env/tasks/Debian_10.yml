@@ -1,7 +1,7 @@
 ---
 # Sets working environment on Debian to sensible state
 
-- name: fix vim mouse editing
+- name: fix vim mouse editing in defaults
   lineinfile:
     path: "/usr/share/vim/vim81/defaults.vim"
     regexp: "set mouse=a"
