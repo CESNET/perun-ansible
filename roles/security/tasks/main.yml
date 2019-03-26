@@ -5,5 +5,16 @@
       - overwrite_firewall_rules is defined
     msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/vars.yml and set values in it"
 
-- include_tasks: "Debian.yml"
+- include_tasks: "Debian_9.yml"
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "9"
+
+- include_tasks: "Debian_10.yml"
+  when: ansible_distribution == "Debian" and ansible_distribution_major_version == "buster/sid"
+
+# lock root password
+- name: Lock root password
+  user:
+    name: root
+    password: "*"
+
 

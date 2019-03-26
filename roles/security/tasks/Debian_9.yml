@@ -55,8 +55,3 @@
     state: started
   when: ipv4_rules.changed or ipv6_rules.changed
 
-# lock root password
-- name: Lock root password
-  user:
-    name: root
-    password: "*"

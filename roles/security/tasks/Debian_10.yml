@@ -1,0 +1,53 @@
+---
+- name: Ensure iptables are not installed
+  package:
+    name: iptables
+    state: absent
+
+- name: Ensure nftables are installed
+  package:
+    name: nftables
+    state: present
+
+# blocks IP addresses after multiple unsuccessful authentication attempts
+- name: Install fail2ban package
+  package:
+    name: fail2ban
+    state: present
+
+# set up FW rules if overwrite_firewall_rules==True
+- name: Set up firewall rules
+  template:
+    backup: true
+    force: "{{ overwrite_firewall_rules }}"
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+  register: inet_rules
+
+- name: Activate firewall rules now and on reboots
+  service:
+    name: nftables
+    state: reloaded
+    enabled: yes
+  when: inet_rules.changed
+
+- name: Set up fail2ban action
+  template:
+    force: no
+    src: nftables-common.local.j2
+    dest: /etc/fail2ban/action.d/nftables-common.local
+  register: f2b_action
+
+- name: Set up fail2ban jail
+  template:
+    force: no
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+  register: f2b_jail
+
+- name: Activate fail2ban settings
+  service:
+    name: fail2ban
+    state: restarted
+    enabled: yes
+  when: f2b_action.changed or f2b_jail.changed

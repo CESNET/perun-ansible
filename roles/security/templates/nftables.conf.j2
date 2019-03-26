@@ -1,0 +1,42 @@
+#!/usr/sbin/nft -f
+flush ruleset
+table inet filter {
+        chain output {
+                type filter hook output priority 0; policy accept;
+                counter comment "count accepted packets"
+        }
+
+        chain forward {
+                type filter hook forward priority 0; policy drop;
+                counter comment "count dropped packets"
+        }
+
+        chain input {
+                type filter hook input priority 0; policy drop;
+                ct state invalid drop comment "drop invalid packets"
+                ct state { established, related } accept comment "accept all connections related to connections made by us"
+                iifname "lo" accept comment "accept loopback"
+                iifname != "lo" ip saddr 127.0.0.0/8 drop comment "block remote packets claiming to be from IPv4 loopback address"
+                iifname != "lo" ip6 saddr ::1 drop comment "block remote packets claiming to be from IPv6 loopback address"
+                ip protocol icmp accept comment "accept all icmp types"
+                ip6 nexthdr ipv6-icmp accept comment "accept all icmp types"
+                ip saddr 147.251.0.0/16 tcp dport ssh accept comment "accept ssh from MUNI"
+                ip saddr 147.228.0.0/16 tcp dport ssh accept comment "accept ssh from ZCU"
+                ip saddr 147.231.0.0/16 tcp dport ssh accept comment "accept ssh from CAS"
+                ip saddr 160.217.0.0/16 tcp dport ssh accept comment "accept ssh from JCU"
+                ip saddr 78.128.208.0/20 tcp dport ssh accept comment "accept ssh from CESNET"
+                ip saddr 195.113.0.0/16 tcp dport ssh accept comment "accept ssh from CESNET"
+                ip6 saddr 2001:718::/32 tcp dport ssh accept comment "accept ssh from CESNET provider"
+                tcp dport 80 accept comment "accept http"
+                tcp dport 443 accept comment "accept https"
+                tcp dport 636 accept comment "accept ldaps"
+                tcp dport 5432 accept comment "accept postgres"
+                counter comment "count dropped packets"
+        }
+}
+table inet fail2ban {
+        chain input {
+                # Assign a high priority to reject as fast as possible and avoid more complex rule evaluation
+                type filter hook input priority 100;
+        }
+}
