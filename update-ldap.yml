@@ -1,0 +1,21 @@
+---
+#  Ad-hoc role for updating LDAP indexes
+#  run with:
+#  ansible-playbook -i inventories/all --ask-vault-pass update-ldap.yml
+
+- hosts:
+   - ldap-replicas
+   - perun-servers
+  remote_user: root
+  pre_tasks:
+    - name: Require Debian
+      assert:
+        that:
+          - ansible_distribution == "Debian"
+          - ansible_distribution_major_version in ["8", "9","buster/sid"]
+        msg: "Only Debian 8+ is supported"
+  roles:
+    #
+    # This role will set working environment to a sensible state.
+    - { role: update-ldap }
+    #
