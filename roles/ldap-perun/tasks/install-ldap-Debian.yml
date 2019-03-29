@@ -177,6 +177,8 @@
     - login eq
     - memberOfPerunVo eq
     - userCertificateSubject eq
+    - entityID eq
+    - assignedToResourceId eq
   notify: Restart LDAP
 
 - name: Change o attribute to perun in root dn
