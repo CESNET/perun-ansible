@@ -13,6 +13,13 @@
     filename: 'switch'
     update_cache: yes
 
+- name: backports repo
+  apt_repository:
+    repo: "deb http://deb.debian.org/debian {{ ansible_distribution_release }}-backports main"
+    state: present
+    filename: 'backports'
+    update_cache: yes
+
 - name: Install Shibboleth
   apt:
     name: shibboleth

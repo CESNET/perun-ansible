@@ -3,7 +3,9 @@
 #  run with:
 #  ansible-playbook -i inventories/all --ask-vault-pass update.yml
 
-- hosts: all
+- hosts:
+    - perun-servers
+    -  proxy-idps
   remote_user: root
   pre_tasks:
     - name: Require Debian
