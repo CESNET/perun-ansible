@@ -20,6 +20,15 @@
     filename: 'backports'
     update_cache: yes
 
+- name: Install from backports
+  apt:
+    name:
+      - init-system-helpers
+      - libxerces-c3.2
+    default_release: "{{ ansible_distribution_release }}-backports"
+    state: latest
+    update_cache: yes
+
 - name: Install Shibboleth
   apt:
     name: shibboleth
