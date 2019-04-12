@@ -1,0 +1,18 @@
+---
+#  Ad-hoc role for updating all packages
+#  run with:
+#  ansible-playbook -i inventories/all --ask-vault-pass apt-upgrade.yml --limit proxy-idps
+
+- hosts: all
+  remote_user: root
+  pre_tasks:
+    - name: Require Debian
+      assert:
+        that:
+          - ansible_distribution == "Debian"
+        msg: "All Debians"
+  tasks:
+    - name: apt-upgrade
+      apt:
+        upgrade: yes
+        update_cache: yes
