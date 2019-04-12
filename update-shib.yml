@@ -1,0 +1,21 @@
+---
+#  Ad-hoc role for updating Shibboleth SP
+#  run with:
+#  ansible-playbook -i inventories/all --ask-vault-pass update-shib.yml
+
+- hosts:
+    - perun-servers
+    - proxy-idps
+  remote_user: root
+  pre_tasks:
+    - name: Require Debian
+      assert:
+        that:
+          - ansible_distribution == "Debian"
+          - ansible_distribution_major_version in [ "9" ]
+        msg: "Only Debian 9"
+  roles:
+    #
+    # This role updates selected shibboleth packages and restarts the server
+    - { role: update-shibboleth }
+    #
