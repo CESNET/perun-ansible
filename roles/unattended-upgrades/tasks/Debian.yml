@@ -4,16 +4,6 @@
     name: unattended-upgrades
     state: present
 
-- name: Install sendmail package
-  package:
-    name: sendmail
-    state: present
-
-- name: Install mailutils package
-  package:
-    name: mailutils
-    state: present
-
 - name: Set Origins-Pattern
   blockinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
@@ -22,6 +12,7 @@
               "origin=Debian,codename=${distro_codename}";
               "origin=Debian,codename=${distro_codename}-updates";
               "origin=meta@cesnet.cz,a=stable";
+              "origin=deb.sury.org";
 
 - name: Enable periodic updates
   copy:
@@ -43,6 +34,25 @@
     line:   'Unattended-Upgrade::MailOnlyOnError "true";'
     backrefs: yes
 
+- name: get package facts
+  package_facts:
+    manager: "apt"
+
+- name: is MTA installed?
+  set_fact:
+    mta_installed: "{{'sendmail' in ansible_facts.packages or 'exim4-base' in ansible_facts.packages or 'postfix' in ansible_facts.packages}}"
+
+- name: Install sendmail package if no MTA is installed
+  package:
+    name: sendmail
+    state: present
+  when: not mta_installed
+
+- name: Install mailutils package
+  package:
+    name: mailutils
+    state: present
+
 - name: Set root mail alias
   blockinfile:
     path: /etc/aliases
@@ -51,5 +61,5 @@
   register: root_mail_alias
 
 - name: Run newaliases
-  command: /usr/sbin/newaliases
+  command: newaliases
   when: root_mail_alias.changed
