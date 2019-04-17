@@ -39,5 +39,10 @@ orai18n_file_path: '~/orai18n.jar'
 # Federative authz
 fed_authz: 'fed'
 
+# JDBC HikariCP configuration - see property explanation in jdbc_properties.j2 (/etc/perun/jdbc.properties)
 jdbc_maximumPoolSize: '150'
 jdbc_minimumIdle: '10'
+jdbc_connectionTimeout: '300000'
+jdbc_maxLifetime: '1800000'
+jdbc_idleTimeout: '600000'
+jdbc_leakDetectionThreshold: '30000'

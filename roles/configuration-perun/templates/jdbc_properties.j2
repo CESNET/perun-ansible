@@ -2,5 +2,30 @@ jdbc.url=jdbc:postgresql://localhost:5432/{{ db_name }}
 jdbc.username={{ db_user }}
 jdbc.password={{ password_db }}
 jdbc.driver=org.postgresql.Driver
+
+# HikariCP suggest to match number of connections with number of CPUs available.
+# Using same values -> fix-sized-pool better handles spike demands.
+# Max. should be below DB limit (which si by default 150 for Perun).
+# Ideal seems to be like 25 / 10
 jdbc.maximumPoolSize={{ jdbc_maximumPoolSize }}
 jdbc.minimumIdle={{ jdbc_minimumIdle }}
+
+# How long Perun waits for connection from the pool before exception is thrown. Value is in millis.
+# Our default is 5 minutes / Hikari default is 30s
+jdbc.connectionTimeout={{ jdbc_connectionTimeout }}
+
+# How long we keep one connection in the pool before eviction. Value is in millis.
+# Currently used connection are evicted only after returning to the pool if they exceeded the limit.
+# Must be below any DB or infrastructure limit.
+# Hikari default is 30 minutes.
+jdbc.maxLifetime={{ jdbc_maxLifetime }}
+
+# How long we keep idle connections in the pool before eviction.
+# Must be several seconds below maxLifetime.
+# Hikari default is 10 minutes.
+jdbc.idleTimeout={{ jdbc_idleTimeout }}
+
+# Log connections which are stuck in the process of closing and before their returning to the pool for specified time.
+# Value is in millis.
+# Hikari default is 0 (disabled), our default is 30 seconds
+jdbc.leakDetectionThreshold={{ jdbc_leakDetectionThreshold }}
