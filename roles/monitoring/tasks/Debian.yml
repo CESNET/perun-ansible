@@ -93,6 +93,12 @@
       =1jV6
       -----END PGP PUBLIC KEY BLOCK-----
 
+- name: enable FTP Debian repositories
+  copy:
+    dest: '/etc/apt/apt.conf.d/85enable-ftp'
+    content: 'Dir::Bin::Methods::ftp "ftp";'
+    force: no
+
 - name: Add MetaCentrum repository
   apt_repository:
     repo: "{{item}}"
@@ -100,13 +106,7 @@
     state: present
   with_items:
     - "deb ftp://repo.metacentrum.cz/ all main pilot"
-    - "deb ftp://repo.metacentrum.cz/ {{ansible_lsb.codename}} main pilot"
-
-- name: enable FTP Debian repositories
-  copy:
-    dest: '/etc/apt/apt.conf.d/85enable-ftp'
-    content: 'Dir::Bin::Methods::ftp "ftp";'
-    force: no
+#    - "deb ftp://repo.metacentrum.cz/ {{ansible_lsb.codename}} main pilot"
 
 - name: Install check_mk packages
   apt:
