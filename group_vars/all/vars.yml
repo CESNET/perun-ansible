@@ -46,3 +46,18 @@ jdbc_connectionTimeout: '300000'
 jdbc_maxLifetime: '1800000'
 jdbc_idleTimeout: '600000'
 jdbc_leakDetectionThreshold: '30000'
+
+tomcat_owners:
+  jessie: "tomcat7"
+  stretch: "tomcat8"
+  buster: "tomcat"
+
+tomcat_versions:
+  jessie: "tomcat7"
+  stretch: "tomcat8"
+  buster: "tomcat9"
+
+
+tomcat_owner: "{{tomcat_owners[ansible_lsb.codename]}}"
+tomcat_group: "{{tomcat_owners[ansible_lsb.codename]}}"
+tomcatN: "{{tomcat_versions[ansible_lsb.codename]}}"

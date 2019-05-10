@@ -1,0 +1,15 @@
+---
+- name: set system tomcat service
+  copy:
+      dest: "/etc/systemd/system/{{tomcatN}}.service.d/override.conf"
+      content: |
+        [Service]
+        User={{tomcat_owner}}
+        Group={{perun_group}}
+    register: tomcat_override
+    - name: reload systemd
+      systemd:
+        daemon_reload: yes
+        name: "{{tomcatN}}"
+        state: restarted
+      when: tomcat_override.changed

@@ -37,17 +37,17 @@
 
 - name: Ensure Tomcat is installed
   package:
-    name: tomcat8
+    name: "{{tomcatN}}"
     state: present
 
 # possible locations for JDBC drivers in tomcat:
-# $CATALINA_HOME/shared/ (/usr/share/tomcat8/shared) - used by all tomcat instances
-# $CATALINA_BASE/shared/ (/var/lib/tomcat8/shared) - used only by the system tomcat, not by user tomcats
+# $CATALINA_HOME/shared/ (/usr/share/tomcatN/shared) - used by all tomcat instances
+# $CATALINA_BASE/shared/ (/var/lib/tomcatN/shared) - used only by the system tomcat, not by user tomcats
 - name: Add Oracle JDBC drivers to tomcat
   copy:
     remote_src: yes
     src: "{{ item }}"
-    dest: "/var/lib/tomcat8/shared/"
+    dest: "/var/lib/{{tomcatN}}/shared/"
   with_items:
     - "/home/{{ perun_login }}/ojdbc8.jar"
     - "/home/{{ perun_login }}/orai18n.jar"

@@ -40,8 +40,8 @@
     - { role: monitoring, tags: monitoring }
 
 - hosts: perun-servers
+  remote_user: root
   pre_tasks:
-
   - name: Check that host's variables are loaded
     assert:
       that:

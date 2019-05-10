@@ -1,16 +1,4 @@
 ---
 # vars file for tomcat-perun
-tomcat8_packages:
-  Debian:
-    - tomcat8
-    - tomcat8-admin
-    - tomcat8-user
-  RedHat: []
-
-python_packages:
-  Debian:
-    - python
-    - python-pexpect
-  RedHat: []
 
 apache_p12_file: /etc/perun/ssl/ssl-apache-cert.p12
