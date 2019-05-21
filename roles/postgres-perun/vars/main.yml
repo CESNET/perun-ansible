@@ -2,14 +2,14 @@
 
 postgres_version:
   Debian_9: 11
-  Debian_buster/sid: 11
+  Debian_10: 11
 
 psql_version: "{{postgres_version[ansible_distribution+'_'+ansible_distribution_major_version]}}"
 
 postgre_packages:
   Debian_9:
     - postgresql-11
-  Debian_buster/sid:
+  Debian_10:
     - postgresql-11
 
 
