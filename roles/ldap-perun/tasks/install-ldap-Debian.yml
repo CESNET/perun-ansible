@@ -170,7 +170,6 @@
     - cn,uid eq
     - uidNumber,gidNumber eq
     - member,memberUid eq
-    - uniqueMember eq
     - perunVoId eq
     - eduPersonPrincipalNames eq
     - entryCSN,entryUUID eq
