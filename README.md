@@ -2,6 +2,26 @@
 
 This repository serves for easier deployment of Perun server with default configuration.
 
+## Overview
+
+![Perun UML Deployment Diagram](docs/Perun_instance.svg)
+
+This Ansible playbook installs an instance of [Perun](https://perun-aai.org/). Its main part is the **Perun RPC** web application,
+which is deployed into **Tomcat** servlet container. The Tomcat is not accessible directly from outside, it is behind
+an **Apache** web server, which forwards requests to the Tomcat using AJP protocol. Apache uses **Shibboleth SP** plugin 
+and its associated daemon for federated authentication based on SAML protocol.
+
+The Perun RPC application stores data in **PostgreSQL** relational database.
+
+A separate process called **Perun Engine** controls slave machines by connecting to them using the Secure Shell (ssh)
+protocol and executing so-called slave scripts installed on the machines from DEB or RPM packages. 
+An administrator of a slave machine can tune the slave scripts by adding so-called pre-hook and post-hook
+scripts to the directory /etc/perun/&lt;service&gt;.d/      
+ 
+Selected data from the Perun database are made available through an OpenLDAP server. 
+A separate process called **LDAP Connector (LDAPc)** observes changes in the database and modifies the LDAP
+directory in real-time. 
+ 
 ## Requirements
 
  - 64-bit Debian system
