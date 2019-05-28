@@ -12,15 +12,20 @@ an **Apache** web server, which forwards requests to the Tomcat using AJP protoc
 and its associated daemon for federated authentication based on SAML protocol.
 
 The Perun RPC application stores data in **PostgreSQL** relational database.
-
-A separate process called **Perun Engine** controls slave machines by connecting to them using the Secure Shell (ssh)
-protocol and executing so-called slave scripts installed on the machines from DEB or RPM packages. 
-An administrator of a slave machine can tune the slave scripts by adding so-called pre-hook and post-hook
-scripts to the directory /etc/perun/&lt;service&gt;.d/      
  
 Selected data from the Perun database are made available through an OpenLDAP server. 
 A separate process called **LDAP Connector (LDAPc)** observes changes in the database and modifies the LDAP
 directory in real-time. 
+
+A separate process called **Perun Engine** controls slave machines. It communicates using JMS with **Perun Dispatcher**,
+which is located inside of the Perun RPC. Dispatcher observes changes in database and instructs Engine 
+to update some services on some slave machines.
+For each service on a machine, Engine runs a GEN script, which uses HTTP to obtain data from RPC 
+and generates files to be transferred to the slave machine.
+Then Engine runs a SEND script, which connects to the slave machine using the Secure Shell (ssh)
+protocol, transfers the generated files, and executes so-called slave scripts installed on the machines from DEB or RPM packages. 
+An administrator of a slave machine can tune the slave scripts by adding so-called pre-hook, mid-hook and post-hook
+scripts to the directory /etc/perun/&lt;service&gt;.d/      
  
 ## Requirements
 
