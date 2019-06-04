@@ -13,6 +13,6 @@
     msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set values in it"
 
 - include_tasks: "{{ ansible_distribution }}.yml"
-  when: install_yubikeys
+  when: install_yubikeys|bool
 
 
