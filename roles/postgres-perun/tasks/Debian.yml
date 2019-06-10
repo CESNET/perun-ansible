@@ -120,6 +120,7 @@
     name: postgres
     password: "{{ password_postgre }}"
     state: present
+    encrypted: yes
   register: postgres_password
 
 - name: "Add rows to pg_hba.conf"
@@ -189,6 +190,7 @@
     name: "{{ db_user }}"
     password: "{{ password_db }}"
     role_attr_flags: NOSUPERUSER,NOCREATEDB
+    encrypted: yes
     state: present
 
 - name: Create database "{{ db_name }}" owned by user "{{ db_user }}"
