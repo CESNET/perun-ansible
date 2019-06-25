@@ -41,13 +41,19 @@
             - name: message about upgrading
               debug:
                 msg: "upgrading version {{pver}} to at least {{desired_version}}"
-            - name: stop services
+            - name: get service facts
+              service_facts:
+            - name: stop ldapc-ada
+              when: ansible_facts.services['perun-ldapc-ada'] is defined
+              service:
+                name: perun-ldapc-ada
+                state: stopped
+            - name: stop engine and rpc
               service:
                 name: "{{item}}"
                 state: stopped
               loop:
                 - perun-engine
-                - perun-ldapc
                 - apache2
                 - "{{tomcatN}}"
             - name: Unhold package from upgrading
@@ -72,5 +78,9 @@
               loop:
                 - "{{tomcatN}}"
                 - apache2
-                - perun-ldapc
                 - perun-engine
+            - name: start ldapc-ada
+              when: ansible_facts.services['perun-ldapc-ada'] is defined
+              service:
+                name: perun-ldapc-ada
+                state: started
