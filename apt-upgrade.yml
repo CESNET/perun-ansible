@@ -1,7 +1,10 @@
 ---
 #  Ad-hoc role for updating all packages
+#
+# WARNING - upgrades even packages marked as hold!
+#
 #  run with:
-#  ansible-playbook -i inventories/all --ask-vault-pass apt-upgrade.yml --limit proxy-idps
+#  ansible-playbook -i inventories/all apt-upgrade.yml --limit proxy-idps,perun-servers
 
 - hosts: all
   remote_user: root
