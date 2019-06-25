@@ -1,0 +1,76 @@
+---
+#  Ad-hoc role for updating PostgreSQL server
+#  run with:
+#  ansible-playbook -i inventories/all update-postgres.yml
+
+- hosts:
+    - perun-servers
+  remote_user: root
+  vars:
+    postgres_pkg: postgresql-11
+    desired_version: "11.4"
+
+  pre_tasks:
+    - name: prerequisites checks
+      assert:
+        that:
+          - ansible_distribution == "Debian"
+          - ansible_distribution_major_version in [ "8", "9" , "10" ]
+          - install_postgres is defined
+          - tomcatN is defined
+  tasks:
+    - name: Only where PostgreSQL is configured
+      when: install_postgres
+      block:
+        - name: get package facts
+          package_facts:
+
+        - name: detect postgres version
+          set_fact:
+            pver: "{{ansible_facts.packages[postgres_pkg][0].version}}"
+            should_upgrade: "{{ansible_facts.packages[postgres_pkg][0].version is version(desired_version, '<=')}}"
+
+        - name: message about not upgrading
+          when: not should_upgrade
+          debug:
+            msg: "not upgrading, version {{pver}} already is {{desired_version}}"
+
+        - name: perform upgrade
+          when: should_upgrade
+          block:
+            - name: message about upgrading
+              debug:
+                msg: "upgrading version {{pver}} to at least {{desired_version}}"
+            - name: stop services
+              service:
+                name: "{{item}}"
+                state: stopped
+              loop:
+                - perun-engine
+                - perun-ldapc
+                - apache2
+                - "{{tomcatN}}"
+            - name: Unhold package from upgrading
+              dpkg_selections:
+                name: "{{postgres_pkg}}"
+                selection: install
+            - name: "upgrade {{postgres_pkg}}"
+              apt:
+                name:
+                  - "{{postgres_pkg}}"
+                state: latest
+                update_cache: yes
+              register: psqlupdate
+            - name: Hold package from upgrading
+              dpkg_selections:
+                name: "{{postgres_pkg}}"
+                selection: hold
+            - name: start services
+              service:
+                name: "{{item}}"
+                state: started
+              loop:
+                - "{{tomcatN}}"
+                - apache2
+                - perun-ldapc
+                - perun-engine
