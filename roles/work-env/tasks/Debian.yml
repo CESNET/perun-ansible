@@ -63,3 +63,20 @@
         \ if line("'\"") > 1 && line("'\"") <= line("$") |
         \   exe "normal! g`\"" |
         \ endif
+
+- name: dir /root/.config/htop exists
+  file:
+    path: /root/.config/htop
+    state: directory
+
+- name: create /root/.config/htop/htoprc
+  copy:
+    content: ""
+    dest: /root/.config/htop/htoprc
+    force: no
+
+- name: htop hide user threads
+  lineinfile:
+    path: /root/.config/htop/htoprc
+    regexp: '^hide_userland_threads='
+    line:   'hide_userland_threads=1'
