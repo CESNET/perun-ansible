@@ -29,14 +29,29 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
  
 ## Requirements
 
- - 64-bit Debian system
- - Requires atleast 4GB free disk space
- - Ideally dedicated 2 CPUs and atleast 3GB RAM
+ - 64-bit Debian system (version 9 or 10)
+ - Requires at least 8GB free disk space
+ - Ideally dedicated 2 CPUs and at least 4GB RAM
+
+## TL;DR for the impatient
+
+```$bash
+sudo apt install ansible
+git clone https://github.com/CESNET/perun-ansible.git
+cd perun-ansible
+MY_PERUN_MACHINE=perun.mysite.org
+cp -r host_vars/perun.example.com/ host_vars/$MY_PERUN_MACHINE
+sed -i -e "s/production-perun.awesomesite.cz/$MY_PERUN_MACHINE/" inventories/prod
+echo >.password "test"
+ansible-playbook -i inventories/prod site.yml
+
+firefox https://perun:test@$MY_PERUN_MACHINE/ba/gui/
+```
 
 ## Installation of Ansible
 
 - First you need to install Ansible to your system ([Installation of Ansible](http://docs.ansible.com/ansible/intro_installation.html)), which will be used to install Perun to remote server (or localhost).
-- **The minimal version of Ansible is 2.4!**
+- **The minimal version of Ansible is 2.5!**
 - **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 

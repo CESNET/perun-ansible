@@ -64,8 +64,7 @@
       msg: "Create directory host_vars/{{inventory_hostname}}/, copy there file host_vars/perun.example.com/passwords.yml and set all values in it"
     tags: ['perun', 'config', 'apache', 'tomcat', 'postgres', 'build', 'engine', 'wui', 'ldap' ]
 
-  # Debian 7 has only Apache 2.2, which have incompatible config files with Apache 2.4
-  - name: Require Debian 9
+  - name: Require Debian 9+
     assert:
       that:
         - ansible_distribution == "Debian"
@@ -73,13 +72,12 @@
       msg: "Only Debian 9+ is supported"
     tags: ['apache','postgres']
 
-  # editing the file shibboleth2.xml requires xml task available since Ansible 2.4
-  - name:  Ansible 2.4+ required
+  - name:  Ansible 2.5+ required
     assert:
       that:
         - ansible_version is defined
-        - ansible_version.full is version_compare('2.4', '>=')
-      msg: "Required Ansible version is 2.4+ which contains xml task"
+        - ansible_version.full is version_compare('2.5', '>=')
+      msg: "Required Ansible version is 2.5+ with import_role and package_facts"
     tags: ['shibboleth']
 
 
