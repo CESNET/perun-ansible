@@ -15,7 +15,12 @@
           - ansible_distribution == "Debian"
         msg: "All Debians"
   tasks:
+#    - name: apt-upgrade
+#      apt:
+#        upgrade: yes
+#        update_cache: yes
     - name: apt-upgrade
       apt:
-        upgrade: yes
+        name: "*"
+        state: latest
         update_cache: yes
