@@ -242,4 +242,4 @@
     dest: "/etc/cron.d/postgresql-backup"
     content: |
       # Everyday do the backup of the PostgreSQL DB
-      50 22 * * * postgres /usr/bin/pg_dumpall -f /var/lib/postgresql/backup.sql; xz -f /var/lib/postgresql/backup.sql
+      50 22 * * * postgres /usr/bin/pg_dumpall | xz >/var/lib/postgresql/backup.sql.xz
