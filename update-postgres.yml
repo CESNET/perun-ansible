@@ -8,7 +8,7 @@
   remote_user: root
   vars:
     postgres_pkg: postgresql-11
-    desired_version: "11.4"
+    desired_version: "11.5"
 
   pre_tasks:
     - name: prerequisites checks
@@ -43,10 +43,10 @@
                 msg: "upgrading version {{pver}} to at least {{desired_version}}"
             - name: get service facts
               service_facts:
-            - name: stop ldapc-ada
-              when: ansible_facts.services['perun-ldapc-ada'] is defined
+            - name: stop perun-ldapc
+              when: ansible_facts.services['perun-ldapc'] is defined
               service:
-                name: perun-ldapc-ada
+                name: perun-ldapc
                 state: stopped
             - name: stop engine and rpc
               service:
@@ -79,8 +79,8 @@
                 - "{{tomcatN}}"
                 - apache2
                 - perun-engine
-            - name: start ldapc-ada
-              when: ansible_facts.services['perun-ldapc-ada'] is defined
+            - name: start perun-ldapc
+              when: ansible_facts.services['perun-ldapc'] is defined
               service:
-                name: perun-ldapc-ada
+                name: perun-ldapc
                 state: started
