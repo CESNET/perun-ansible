@@ -43,16 +43,21 @@
                 msg: "upgrading version {{pver}} to at least {{desired_version}}"
             - name: get service facts
               service_facts:
-            - name: stop perun-ldapc
-              when: ansible_facts.services['perun-ldapc'] is defined
-              service:
-                name: perun-ldapc
-                state: stopped
-            - name: stop engine and rpc
+            - name: ldapc service status
+              set_fact:
+                ldapc_should_run: "{{ansible_facts.services['perun-ldapc'].state == 'running'}}"
+            - name: engine service status
+              set_fact:
+                engine_should_run: "{{ansible_facts.services['perun-engine'].state == 'running'}}"
+            - name: services states
+              debug:
+                msg: "perun-ldapc running: {{ldapc_should_run}}, perun-engine running: {{engine_should_run}}"
+            - name: stop ldapc, engine and rpc
               service:
                 name: "{{item}}"
                 state: stopped
               loop:
+                - perun-ldapc
                 - perun-engine
                 - apache2
                 - "{{tomcatN}}"
@@ -78,9 +83,13 @@
               loop:
                 - "{{tomcatN}}"
                 - apache2
-                - perun-engine
             - name: start perun-ldapc
-              when: ansible_facts.services['perun-ldapc'] is defined
+              when: ansible_facts.services['perun-ldapc'] is defined and ldapc_should_run
               service:
                 name: perun-ldapc
+                state: started
+            - name: start perun-engine
+              when: ansible_facts.services['perun-engine'] is defined and engine_should_run
+              service:
+                name: perun-engine
                 state: started
