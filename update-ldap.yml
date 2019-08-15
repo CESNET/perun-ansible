@@ -1,7 +1,7 @@
 ---
 #  Ad-hoc role for updating LDAP indexes
 #  run with:
-#  ansible-playbook -i inventories/all --ask-vault-pass update-ldap.yml
+#  ansible-playbook -i inventories/all update-ldap.yml
 
 - hosts:
    - ldap-replicas
@@ -17,6 +17,5 @@
 
   roles:
     #
-    # This role will set working environment to a sensible state.
     - { role: update-ldap }
     #

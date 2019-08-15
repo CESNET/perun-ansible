@@ -57,11 +57,13 @@
     version: master
     update: yes
 
-- stat:
+- name: stat perun-schema.ldif
+  stat:
     path: "{{perun_folder}}/perun-utils/ldapc-scripts/schemas/perun-schema.ldif"
   register: schema_ldif
 
-- assert:
+- name: assert perun-schema.ldif existence
+  assert:
     that:
       - schema_ldif.stat.exists
     msg: "file {{perun_folder}}/perun-utils/ldapc-scripts/schemas/perun-schema.ldif does not exist"
