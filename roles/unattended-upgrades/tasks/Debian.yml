@@ -23,16 +23,14 @@
 - name: Set Mail to root
   lineinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
-    regexp: '//Unattended-Upgrade::Mail "root";'
+    regexp: 'Unattended-Upgrade::Mail'
     line:   'Unattended-Upgrade::Mail "root";'
-    backrefs: yes
 
 - name: Set MailOnlyOnError
   lineinfile:
     path: /etc/apt/apt.conf.d/50unattended-upgrades
-    regexp: '//Unattended-Upgrade::MailOnlyOnError "true";'
+    regexp: 'Unattended-Upgrade::MailOnlyOnError'
     line:   'Unattended-Upgrade::MailOnlyOnError "true";'
-    backrefs: yes
 
 - name: get package facts
   package_facts:
