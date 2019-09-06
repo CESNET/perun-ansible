@@ -6,6 +6,7 @@
       - perun_login is defined
       - perun_group is defined
       - perun_folder is defined
+      - perun_version is defined
 
 - name: prerequisites installed
   apt:
@@ -54,7 +55,7 @@
   git:
     repo: https://github.com/CESNET/perun.git
     dest: "{{perun_folder}}"
-    version: master
+    version: "{{perun_version}}"
     update: yes
 
 - name: stat perun-schema.ldif
