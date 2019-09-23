@@ -25,19 +25,25 @@
   roles:
     #
     # This role will set working environment to a sensible state.
-    - { role: work-env, tags: work-env }
+    - martin_kuba.work_env
     #
     # This role will set up security measures like firewall.
-    - { role: security, tags: security }
+    - cesnet.firewall
     #
     # This role will deploy authentication by hardware Yubikeys.
-    - { role: yubikey, tags: yubikey }
+    -
+      role: cesnet.yubikeys
+      vars:
+        yubikey_lognames: "{{ create_yubikey_users }}"
+        sudo_root_lognames: "{{ sudo_root_users }}"
+        other_sudo_user: "perun"
+        sudo_other_lognames: "{{ sudo_perun_users }}"
     #
     # This role will deploy unattended upgrades of Debian OS.
-    - { role: unattended-upgrades, tags: unattended-upgrades }
+    - cesnet.unattended_upgrades
     #
     # This role will deploy components needed for passive checks from MetaCentrum's Nagios.
-    - { role: monitoring, tags: monitoring }
+    - cesnet.metacentrum_monitoring
 
 - hosts: perun-servers
   remote_user: root

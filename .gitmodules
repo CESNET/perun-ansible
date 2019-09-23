@@ -1,0 +1,3 @@
+[submodule "cesnet_roles"]
+	path = cesnet_roles
+	url = https://github.com/CESNET/perun-ansible-roles

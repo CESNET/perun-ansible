@@ -61,3 +61,20 @@ tomcat_versions:
 tomcat_owner: "{{tomcat_owners[ansible_lsb.codename]}}"
 tomcat_group: "{{tomcat_owners[ansible_lsb.codename]}}"
 tomcatN: "{{tomcat_versions[ansible_lsb.codename]}}"
+
+unattended_upgrades_origin_patterns: |2
+          "origin=Debian,codename=${distro_codename}";
+          "origin=Debian,codename=${distro_codename}-updates";
+          "origin=meta@cesnet.cz,a=stable";
+          "origin=deb.sury.org";
+          "origin=apt.postgresql.org,codename=${distro_codename}-pgdg";
+unattended_upgrades_blacklist: |2
+          "postgresql-11";
+          "slapd";
+
+firewall_open_tcp_ports:
+  - { port: 80, comment: "accept http" }
+  - { port: 443, comment: "accept https" }
+  - { port: 636, comment: "accept ldaps" }
+  - { port: 5432, ipv6: "2001:718::/32", comment: "accept postgres from CESNET" }
+  - { port: 5432, ipv6: "147.251.0.0/16", comment: "accept postgres from MUNI" }
