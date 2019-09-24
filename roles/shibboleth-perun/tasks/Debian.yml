@@ -116,6 +116,9 @@
       <!-- Source IdP name -->
       <Attribute name="urn:cesnet:proxyidp:attribute:sourceIdPName" id="sourceIdPName" />
 
+      <!-- OrcID -->
+      <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.16" id="eduPersonOrcid"/>
+
   notify:
     - "restart shibd"
 
