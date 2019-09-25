@@ -119,6 +119,12 @@
       <!-- OrcID -->
       <Attribute name="urn:oid:1.3.6.1.4.1.5923.1.1.1.16" id="eduPersonOrcid"/>
 
+      <!-- External affiliations provided by the Proxy (with scope different from the proxy)
+          If Perun is configured with proxy, then original IdP affiliations are sent in
+          affiliation attribute. This is filled only when original IdP is also a Proxy.
+          For us it was previously known as forwardedScopedAffiliation -->
+      <Attribute name="urn:oid:1.3.6.1.4.1.34998.3.3.1.11" id="voPersonExternalAffiliation"/>
+
   notify:
     - "restart shibd"
 
