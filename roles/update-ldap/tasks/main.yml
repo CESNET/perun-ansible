@@ -49,13 +49,13 @@
     shell: /bin/bash
     system: yes
 
-- name: Clone git repository of perun sources to remote server
+- name: "Clone git repository of perun sources in version {{ perun_version }}"
   become: yes
-  become_user: "{{perun_login}}"
+  become_user: "{{ perun_login }}"
   git:
     repo: https://github.com/CESNET/perun.git
-    dest: "{{perun_folder}}"
-    version: "{{perun_version}}"
+    dest: "{{ perun_folder }}"
+    version: "{{ perun_version }}"
     update: yes
 
 - name: stat perun-schema.ldif
