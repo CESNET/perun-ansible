@@ -10,6 +10,8 @@
       [Service]
       User={{tomcat_owner}}
       Group={{perun_group}}
+      ReadOnlyPaths=/etc/perun
+      ReadWritePaths=/var/log/perun
   register: tomcat_override
 - name: reload systemd
   systemd:
