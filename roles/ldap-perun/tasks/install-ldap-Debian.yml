@@ -160,6 +160,14 @@
     values: "x-ns-"
     state: exact
 
+- name: "create ou=People branch in LDAP"
+  ldap_entry:
+    dn: "ou=People,{{ slapd_basedn }}"
+    objectClass: organizationalUnit
+    state: present
+    bind_dn: "{{ slapd_basedn_admin }}"
+    bind_pw: "{{ password_ldap_data_tree }}"
+
 - name: Set indexes (olcDbIndex attribute)
   ldap_attr:
     dn: olcDatabase={1}mdb,cn=config
