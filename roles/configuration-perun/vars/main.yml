@@ -55,3 +55,6 @@ perun_web_gui_properties_file: "{{ perun_config_dir }}/perun-web-gui.properties"
 perun_ext_sources_xml_template: perun_extSources_xml.j2
 perun_ext_sources_xml_file: "{{ perun_config_dir }}/perun-extSources.xml"
 
+# Template file and destination in remote system for perun-roles.yml
+perun_roles_yml_template: perun_roles_yml.j2
+perun_roles_yml_file: "{{ perun_config_dir }}/perun-roles.yml"

@@ -118,3 +118,11 @@
     mode: 0640
     force: no
 
+- name: Create file "{{ perun_roles_yml_file }}"
+  template:
+    src: "{{ perun_roles_yml_template }}"
+    dest: "{{ perun_roles_yml_file }}"
+    owner: "{{ config_files_owner }}"
+    group: "{{ perun_group }}"
+    mode: 0640
+    force: no
