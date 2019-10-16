@@ -30,29 +30,30 @@
     - server.xml
     - tomcat-users.xml
 
-- name: Export temporary password file for tomcat certificate to remote computer
-  copy:
-    content: |
-      {{password_tomcat_certificate}}
-    dest: "/home/{{ perun_login }}/input.txt"
-    owner: "{{ perun_login }}"
-    group: "{{ perun_group }}"
-    mode: 0640
-
-- name: Export certificate of machine (Apache) into format .p12
-  command: openssl pkcs12 -passout "file:/home/{{ perun_login }}/input.txt" -export -out "{{ apache_p12_file }}" -in "{{ apache_certificate_file }}" -inkey "{{ apache_certificate_key_file }}"
-
-- name: Make p12 file readable by tomcat
-  file:
-    path: "{{ apache_p12_file }}"
-    state: file
-    group: "{{tomcat_group}}"
-    mode: 0640
-
-- name: Delete temporary password file for tomcat certificate
-  file:
-    path: "/home/{{ perun_login }}/input.txt"
-    state: absent
+## used only at the CESNET instance for http client
+#- name: Export temporary password file for tomcat certificate to remote computer
+#  copy:
+#    content: |
+#      {{password_tomcat_certificate}}
+#    dest: "/home/{{ perun_login }}/input.txt"
+#    owner: "{{ perun_login }}"
+#    group: "{{ perun_group }}"
+#    mode: 0640
+#
+#- name: Export certificate of machine (Apache) into format .p12
+#  command: openssl pkcs12 -passout "file:/home/{{ perun_login }}/input.txt" -export -out "{{ apache_p12_file }}" -in "{{ apache_certificate_file }}" -inkey "{{ apache_certificate_key_file }}"
+#
+#- name: Make p12 file readable by tomcat
+#  file:
+#    path: "{{ apache_p12_file }}"
+#    state: file
+#    group: "{{tomcat_group}}"
+#    mode: 0640
+#
+#- name: Delete temporary password file for tomcat certificate
+#  file:
+#    path: "/home/{{ perun_login }}/input.txt"
+#    state: absent
 
 - name: Create tomcat configuration file
   template:

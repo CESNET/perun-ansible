@@ -97,41 +97,54 @@
     # ---------------
     #
     # This role will check or create SSL/TLS certificates.
+    # migrated to migrated to role cesnet.perun_server/begin.yml
     - { role: certs-perun, become: true, tags: [ 'apache', 'postgres', 'ldap' ] }
     #
     # This role will create user perun and install basic software packages.
+    # migrated to role cesnet.perun_server/begin.yml and deploy_perun.yml
     - { role: perun, become: true, tags: [ 'perun', 'config', 'tomcat', 'postgres', 'build', 'deploy', 'ldap' ] }
     #
     # This role will create configuration files of Perun from templates.
+    #TODO migrate
     - { role: configuration-perun, become: true, tags: [ 'config', 'deploy', 'engine' ] }
     #
     # This role will install Shibboleth SP.
+    #TODO migrate
     - { role: shibboleth-perun, become: true, tags: [ 'shibboleth', 'apache' ] }
     #
     # This role will install Apache and its config files for Perun, needs Shibboleth.
+    #TODO migrate
     - { role: apache-perun, become: true, tags: [ 'apache', 'deploy'] }
     #
-    # This role will install Tomcat and its config files for Perun.
+    # This role will install Tomcat and its config files for Perun. -
+    #TODO migrate
     - { role: tomcat-perun, become: true, tags: [ 'tomcat', 'deploy' ] }
     #
     # This role will install Oracle DB drivers to Maven repo and to system Tomcat.
+    # migrated to migrated to role cesnet.perun_server/oracle_jdbc.yml
     - { role: oracle-perun, become: true, tags: oracle }
     #
     # This role will deploy PostgreSQL DB and create DB tables.
+    #TODO migrate
     - { role: postgres-perun, become: true, tags: postgres}
     #
-    # This role will compile and package all Perun modules  
+    # This role will compile and package all Perun modules
+    # migrated to role cesnet.perun_server/deploy_perun.yml
     - { role: build-perun, become: true, tags: [ 'build', 'deploy', 'engine', 'ldap' ]}
     #
     # This role will deploy perun-rpc to Tomcat and perun-web-gui to Apache.
+    # migrated to role cesnet.perun_server/deploy_perun.yml
     - { role: deploy-perun, become: true, tags: deploy }
     #
     # This role will deploy engine with GEN/SEND scripts and CLI scripts.
+    # migrated to role cesnet.perun_server/deploy_perun.yml and deploy_services.yml
     - { role: engine-perun, become: true, tags: engine }
     #
     # This role will deploy new web user interface of Perun.
+    # migrated to role cesnet.perun_server/deploy_wui.yml
     - { role: wui-perun, become: true, tags: wui}
     #
     # This role will deploy and configure LDAP server and LDAPc connector.
+    #TODO migrate
     - { role: ldap-perun, become: true, tags: ldap }
     #
