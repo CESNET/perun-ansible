@@ -2,6 +2,7 @@
 
 export PERUN_USER=perun-engine/{{ password_perun_engine }}
 export PERUN_URL=https://{{ perun_hostname }}/ba/rpc/
+export PERUN_COOKIE=/home/perun/.perun-engine-cookie.txt
 export PERL5LIB=/opt/perun-cli/lib/
 # On Debian 9 / Perl 5.24.1 doesn't automatically include current folder to perl libs, so we must include it manually
 export PERL5LIB=$PERL5LIB":."
