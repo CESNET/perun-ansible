@@ -52,16 +52,22 @@ ShibCompatValidUser on
 
   #### SECURITY
 
-  # FIX: HTTP tracing
+  # HTTP tracing
   TraceEnable off
-  # FIX: Clickjacking
+  # https://scotthelme.co.uk/hardening-your-http-response-headers/#x-frame-options
   Header always set X-Frame-Options DENY
-  # FIX: HSTS Missing From HTTPS Server
+  # https://scotthelme.co.uk/hsts-the-missing-link-in-tls/
   Header always set Strict-Transport-Security "max-age=63072000"
-  # FIX: Don't let browser to guess content type
+  # https://scotthelme.co.uk/hardening-your-http-response-headers/#x-content-type-options
   Header always set X-Content-Type-Options nosniff
-  # FIX: Allow browsers to block xss (if they believe its xss).
+  # https://scotthelme.co.uk/hardening-your-http-response-headers/#x-xss-protection
   Header always set X-XSS-Protection "1; mode=block"
+  # https://scotthelme.co.uk/content-security-policy-an-introduction/
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+  # https://scotthelme.co.uk/a-new-security-header-referrer-policy/
+  Header always set Referrer-Policy "no-referrer-when-downgrade"
+  # https://scotthelme.co.uk/a-new-security-header-feature-policy/
+  Header always set Feature-Policy "microphone 'none'; camera 'none'; geolocation 'none'; payment 'none'"
 
   # Disable browser caching for our html/rpc resources
   Header always set Cache-Control "no-cache, no-store, max-age=0, must-revalidate" "expr=%{REQUEST_URI} =~ m#^/(.*)/((gui|pwd-reset|wui|ic|registrar|publications|profile|affiliation)(/|(.*).nocache.js)|rpc/(.*))$#"
