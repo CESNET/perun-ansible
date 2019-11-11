@@ -16,7 +16,7 @@ yubikey_users:
     name: Alessandro Volta
     yubikeys:
       - ccccccfghijk
-    sshkey:
+    sshkeys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnkDzzBfCAgjxv4lZKZ744lPiIRbGhfnQFbSEmeU7ZlRn5zPK2r7Ur+T7I89YHly1nEVPoQ0O8elA7eDaHZ2jIUyYXbzVrYr+7dNSvoO+tqXoG1r5VuZM8jv9m55IFClV0NONqbrgDLRl771ZVqdMah10xPA9X5hv5O17LlDYWyP0j5tJ6M1Ua3t1oI+Gsx28xicJYuLSA5ixpb0b5vftlSvdz7OCC1ojKdTESV3dGifgmJ+B4OZu3ha/Ti6K+pIOYHNtg/yriI6AZNZyLG/L/x5EtE28XRBOr2auXuIlBwK1IWI9MtoSB6L8WjhHl+7WPQej50eL9keK22diIJen9
   einstein:
     name: Albert Einstein
