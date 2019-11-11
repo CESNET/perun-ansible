@@ -16,6 +16,11 @@
     name: "{{ apache_package[ansible_os_family] }}"
     state: present
 
+- name: Install Unzip
+  package:
+    name: "unzip"
+    state: present
+
 - name: Enable Apache modules
   apache2_module:
     name: "{{ item }}"
@@ -94,6 +99,28 @@
     group: "{{ perun_group }}"
     mode: 0644
   with_items: "{{ maintenance_files }}"
+
+- name: Create directory for static files
+  file:
+    path: /var/www/static
+    state: directory
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0755
+
+- name: Download Bootstrap 3.4.1
+  get_url:
+    url: "https://github.com/twbs/bootstrap/releases/download/v3.4.1/bootstrap-3.4.1-dist.zip"
+    dest: "/home/perun/"
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+    mode: 0644
+
+- name: Unpack and deploy Bootstrap static files
+  unarchive:
+    src: "/home/perun/bootstrap-3.4.1-dist.zip"
+    dest: "/var/www/static/"
+    remote_src: "yes"
 
 - name: Add EGI IGTF repository key
   apt_key:
