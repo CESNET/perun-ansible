@@ -1,9 +1,10 @@
 ---
-#  Ad-hoc role for updating LDAP indexes
+#  Role for updating LDAP schemas
 #  run with:
 #  ansible-playbook -i inventories/all update-ldap.yml
 
-- hosts:
+- name: Update LDAP schemas on all Perun servers and LDAP replicas
+  hosts:
    - ldap-replicas
    - perun-servers
   remote_user: root
@@ -16,6 +17,4 @@
         msg: "Only Debian 8+ is supported"
 
   roles:
-    #
-    - { role: update-ldap }
-    #
+    - update-ldap
