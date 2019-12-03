@@ -13,6 +13,11 @@ nativeLanguage=cs,\u010Cesky,Czech
 getIdentityConsolidatorUrl=
 #disableCreateVo=true
 
+# GDPR agreement logic for admins in Perun. Any admin is required to agree with the last version of the text.
+# His approvals are stored in "urn:perun:user:attribute-def:def:gdprAdminApprovedVersions".
+# Relevant to CESNET instance only
+gdprAdminEnabled=false
+
 ### NEW WUI CONFIG ######
 
 rt.defaultQueue=perun
@@ -73,6 +78,10 @@ wayf.spLoginUrl=https://{{perun_hostname}}/Consolidator.sso/Login
 # tell registrar, which url prefixes has custom wayf and should be used for identity consolidation
 # if not set, user is redirected to /fed/ for federated identities (registrar->ic)
 #registrar.customWayfsPrefixes=elixir,bbmri
+
+# List of Vos and groups for which we skip summary page if no error happens and we redirect outside of registrar afterwards
+# format: "vo_short_name" or "vo_short_name:group_name".
+#registrar.skipSummaryFor=
 
 ### User Profile ###
 
