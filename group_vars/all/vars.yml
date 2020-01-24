@@ -17,6 +17,8 @@ perun_services_folder: "/home/{{ perun_login }}/perun-services"
 perun_wui_folder: "/home/{{ perun_login }}/perun-wui"
 # Path to repository with Perun LDAPc
 perun_ldapc_folder: "/home/{{ perun_login }}/perun-ldapc"
+# Path to repository with Perun web apps
+perun_web_apps_folder: "/home/{{ perun_login }}/perun-web-apps"
 
 # Main Perun folder
 perun_config_dir: "/etc/perun"
