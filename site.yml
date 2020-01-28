@@ -50,7 +50,7 @@
     # This role will deploy components needed for passive checks from MetaCentrum's Nagios.
     - cesnet.metacentrum_monitoring
 
-- hosts: perun-servers
+- hosts: perun_servers
   remote_user: root
   pre_tasks:
   - name: Check that host's variables are loaded
