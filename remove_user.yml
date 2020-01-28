@@ -1,0 +1,12 @@
+---
+- name: "removes user"
+  hosts: all
+  remote_user: root
+  vars:
+    login: "romankruzik"
+  tasks:
+    - name: "detect user"
+      user:
+        name: "{{ login }}"
+        remove: yes
+        state: absent
