@@ -63,7 +63,7 @@ ShibCompatValidUser on
   # https://scotthelme.co.uk/hardening-your-http-response-headers/#x-xss-protection
   Header always set X-XSS-Protection "1; mode=block"
   # https://scotthelme.co.uk/content-security-policy-an-introduction/
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ ; frame-src https://www.google.com/recaptcha/ ; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
   # https://scotthelme.co.uk/a-new-security-header-referrer-policy/
   Header always set Referrer-Policy "no-referrer-when-downgrade"
   # https://scotthelme.co.uk/a-new-security-header-feature-policy/
