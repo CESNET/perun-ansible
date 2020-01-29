@@ -1,67 +1,41 @@
-- name: "compile Perun GUI NG on localhost"
-  hosts: localhost
-  connection: local
-  vars:
-    compile_dir: "{{ lookup('env','HOME') }}/perun-web-apps"
-  tasks:
-    - debug:
-        var: compile_dir
-    - name: "clone git repository of perun-web-apps (on controlling host)"
-      git:
-        repo: https://github.com/CESNET/perun-web-apps.git
-        dest: "{{ compile_dir }}"
-        version: production
-        update: yes
-      register: git_updated
-
-    - name: "build perun web apps. WARNING: THIS CAN TAKE SEVERAL MINUTES!"
-      shell: "mvn clean install -DskipTests"
-      args:
-        chdir: "{{ compile_dir }}"
-      when: git_updated.changed
-
 - name: "Update Perun GUI NG"
   hosts: perun_gui_ng
   remote_user: root
-  vars:
-    compile_dir: "{{ lookup('env','HOME') }}/perun-web-apps"
+  become: yes
+  become_user: perun
   tasks:
-    - name: "fetch GUI configs from remote machines"
-      fetch:
-        src: /var/perun-web-apps/admin-gui/assets/config/instanceConfig.json
-        dest: files/hosts/
-      ignore_errors: yes
+    - name: "clone git repository of perun-web-apps"
+      git:
+        repo: https://github.com/CESNET/perun-web-apps.git
+        dest: /home/perun/perun-web-apps
+        version: production
+        update: yes
+        force: yes
+      register: git_updated
+    - block:
+        - name: "backup GUI config"
+          copy:
+            remote_src: yes
+            src: /var/perun-web-apps/admin-gui/assets/config/instanceConfig.json
+            dest: /home/perun/instanceConfig.json
+          ignore_errors: yes
 
-    - name: "create /var/perun-web-apps directory"
-      file:
-        path: "/var/perun-web-apps"
-        state: directory
-        owner: perun
-        group: perun
+        - name: "empty the dir /var/perun-web-apps/"
+          shell:
+            cmd: "rm -rf /var/perun-web-apps/*"
+            warn: no
 
-    - name: "empty the dir"
-      shell:
-        cmd: "rm -rf /var/perun-web-apps/*"
-        warn: no
+        - name: "deploy perun web apps"
+          delegate_to: "{{ inventory_hostname }}"
+          synchronize:
+            src: "/home/perun/perun-web-apps/dist/apps/"
+            dest: /var/perun-web-apps
+            rsync_opts:
+              - "--exclude=instanceConfig.json"
 
-    - name: "deploy perun web apps"
-      synchronize:
-        src: "{{ compile_dir }}/dist/apps/"
-        dest: /var/perun-web-apps
-        rsync_opts:
-          - "--exclude=instanceConfig.json"
-        archive: no
-        recursive: yes
-
-    - name: "copy GUI configs back to machines"
-      copy:
-        src: "files/hosts/{{ inventory_hostname }}/var/perun-web-apps/admin-gui/assets/config/instanceConfig.json"
-        dest: /var/perun-web-apps/admin-gui/assets/config/instanceConfig.json
-
-    - name: "change ownership of the tree under /var/perun-web-apps directory"
-      file:
-        path: "/var/perun-web-apps"
-        state: directory
-        owner: perun
-        group: perun
-        recurse: yes
+        - name: "copy GUI configs back to machines"
+          copy:
+            remote_src: yes
+            src: /home/perun/instanceConfig.json
+            dest: /var/perun-web-apps/admin-gui/assets/config/instanceConfig.json
+      when: git_updated.changed
