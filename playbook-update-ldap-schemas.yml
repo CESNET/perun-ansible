@@ -5,9 +5,11 @@
 
 - name: Update LDAP schemas on all Perun servers and LDAP replicas
   hosts:
-   - ldap-replicas
-   - perun-servers
+   - ldap_replicas
+   - perun_servers
   remote_user: root
+  vars:
+    perun_version: master
   pre_tasks:
     - name: Require Debian
       assert:
