@@ -55,3 +55,7 @@ perun_ldapc_attributes_xml_file: "{{ perun_config_dir }}/perun-ldapc-attributes.
 # Template file and destination in remote system for perun-ldapc
 perun_ldapc_template: perun_ldapc.j2
 perun_ldapc_file: "{{ perun_config_dir }}/perun-ldapc"
+
+# Template file and destination in remote system for perun-ldapc
+perun_ldapc_last_state_template: perun_ldapc_last_state.j2
+perun_ldapc_last_state_file: "{{ perun_ldapc_folder }}/perun-ldapc-last-state"
