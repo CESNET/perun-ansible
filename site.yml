@@ -117,7 +117,7 @@
     - { role: apache-perun, become: true, tags: [ 'apache', 'deploy'] }
     #
     # This role will install Tomcat and its config files for Perun. -
-    #TODO migrate
+    # migrated to docker container perun_rpc
     - { role: tomcat-perun, become: true, tags: [ 'tomcat', 'deploy' ] }
     #
     # This role will install Oracle DB drivers to Maven repo and to system Tomcat.
@@ -125,7 +125,7 @@
     - { role: oracle-perun, become: true, tags: oracle }
     #
     # This role will deploy PostgreSQL DB and create DB tables.
-    #TODO migrate
+    # migrated to roles cesnet.postgresql and cesnet.perun_docker_server/tasks/perun_postgres.yml
     - { role: postgres-perun, become: true, tags: postgres}
     #
     # This role will compile and package all Perun modules
