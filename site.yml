@@ -19,9 +19,9 @@
       assert:
         that:
           - ansible_distribution == "Debian"
-          - ansible_distribution_major_version in ["8", "9","10"]
-        msg: "Only Debian 8+ is supported"
-    - name:  Ansible 2.7+ required
+          - ansible_distribution_major_version in ["10"]
+        msg: "Only Debian 10+ is supported"
+    - name:  Ansible 2.9+ required
       assert:
         that:
           - ansible_version is defined
