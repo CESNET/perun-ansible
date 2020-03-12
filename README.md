@@ -52,7 +52,7 @@ firefox https://perun:test@$MY_PERUN_MACHINE/ba/gui/
 ## Installation of Ansible
 
 - First you need to install Ansible to your system ([Installation of Ansible](http://docs.ansible.com/ansible/intro_installation.html)), which will be used to install Perun to remote server (or localhost).
-- **The minimal version of Ansible is 2.5!**
+- **The minimal version of Ansible is 2.9!**
 - **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 

@@ -25,8 +25,8 @@
       assert:
         that:
           - ansible_version is defined
-          - ansible_version.full is version_compare('2.7', '>=')
-        msg: "Required Ansible version is 2.7+ with include_tasks supporting tags"
+          - ansible_version.full is version_compare('2.9', '>=')
+        msg: "Required Ansible version is 2.9+"
   roles:
     #
     # This role will set working environment to a sensible state.
