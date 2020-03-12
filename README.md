@@ -39,6 +39,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
 sudo apt install ansible
 git clone https://github.com/CESNET/perun-ansible.git
 cd perun-ansible
+git submodule update --init --recursive
 MY_PERUN_MACHINE=perun.mysite.org
 cp -r host_vars/perun.example.com/ host_vars/$MY_PERUN_MACHINE
 sed -i -e "s/production-perun.awesomesite.cz/$MY_PERUN_MACHINE/" inventories/prod
