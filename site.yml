@@ -146,5 +146,5 @@
     #
     # This role will deploy and configure LDAP server and LDAPc connector.
     #TODO migrate
-    - { role: ldap-perun, become: true, tags: ldap }
+    - { role: ldap-perun, become: true, tags: [ 'ldap', 'install-ldap'] }
     #

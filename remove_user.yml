@@ -3,10 +3,20 @@
   hosts: all
   remote_user: root
   vars:
-    login: "romankruzik"
+    login: "vsetepet"
   tasks:
-    - name: "detect user"
+    - name: "delete OS user"
       user:
         name: "{{ login }}"
         remove: yes
+        state: absent
+    - name: "remove group"
+      group:
+        name: "{{ login }}"
+        state: absent
+    - name: "remove from yubikeys"
+      lineinfile:
+        path:
+
+        regexp: "^{{ login }}"
         state: absent

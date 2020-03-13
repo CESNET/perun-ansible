@@ -9,7 +9,7 @@
    - perun_servers
   remote_user: root
   vars:
-    perun_version: master
+    perun_version: production
   pre_tasks:
     - name: Require Debian
       assert:
