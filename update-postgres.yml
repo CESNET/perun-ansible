@@ -4,11 +4,11 @@
 #  ansible-playbook -i inventories/all update-postgres.yml
 
 - hosts:
-    - perun-servers
+    - perun_servers
   remote_user: root
   vars:
-    postgres_pkg: postgresql-11
-    desired_version: "11.5"
+    postgres_pkg: postgresql-12
+    desired_version: "12.2"
 
   pre_tasks:
     - name: prerequisites checks

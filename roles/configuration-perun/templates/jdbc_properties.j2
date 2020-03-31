@@ -4,9 +4,8 @@ jdbc.password={{ password_db }}
 jdbc.driver=org.postgresql.Driver
 
 # HikariCP suggest to match number of connections with number of CPUs available.
-# Using same values -> fix-sized-pool better handles spike demands.
+# minimumIdle means that number unused connections will be maintained all the time
 # Max. should be below DB limit (which si by default 150 for Perun).
-# Ideal seems to be like 25 / 10
 jdbc.maximumPoolSize={{ jdbc_maximumPoolSize }}
 jdbc.minimumIdle={{ jdbc_minimumIdle }}
 
