@@ -1,95 +1,73 @@
 ---
-#  Ad-hoc role for updating PostgreSQL server
-#  run with:
-#  ansible-playbook -i inventories/all update-postgres.yml
-
 - hosts:
     - perun_servers
   remote_user: root
   vars:
-    postgres_pkg: postgresql-12
-    desired_version: "12.2"
+    tomcat_versions:
+      jessie: "tomcat7"
+      stretch: "tomcat8"
+      buster: "tomcat9"
+    tomcat_owner: "{{tomcat_owners[ansible_lsb.codename]}}"
+    tomcat_group: "{{tomcat_owners[ansible_lsb.codename]}}"
+    tomcatN: "{{tomcat_versions[ansible_lsb.codename]}}"
 
   pre_tasks:
-    - name: prerequisites checks
+    - name: Require Debian
       assert:
         that:
           - ansible_distribution == "Debian"
-          - ansible_distribution_major_version in [ "8", "9" , "10" ]
-          - install_postgres is defined
-          - tomcatN is defined
+          - ansible_distribution_major_version in ["9","10"]
+        msg: "Only Debian 9+ is supported"
+    - name: "get package facts"
+      package_facts:
+        manager: "apt"
+    - name: "find postgresql-11"
+      when: "'postgresql-11' in ansible_facts.packages"
+      set_fact:
+        postgresql_package: "postgresql-11"
+    - name: "find postgresql-12"
+      when: "'postgresql-12' in ansible_facts.packages"
+      set_fact:
+        postgresql_package: "postgresql-12"
+    - name: "assert some postgres"
+      assert:
+        that: postgresql_package is defined
+    - debug:
+        var: postgresql_package
+    - debug:
+        var: tomcatN
   tasks:
-    - name: Only where PostgreSQL is configured
-      when: install_postgres
-      block:
-        - name: get package facts
-          package_facts:
-
-        - name: detect postgres version
-          set_fact:
-            pver: "{{ansible_facts.packages[postgres_pkg][0].version}}"
-            should_upgrade: "{{ansible_facts.packages[postgres_pkg][0].version is version(desired_version, '<=')}}"
-
-        - name: message about not upgrading
-          when: not should_upgrade
-          debug:
-            msg: "not upgrading, version {{pver}} already is {{desired_version}}"
-
-        - name: perform upgrade
-          when: should_upgrade
-          block:
-            - name: message about upgrading
-              debug:
-                msg: "upgrading version {{pver}} to at least {{desired_version}}"
-            - name: get service facts
-              service_facts:
-            - name: ldapc service status
-              set_fact:
-                ldapc_should_run: "{{ansible_facts.services['perun-ldapc'].state == 'running'}}"
-            - name: engine service status
-              set_fact:
-                engine_should_run: "{{ansible_facts.services['perun-engine'].state == 'running'}}"
-            - name: services states
-              debug:
-                msg: "perun-ldapc running: {{ldapc_should_run}}, perun-engine running: {{engine_should_run}}"
-            - name: stop ldapc, engine and rpc
-              service:
-                name: "{{item}}"
-                state: stopped
-              loop:
-                - perun-ldapc
-                - perun-engine
-                - apache2
-                - "{{tomcatN}}"
-            - name: Unhold package from upgrading
-              dpkg_selections:
-                name: "{{postgres_pkg}}"
-                selection: install
-            - name: "upgrade {{postgres_pkg}}"
-              apt:
-                name:
-                  - "{{postgres_pkg}}"
-                state: latest
-                update_cache: yes
-              register: psqlupdate
-            - name: Hold package from upgrading
-              dpkg_selections:
-                name: "{{postgres_pkg}}"
-                selection: hold
-            - name: start services
-              service:
-                name: "{{item}}"
-                state: started
-              loop:
-                - "{{tomcatN}}"
-                - apache2
-            - name: start perun-ldapc
-              when: ansible_facts.services['perun-ldapc'] is defined and ldapc_should_run
-              service:
-                name: perun-ldapc
-                state: started
-            - name: start perun-engine
-              when: ansible_facts.services['perun-engine'] is defined and engine_should_run
-              service:
-                name: perun-engine
-                state: started
+    - name: "get service facts"
+      service_facts:
+    - name: "get ldapc service status"
+      set_fact:
+        ldapc_should_run: "{{ansible_facts.services['perun-ldapc'].state == 'running'}}"
+    - name: "stop perun-ldapc service"
+      service:
+        name: perun-ldapc
+        state: stopped
+    - name: "stop tomcat service"
+      service:
+        name: "{{ tomcatN }}"
+        state: stopped
+    - name: "Unhold package {{ postgresql_package }} from upgrading"
+      dpkg_selections:
+        name: "{{ postgresql_package }}"
+        selection: install
+    - name: "upgrade {{ postgresql_package }}"
+      apt:
+        name: "{{ postgresql_package }}"
+        state: latest
+    - name: "Hold package {{ postgresql_package }} from upgrading"
+      dpkg_selections:
+        name: "{{ postgresql_package }}"
+        selection: hold
+    - name: "start tomcat service"
+      service:
+        name: "{{ tomcatN }}"
+        state: started
+    - name: "start perun-ldapc"
+      when: ansible_facts.services['perun-ldapc'] is defined and ldapc_should_run
+      service:
+        name: perun-ldapc
+        state: started
