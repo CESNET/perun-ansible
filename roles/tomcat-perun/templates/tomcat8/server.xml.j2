@@ -17,7 +17,7 @@
     <Connector port="18443" protocol="org.apache.coyote.http11.Http11NioProtocol" maxThreads="150" address="127.0.0.1"
         URIEncoding="UTF-8" />
     <!-- Perun RPC -->
-    <Connector port="8009" protocol="AJP/1.3" address="127.0.0.1"
+    <Connector port="8009" protocol="AJP/1.3" address="127.0.0.1" secretRequired="false" allowedRequestAttributesPattern=".*"
          tomcatAuthentication="false" URIEncoding="UTF-8" packetSize="65000"/>
     <Engine name="Catalina" defaultHost="localhost">
       <Realm className="org.apache.catalina.realm.LockOutRealm">
