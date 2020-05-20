@@ -71,6 +71,8 @@ unattended_upgrades_origin_patterns: |2
           "origin=deb.sury.org";
           "origin=apt.postgresql.org,codename=${distro_codename}-pgdg";
 unattended_upgrades_blacklist: |2
+          "postgresql-13";
+          "postgresql-12";
           "postgresql-11";
           "slapd";
 
