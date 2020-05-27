@@ -35,6 +35,10 @@
   shell: slappasswd -s {{ password_ldap_config }}
   register: config_admin_password_hash
 
+- name: Generate the password for proxy user
+  shell: slappasswd -s {{ password_ldap_proxy }}
+  register: proxy_password_hash
+
 - name: Set up admin to manage config
   ldap_attr:
     dn: olcDatabase={0}config,cn=config
@@ -112,8 +116,9 @@
       replace: olcAccess
       olcAccess: {0}to attrs=userPassword by self write by anonymous auth by * none
       olcAccess: {1}to attrs=shadowLastChange by self write by * read
-      olcAccess: {2}to * by self read by * break
-      olcAccess: {3}to * by users search by * break
+      olcAccess: {2}to dn.subtree="{{ slapd_basedn }}" by dn.exact="cn=proxy,{{ slapd_basedn }}" read by * break
+      olcAccess: {3}to * by self read by * break
+      olcAccess: {4}to * by users search by * break
       -
 
   register: access_ldif
@@ -165,6 +170,27 @@
     dn: "ou=People,{{ slapd_basedn }}"
     objectClass: organizationalUnit
     state: present
+    bind_dn: "{{ slapd_basedn_admin }}"
+    bind_pw: "{{ password_ldap_data_tree }}"
+
+- name: "create cn=proxy,{{ slapd_basedn }} user"
+  ldap_entry:
+    dn: "cn=proxy,{{ slapd_basedn }}"
+    objectClass:
+      - simpleSecurityObject
+      - organizationalRole
+    attributes:
+      cn: proxy
+      description: User for proxy with full admin rights
+      userPassword: "{SHA}{{ proxy_password_hash }}"
+    state: present
+    bind_dn: "{{ slapd_basedn_admin }}"
+    bind_pw: "{{ password_ldap_data_tree }}"
+
+- name: "set cn=proxy,{{ slapd_basedn }} password"
+  ldap_passwd:
+    dn: "cn=proxy,{{ slapd_basedn }}"
+    passwd: "{{ password_ldap_proxy }}"
     bind_dn: "{{ slapd_basedn_admin }}"
     bind_pw: "{{ password_ldap_data_tree }}"
 
