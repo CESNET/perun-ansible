@@ -84,14 +84,6 @@ firefox https://perun:test@$MY_PERUN_MACHINE/ba/gui/
 - Edit the vault file with command `ansible-vault edit passwords.yml` and set real values
 - If you have more than one Perun server, just create a folder with vars.yml and passwords.yml files under the host_vars/ folder for each server.
 
-## Optional Oracle DB drivers
-
-- Download Oracle DB drivers 'orai18n’ and 'ojdbc8’ from [here](http://www.oracle.com/technetwork/database/features/jdbc/jdbc-ucp-122-3110062.html) on your system with Ansible (**the system which you will use to run this playbook**).
-- You need to register before downloading these files.
-- Put these file into your home directory (at the local machine with Ansible), or set paths to these files in **group_vars/all/vars.yml** file (variables **ojdbc8_file_path** and **orai18n_file_path**).
-- Set the variable **install_oracle: True** in the **vars.yml** file.
-- This will put the drivers into Tomcat and into all the produced executable jars.
-
 ## Run Ansible playbook
 
 - Now you can run ansible script with this command (**you need to be in downloaded Ansible repository**). It uses hostname from ./inventories/prod file. You can change it to ./inventories/test (or dev) to use hostname from another inventory.
