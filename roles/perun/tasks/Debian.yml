@@ -11,7 +11,7 @@
   group:
     name: "{{ perun_group }}"
     system: yes
-    
+
 - name: "Create {{ perun_login }} user"
   user:
     name: "{{ perun_login }}"
@@ -36,6 +36,15 @@
 - name: Make "{{ perun_log_dir }}" directory
   file:
     path: "{{ perun_log_dir }}"
+    state: directory
+    mode: 0775
+    owner: "{{ perun_login }}"
+    group: "{{ perun_group }}"
+
+# used for logs from group synchronizations
+- name: Make "{{ perun_log_dir }}/groupsync" directory
+  file:
+    path: "{{ perun_log_dir }}/groupsync"
     state: directory
     mode: 0775
     owner: "{{ perun_login }}"
