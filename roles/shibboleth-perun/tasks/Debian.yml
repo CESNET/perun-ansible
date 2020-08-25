@@ -79,7 +79,7 @@
     insertafter: '<Errors supportContact="root@localhost" helpLocation="/about.html" styleSheet="/shibboleth-sp/main.css"/>'
     marker: "<!-- {mark} ANSIBLE IdP metadata MANAGED BLOCK -->"
     content: |
-      <MetadataProvider type="XML" uri="{{ shibboleth_idp_metadata_url }}"
+      <MetadataProvider type="XML" url="{{ shibboleth_idp_metadata_url }}"
                       backingFilePath="proxyidp.xml" reloadInterval="1800" />
   notify:
     - "restart shibd"
