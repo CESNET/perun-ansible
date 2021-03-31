@@ -1,3 +1,3 @@
 [perun_docker_servers]
 # change this to a real DNS name
-cloud11.perun-aai.org
+perun.example.org
