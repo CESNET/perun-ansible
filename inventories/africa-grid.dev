@@ -1,5 +1,0 @@
-[perun-servers]
-151.97.41.47 ansible_user=ansible
-
-[africa-grid:children]
-perun-servers

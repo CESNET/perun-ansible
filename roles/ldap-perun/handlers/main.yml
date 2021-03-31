@@ -1,7 +1,0 @@
----
-# handlers file for ldap-perun
-- name: Restart LDAP
-  service:
-    state: restarted
-    enabled: yes
-    name: "{{ slapd_service[ansible_os_family ]}}"

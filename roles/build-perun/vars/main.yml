@@ -1,5 +1,0 @@
----
-# vars file for build-perun
-prerequisites:
-  Debian:
-    - maven

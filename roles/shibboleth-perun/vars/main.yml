@@ -1,7 +1,0 @@
----
-
-shib_namespace:
-  Debian_9: "urn:mace:shibboleth:3.0:native:sp:config"
-  Debian_10: "urn:mace:shibboleth:3.0:native:sp:config"
-
-shib_xml_namespace: "{{shib_namespace[ansible_distribution+'_'+ansible_distribution_major_version]}}"

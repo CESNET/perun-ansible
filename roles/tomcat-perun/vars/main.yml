@@ -1,4 +1,0 @@
----
-# vars file for tomcat-perun
-
-apache_p12_file: /etc/perun/ssl/ssl-apache-cert.p12

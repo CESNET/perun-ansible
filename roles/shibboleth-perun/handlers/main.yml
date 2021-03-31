@@ -1,8 +1,0 @@
----
-# handlers file for shibboleth-perun
-- name: restart Shibd
-  become: true
-  service:
-    state: restarted
-    name: shibd
-  listen: "restart shibd"
