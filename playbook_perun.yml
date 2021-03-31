@@ -1,0 +1,16 @@
+---
+#  Role for installing and maintaining Perun instances in Docker containers.
+#
+# run as:
+#   ansible-playbook playbook_perun.yml
+#
+# for limited machines or functionality, run as:
+#   ansible-playbook playbook_perun.yml --tags postgresql,perun_postgres --limit perun.example.org
+#
+# for possible tags, see the file roles/cesnet.perun_docker_server/tasks/main.yml
+
+- name: "install Perun server on a machine"
+  hosts: perun_docker_servers
+  remote_user: root
+  roles:
+    - role: cesnet.perun_docker_server

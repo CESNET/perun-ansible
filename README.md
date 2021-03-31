@@ -4,7 +4,7 @@ This repository serves for easier deployment of Perun server with default config
 
 ## Overview
 
-![Perun UML Deployment Diagram](docs/Perun_instance.svg)
+![Perun UML Deployment Diagram](docs/perun_docker_deployment_diagram.png)
 
 This Ansible playbook installs an instance of [Perun](https://perun-aai.org/). Its main part is the **Perun RPC** web application,
 which is deployed into **Tomcat** servlet container. The Tomcat is not accessible directly from outside, it is behind
@@ -29,7 +29,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
  
 ## Requirements
 
- - 64-bit Debian system (version 9 or 10)
+ - 64-bit Debian system (version 10)
  - Requires at least 8GB free disk space
  - Ideally dedicated 2 CPUs and at least 4GB RAM
 
@@ -41,13 +41,13 @@ git clone https://github.com/CESNET/perun-ansible.git
 cd perun-ansible
 git submodule update --init --recursive
 MY_PERUN_MACHINE=perun.mysite.org
-cp -r host_vars/perun.example.com/ host_vars/$MY_PERUN_MACHINE
-sed -i -e "s/production-perun.awesomesite.cz/$MY_PERUN_MACHINE/" inventories/prod
+sed -i -e "s/perun.example.org/$MY_PERUN_MACHINE/" hosts
 echo >.password "test"
-ansible-playbook -i inventories/prod site.yml
+ansible-playbook playbook_perun.yml
 
 firefox https://perun:test@$MY_PERUN_MACHINE/ba/gui/
 ```
+All passwords are set to "test".
 
 ## Installation of Ansible
 
@@ -58,52 +58,36 @@ firefox https://perun:test@$MY_PERUN_MACHINE/ba/gui/
 
 ## Clone this repo
 
-- Now you need to download our Ansible repository from our Github
-  - [Perun-Ansible repository](https://github.com/CESNET/perun-ansible)
+- Download this repository from Github and update its submodules: 
+```$bash
+git clone https://github.com/CESNET/perun-ansible.git
+cd perun-ansible
+git submodule update --init --recursive
+```  
 
-## Install TLS certificates
+## Set address of your server in the inventory file
 
-- At the target machine, preferably in the **/etc/perun/ssl** folder, generate a private key and a certificate request
-- Get TLS certificate from a reputable certification authority together with the CA's chain of certificates from a trusted root CA 
-- Put the certificate and chain files to the folder with the private key. 
-- Install package **ssl-cert** and change the owning group of the private key file to the group **ssl-cert** (needed for LDAP and PostgreSQL servers to access it) 
-- You will have to renew the certificate every couple of years, so we recommend to name the actual files with the certificate, key and chain in a way that marks the year in which they were issued, and to create symbolic links named like cert.pem, key.pem and chain.pem that you will use in all configuration files. In such setup, after renewing the certificate, you will just change the symbolic links instead of all configuration files.
-
-## Set address of your server in inventories
-
-- In **./inventories/prod** file you must **set hostname or ip address** of your Perun server. If you have some test server, you can set it in ./inventories/test file too.
-- Ansible_user variable mentioned behind your hostname is user, which has root privileges (default root).
-- For example fill this file with this row: **perun.example.com ansible_user=root**
+- In **hosts** file you must set hostname of your Perun server. It should be a publicly accessible DNS name,
+  because TLS certificates will be issued for it. 
 
 ## Create configuration files for your host
 
-- Create a new folder under **host_vars/** named exactly as your host in the inventory file
-- Copy there files **vars.yml** and **passwords.yml** from the folder **host_vars/perun.example.com/**
-- Edit the file **vars.yml** with any text editor and set all variables to real values
-- Change password of the **passwords.yml** vault with command: `ansible-vault rekey passwords.yml` (Default password is set to "test".)
-- Edit the vault file with command `ansible-vault edit passwords.yml` and set real values
-- If you have more than one Perun server, just create a folder with vars.yml and passwords.yml files under the host_vars/ folder for each server.
+- You do not need to configure anything for a default installation, just skip this section.
+- For a single machine, you can set variables in the file **group_vars/all/vars.yml** which is used for all machines. 
+- For more than one machine, create a new folder under **host_vars/** named exactly as your host in the inventory file and put a YAML file with variables there
+- The playbook looks for files in the directory **files/{{ perun_instance_hostname }}/** where the variable 
+  perun_instance_hostname has by default the same value as inventory_hostname which contains the name
+  of the machine from the Ansible inventory (the **hosts** file).
 
 ## Run Ansible playbook
 
-- Now you can run ansible script with this command (**you need to be in downloaded Ansible repository**). It uses hostname from ./inventories/prod file. You can change it to ./inventories/test (or dev) to use hostname from another inventory.
-  - `ansible-playbook -i inventories/prod --ask-vault-pass site.yml`
-  - It will ask for your vault password (the file which stores passwords meantioned before)
-
-- Perun should be running after installation on **https://[hostname]/[auth-type]/rpc/**, where [auth-type] is either cert for certificates, non for non-authorized access and ba for basic auth (our initial user perun).
-- For example: **https://[hostname]/ba/gui/** will show GUI of Perun. First you need to fill username and password (user: perun, password: the one you set in passwords.yml file in password_perun_admin variable).
+- Now you can run Ansible playbook with this command (you need to be in the downloaded Ansible repository).
+  - `ansible-playbook playbook_perun.yml`
+- Perun should be running after installation on **https://[hostname]/ba/gui/**. Username is "perun", password is "test".
 
 ## After installation
 
 Now you need to do stuff, which is not handled by Ansible script:
-
-- **Generate SSH key for Perun for accessing slave machines**
-  - As perun user use command: `ssh-keygen -t rsa -C "perun@[perun's_address]" -f ~/.ssh/id_rsa`
-  - Public part of key must be set in /root/.ssh/authorized_keys on each slave machine to be controlled by Perun. 
-
-- **Add certificates to truststore**
-  - The truststore have to contain certificates of servers, which are contacted by Perun. More precisely, chain of their parent certificates (if they are not distributed with Java / browser). Keytool is used to add them:
-  - `keytool -keystore /home/perun/.truststore -importcert -trustcacerts -file /tmp/file_with_cert -alias [cert alias, e.g. rt4.cesnet.cz]`
 
 - **Install slave scripts at slave machines**
   - The slave scripts should be installed at the machines that Perun will control, not at the Perun server!
