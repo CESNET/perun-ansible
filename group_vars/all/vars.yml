@@ -1,9 +1,9 @@
 # versions of containers to deploy
-perun_rpc_container_version: v3.20.0
-perun_cli_container_version: v3.20.0
-perun_ldapc_container_version: v3.20.0
-perun_engine_container_version: p_v3.20.0_s_v3.20.0
-perun_apache_container_version: gui_v3.20.0_wui_v3.20.0_ngui_v0.18.0
+perun_rpc_container_version: v3.25.1
+perun_cli_container_version: v3.25.1
+perun_ldapc_container_version: v3.25.1
+perun_engine_container_version: p_v3.25.1_s_v3.25.0
+perun_apache_container_version: gui_v3.25.1_wui_v3.25.0_ngui_v0.23.0
 
 # use TLS certificates issued by certbot
 perun_use_certbot_certificates: yes
