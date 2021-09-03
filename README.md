@@ -29,7 +29,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
  
 ## Requirements
 
- - 64-bit Debian system (version 10)
+ - 64-bit Debian system (version 10 or 11)
  - Requires at least 8GB free disk space
  - Ideally dedicated 2 CPUs and at least 4GB RAM
 
@@ -52,7 +52,7 @@ All passwords are set to "test".
 ## Installation of Ansible
 
 - First you need to install Ansible to your system ([Installation of Ansible](http://docs.ansible.com/ansible/intro_installation.html)), which will be used to install Perun to remote server (or localhost).
-- **The minimal version of Ansible is 2.9!**
+- **The required version of Ansible is 4!**
 - **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 
