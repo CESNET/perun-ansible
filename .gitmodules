@@ -4,3 +4,6 @@
 [submodule "roles/cesnet.perun_docker_server"]
 	path = roles/cesnet.perun_docker_server
 	url = https://github.com/CESNET/ansible-role-perun-docker-server.git
+[submodule "roles/cesnet.perun_ldap_config"]
+	path = roles/cesnet.perun_ldap_config
+	url = https://github.com/CESNET/ansible-role-perun-ldap-config.git
