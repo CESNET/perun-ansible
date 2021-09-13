@@ -9,4 +9,4 @@ perun_apache_container_version: gui_v3.30.0_wui_v3.30.0_ngui_v2.0.0
 perun_use_certbot_certificates: yes
 
 # the second DNS name used for the new GUI
-perun_ngui_hostname: "{{ inventory_hostname }}"
+perun_ngui_admin_hostname: "{{ inventory_hostname }}"
