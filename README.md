@@ -51,9 +51,9 @@ All passwords are set to "test".
 
 ## Installation of Ansible
 
-- First you need to install Ansible to your system, which will be used to install Perun to remote server (or localhost). 
-- Install Ansible 4 following the guide [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html) but using the PPA repository **ppa:ansible/ansible-4** on Ubuntu or `deb http://ppa.launchpad.net/ansible/ansible-4/ubuntu focal main` on Debian
-- **The required version of Ansible is 4!** 
+- First you need to install Ansible to your system, which will be used to install Perun to remote server (or localhost).
+- Install Ansible following the guide [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- **The required version of Ansible is 5!**
 - **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 
