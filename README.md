@@ -29,7 +29,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
  
 ## Requirements
 
- - 64-bit Debian system (version 10 or 11)
+ - 64-bit Debian system (version 11 or 12)
  - Requires at least 8GB free disk space
  - Ideally dedicated 2 CPUs and at least 4GB RAM
 
