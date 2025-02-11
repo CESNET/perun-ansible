@@ -3,10 +3,34 @@
 This repository serves for easier deployment of Perun server with default configuration.
 
 ## Overview
+This repository shows how to install and maintain an instance or multiple instances of
+[Perun Identity Management System](https://perun-aai.org/) using Ansible.
+
+## Diagrams
+
+### Deployment Flow Diagram 
+
+Ansible roles are public in the repo https://github.com/CESNET/perun-ansible-roles. 
+
+Docker images are also public in 
+the container image repository at gitlab-registry.cesnet.cz where they are created using CI tools from the non-public repo
+https://gitlab.cesnet.cz/712/deployment/idm/perun_idm_docker. 
+
+Files and variables describing a deployed machine should 
+not be public, because they contain secrets like passwords. This repo serves as such place, all settings are in the 
+file [group_vars/all/vars.yml](group_vars/all/vars.yml)
+
+A simple playbook like the [playbook_perun.yml](playbook_perun.yml) that just calls 
+the role [cesnet.perun_docker_server](cesnet_roles/cesnet.perun_docker_server) is all that is needed
+for deploying and managing a single instance or multiple instances of Perun Identity and Access Management System.
+
+![Perun Deployment Flow Diagram](docs/Perun_deployment_flow.png)
+
+### UML Deployment Diagram 
 
 ![Perun UML Deployment Diagram](docs/perun_docker_deployment_diagram.png)
 
-This Ansible playbook installs an instance of [Perun](https://perun-aai.org/). Its main part is the **Perun RPC** web application,
+The main part is the **Perun RPC** web application,
 which is deployed into **Tomcat** servlet container. The Tomcat is not accessible directly from outside, it is behind
 an **Apache** web server, which forwards requests to the Tomcat using AJP protocol. Apache uses **Shibboleth SP** plugin 
 and its associated daemon for federated authentication based on SAML protocol.
@@ -18,7 +42,7 @@ A separate process called **LDAP Connector (LDAPc)** observes changes in the dat
 directory in real-time. 
 
 A separate process called **Perun Engine** controls slave machines. It communicates using JMS with **Perun Dispatcher**,
-which is located inside of the Perun RPC. Dispatcher observes changes in database and instructs Engine 
+which is located inside the Perun RPC. Dispatcher observes changes in database and instructs Engine 
 to update some services on some slave machines.
 For each service on a machine, Engine runs a GEN script, which uses HTTP to obtain data from RPC 
 and generates files to be transferred to the slave machine.
@@ -29,7 +53,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
  
 ## Requirements
 
- - 64-bit Debian system (version 11 or 12)
+ - 64-bit Debian system (version 12)
  - Requires at least 8GB free disk space
  - Ideally dedicated 2 CPUs and at least 4GB RAM
 
@@ -53,7 +77,7 @@ All passwords are set to "test".
 
 - First you need to install Ansible to your system, which will be used to install Perun to remote server (or localhost).
 - Install Ansible following the guide [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- **The required version of Ansible is 7!**
+- **The required version of Ansible is defined in the role [cesnet.perun_docker_server](cesnet_roles/cesnet.perun_docker_server/tasks/main.yml)!**
 - **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 
