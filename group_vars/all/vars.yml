@@ -1,12 +1,19 @@
 # versions of containers to deploy
 
-perun_rpc_git_version: v47.0.0
-perun_rpc_container_version: v47.0.0
-perun_engine_container_version: p_v47.0.0_s_v16.3.1
-perun_apache_container_version: gui_v47.0.0_wui_v4.10.0_ngui_v18.7.0
+perun_rpc_git_version: v49.7.0
+perun_rpc_container_version: v49.7.0
+perun_engine_container_version: p_v49.7.0_s_v16.10.2
+perun_apache_container_version: gui_v49.7.0_wui_v5.3.0_ngui_v20.5.0
+perun_portainer_version: 2.33.5
 
 # use TLS certificates issued by certbot
 perun_use_certbot_certificates: yes
 
 # the second DNS name used for the new GUI
 perun_ngui_admin_hostname: "{{ inventory_hostname }}"
+
+# moved from setting in ansible.cfg to variable in Ansible 12
+ansible_managed: |-
+  This file is managed by Ansible.
+  Do not edit by hand. Make changes in git and re-apply the playbook.
+
