@@ -1,0 +1,115 @@
+#
+# Example Perun instance configuration which enables new GUI (uses OLD only for registrations and identity consolidation).
+# Copy this file to "host_vars/[your_host]/[your_host]_vars.yml" and modify it as necessary.
+#
+# 1) See ../group_vars/all/vars.yml for shared settings like which version of Perun will be deployed
+# or that we use certbot certs from LetsEncrypt (you can also provide your own certs).
+# 2) See ../cesnet_roles/cesnet.perun_docker_server/defaults/main.yml for default settings of all variables.
+# 3) See perun_passwords.yml for default passwords (encrypted as ansible vault with default password "test").
+#
+# 4) Recommended changes for a real-world and non-CESNET deployments:
+#
+# - Set all "perun_firewall_*" variables to your network environment!
+#
+# - Disable CESNET monitoring with "perun_metacentrum_monitoring: no"
+#
+# - Check and update values of following variables:
+#   perun_email, perun_root_email_address, perun_sendmail_config or perun_msmtp_config, perun_root_users,
+#   perun_yubikey_users, perun_yubikey_lognames, perun_sudo_root_lognames, perun_sudo_perun_lognames
+#
+# Note: all users which will be accessing perun instance by SSH will need to have their own Yubikey!
+#
+# - Re-define all password and secret-like variables from ../cesnet_roles/cesnet.perun_docker_server/defaults/main.yml
+#   in a new vars file, eg. "host_vars/[your_host]/[your_host]_passwords.yml" and encrypt it as an ansible vault.
+#   See example password vault "perun_passwords.yml" (same defaults, encrypted with password "test").
+#
+# Note: In this default setting you don't have to re-define OIDC client secrets as NEW GUI uses service-access.
+
+
+# Change hostname for all OLD GUI apps (since we will use default hostname "perun.example.org" for NEW Admin GUI)
+perun_rpc_hostname: signup.example.org
+
+# Name and ID specific for each instance (used e.g. in bugreports or for generating community unique identifiers for users)
+perun_rpc_instance_name: TESTPERUN
+perun_rpc_instance_id: TP1
+
+# Disable OLD GUI apps in apache config - will redirect to new GUI
+perun_apache_old_profile_disabled: yes
+perun_apache_old_admin_gui_disabled: yes
+perun_apache_old_pwdreset_disabled: yes
+
+# Enable API domain so that old GUI domain can have CSRF protection
+perun_api_enabled: yes
+perun_api_hostname: perun-api.example.org
+perun_apache_csrf_protection_enabled: yes
+
+# Enable new Admin GUI with default to "service-access" aka basic-auth login
+perun_ngui_admin_enabled: yes
+perun_ngui_admin_hostname: perun.example.org
+perun_ngui_admin_auto_oauth_redirect: false
+perun_ngui_admin_auto_service_access_redirect: true
+perun_ngui_admin_api_url: https://{{perun_api_hostname}}/ba/rpc/
+
+# Enable new User profile GUI with default to "service-access" aka basic-auth login
+perun_ngui_profile_enabled: yes
+perun_ngui_profile_hostname: profile.example.org
+perun_ngui_profile_auto_oauth_redirect: false
+perun_ngui_profile_auto_service_access_redirect: true
+perun_ngui_profile_api_url: https://{{perun_api_hostname}}/ba/rpc/
+
+# Enable new Password reset GUI with default to "service-access" aka basic-auth login
+perun_ngui_pwdreset_enabled: yes
+perun_ngui_pwdreset_hostname: pwdreset.example.org
+perun_ngui_pwdreset_auto_oauth_redirect: false
+perun_ngui_pwdreset_auto_service_access_redirect: true
+perun_ngui_pwdreset_api_url: https://{{perun_api_hostname}}/ba/rpc/
+
+
+# OTHER MAIN VARS TO MODIFY
+
+#perun_metacentrum_monitoring: no
+#perun_email: support@example.org
+#perun_root_email_address: admin@example.org
+
+# Check and re-define all "perun_firewall_*" like vars to your network env.
+
+# We assume you already have ROOT access on the machine, otherwise you can't install Perun.
+#
+# If you don't wish to create any other users or manage root access for them, keep following vars empty.
+#
+#perun_root_users: [ ]
+#perun_yubikey_lognames: [ ]
+#perun_sudo_root_lognames: [ ]
+#perun_sudo_perun_lognames: [ ]
+#perun_yubikey_users: {}
+
+# If you wish to manage only set of SSH keys for user "root", use following setting (there will be no additional
+# user accounts created)
+#
+#perun_root_users: [ 'tesla' ]
+#perun_yubikey_lognames: [ ]
+#perun_sudo_root_lognames: [ ]
+#perun_sudo_perun_lognames: [ ]
+#perun_yubikey_users:
+#  tesla:
+#    name: Nikola Tesla
+#    rootkey: ssh-rsa bleble card:001
+
+# If you wish to create additional user accounts use following settings.
+#
+# Unless you provide each user with a Yubikey (and set its ID in config) users won't be able to perform sudo
+# to switch to user perun or root as its configured to use Yubikey PAM module with TOTP verification.
+# They might be able to access root with a rootkey if they are listed in perun_root_users var.
+#
+#perun_root_users: [ 'tesla' ]
+#perun_yubikey_lognames: [ 'tesla' ]
+#perun_sudo_root_lognames: [ 'tesla' ]
+#perun_sudo_perun_lognames: [ ]
+#perun_yubikey_users:
+#  tesla:
+#    name: Nikola Tesla
+#    yubikeys:
+#      - ccccccefghij
+#    rootkey: ssh-rsa bleble card:001
+#    sshkeys:
+#      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQA....

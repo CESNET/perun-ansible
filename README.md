@@ -49,29 +49,13 @@ and generates files to be transferred to the slave machine.
 Then Engine runs a SEND script, which connects to the slave machine using the Secure Shell (ssh)
 protocol, transfers the generated files, and executes so-called slave scripts installed on the machines from DEB or RPM packages. 
 An administrator of a slave machine can tune the slave scripts by adding so-called pre-hook, mid-hook and post-hook
-scripts to the directory /etc/perun/&lt;service&gt;.d/      
- 
+scripts to the directory /etc/perun/&lt;service&gt;.d/
+
 ## Requirements
 
  - 64-bit Debian system (version 12)
  - Requires at least 8GB free disk space
  - Ideally dedicated 2 CPUs and at least 4GB RAM
-
-## TL;DR for the impatient
-
-```$bash
-sudo apt install ansible
-git clone https://github.com/CESNET/perun-ansible.git
-cd perun-ansible
-git submodule update --init --recursive
-MY_PERUN_MACHINE=perun.mysite.org
-sed -i -e "s/perun.example.org/$MY_PERUN_MACHINE/" hosts
-echo >.password "test"
-ansible-playbook playbook_perun.yml
-
-firefox https://perun:test@$MY_PERUN_MACHINE/ba/gui/
-```
-All passwords are set to "test".
 
 ## Installation of Ansible
 
@@ -90,25 +74,45 @@ cd perun-ansible
 git submodule update --init --recursive
 ```  
 
-## Set address of your server in the inventory file
+## Prepare DNS names and set address of your server in the inventory file
 
-- In **hosts** file you must set hostname of your Perun server. It should be a publicly accessible DNS name,
-  because TLS certificates will be issued for it. 
+- In **hosts** file you must set hostname of your Perun server. It should be a
+  publicly accessible DNS name, because TLS certificates will be issued for it.
+
+- Perun uses other domains for its UIs and API, so you will need to register 
+  also other DNS names (at least as CNAMEs).
+  See **host_vars/perun.example.org/perun_vars.yml** for more details.
 
 ## Create configuration files for your host
 
-- You do not need to configure anything for a default installation, just skip this section.
-- For a single machine, you can set variables in the file **group_vars/all/vars.yml** which is used for all machines. 
-- For more than one machine, create a new folder under **host_vars/** named exactly as your host in the inventory file and put a YAML file with variables there
-- The playbook looks for files in the directory **files/{{ perun_instance_hostname }}/** where the variable 
-  perun_instance_hostname has by default the same value as inventory_hostname which contains the name
-  of the machine from the Ansible inventory (the **hosts** file).
+- Example instance configuration is in 
+  - **host_vars/perun.example.org/perun_vars.yml**
+  - **host_vars/perun.example.org/perun_passwords.yml**
+- You should create a copy for your hostname and update the config (setting 
+  correct DNS names for all UIs/API at minimum). Read comments at the 
+  begging of the example config file for instructions.
+  ```bash
+  mkdir host_vars/your_hostname
+  cp host_vars/perun.example.org/perun_vars.yml host_vars/your_hostname/perun_vars.yml
+  cp host_vars/perun.example.org/perun_passwords.yml host_vars/your_hostname/perun_passwords.yml
+  ```
+- Default password for example ansible vault is "test".
+  ```bash
+  echo >.password "test"
+  ```
+- The playbook looks for files in the directory **files/{{ perun_instance_hostname }}/** where the variable
+perun_instance_hostname has by default the same value as inventory_hostname which contains the name
+of the machine from the Ansible inventory (the **hosts** file).
 
 ## Run Ansible playbook
 
 - Now you can run Ansible playbook with this command (you need to be in the downloaded Ansible repository).
-  - `ansible-playbook playbook_perun.yml`
-- Perun should be running after installation on **https://[hostname]/ba/gui/**. Username is "perun", password is "test".
+  ```bash
+  ansible-playbook playbook_perun.yml
+  ```
+- Perun admin UI should be running after installation on hostname set in 
+  **perun_ngui_admin_hostname** variable. So for example `perun.example.org`.
+  Username is "perun", password is "test".
 
 ## After installation
 
