@@ -1,8 +1,8 @@
 # versions of containers to deploy
-perun_rpc_git_version: v49.8.0
-perun_rpc_container_version: v49.8.0
-perun_engine_container_version: p_v49.8.0_s_v16.10.3
-perun_apache_container_version: gui_v49.8.0_wui_v5.3.1_ngui_v20.6.0
+perun_rpc_git_version: v49.9.1
+perun_rpc_container_version: v49.9.1
+perun_engine_container_version: p_v49.9.1_s_v16.10.3
+perun_apache_container_version: gui_v49.9.1_wui_v5.3.2_ngui_v20.6.0
 perun_portainer_version: 2.33.6
 
 # use TLS certificates issued by certbot
