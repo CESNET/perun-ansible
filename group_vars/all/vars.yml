@@ -2,7 +2,7 @@
 perun_rpc_git_version: v50.2.0
 perun_rpc_container_version: v50.2.0
 perun_engine_container_version: p_v50.2.0_s_v16.12.0
-perun_apache_container_version: gui_v50.2.0_wui_v6.0.0_ngui_v20.8.0
+perun_apache_container_version: gui_v50.2.0_wui_v6.0.0_ngui_v20.8.1
 perun_cli_python_container_version: p_v50.2.0_cli_v1.2.0
 perun_portainer_version: 2.39.1
 
