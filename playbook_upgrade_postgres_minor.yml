@@ -1,0 +1,172 @@
+#  Role for upgrading minor version of postgresql-NN Debian package.
+
+#  Postgresql is marked as "hold" to prevent its restarts while Perun LDAPc, Auditlogger and Perun RPC are running.
+#  This playbook temporarily stops LDAPc, Auditlogger and Perun RPC (tomcat), upgrades postgres, then starts Perun RPC
+#  (tomcat), LDAPc and Auditlogger again.
+#  LDAPc and Auditlogger are started only if they were running before.
+#
+#  This playbook upgrades only minor version of PostgreSQL, it meas that it keeps the package name (e.g. postgresql-16)
+#  and upgrades its version (e.g. from 16.4 to 16.5). Upgrading major version would mean
+#  installing another package and migrating data, which is a more complicated task.
+#
+#  run with:
+#  ansible-playbook playbook_upgrade_postgres_minor.yml --limit your_host
+
+- name: "Upgrade postgresql Debian package"
+  hosts:
+    - perun_servers
+    - perun_docker_servers
+  remote_user: root
+  vars:
+    tomcat_service: "tomcat11" # perun v55+ requires tomcat11
+
+  pre_tasks:
+    - assert:
+        that:
+          - ansible_facts['distribution']=='Debian'
+    - name: "find installed package name"
+      block:
+        - name: "get package facts"
+          package_facts:
+            manager: "apt"
+        - name: "find installed postgresql version"
+          when: "'postgresql-'+item in ansible_facts['packages'] and 'postgresql-client-'+item in ansible_facts['packages']"
+          set_fact:
+            postgresql_detected_version: "{{ item }}"
+          loop: [ '14', '15', '16', '17', '18' ]
+        - name: "assert some postgres version is installed"
+          assert:
+            that:
+              - postgresql_detected_version is defined
+        - debug:
+            msg: "found postgres-{{ postgresql_detected_version }}"
+    - name: "decide whether the Perun is dockerized"
+      set_fact:
+        nondockerized: "{{ 'perun_servers' in group_names }}"
+        dockerized: "{{ 'perun_docker_servers' in group_names }}"
+    - name: "make list of packages for holding"
+      set_fact:
+        psql_packages:
+          - "postgresql-{{ postgresql_detected_version }}"
+          - "postgresql-{{ postgresql_detected_version }}-repack"
+          - "postgresql-client-{{ postgresql_detected_version }}"
+          - "postgresql-client-common"
+          - "postgresql-common"
+    - name: "include additional postgres packages"
+      set_fact:
+        psql_packages: "{{ psql_packages + special_packages }}"
+      vars:
+        special_packages:
+          - "postgresql-{{ postgresql_detected_version }}-jit"
+      when: postgresql_detected_version | int >= 18
+    - debug:
+        var: psql_packages
+  tasks:
+    - name: "update apt cache"
+      apt:
+        update_cache: yes
+    - name: "clean packages cache in /var/cache/apt/archives"
+      apt:
+        clean: yes
+    - name: "pre-download debian packages"
+      ansible.builtin.command: >-
+        apt-get install -qq --assume-yes --download-only --allow-change-held-packages
+        {% for item in psql_packages %} {{ item }} {% endfor %}
+      register: predownload
+
+    - name: "for non-Docker Perun stop services using PostgreSQL server"
+      when: nondockerized
+      block:
+        - name: "get service facts"
+          ansible.builtin.service_facts:
+        - name: "get perun-ldapc service status"
+          set_fact:
+            ldapc_should_run: "{{ansible_facts['services']['perun-ldapc.service'].state == 'running'}}"
+        - name: "stop perun-ldapc service"
+          ansible.builtin.service:
+            name: perun-ldapc
+            state: stopped
+        - name: "get perun-auditlogger service status"
+          set_fact:
+            auditlogger_should_run: "{{(ansible_facts['services']['perun-auditlogger.service'] is defined) and (ansible_facts['services']['perun-auditlogger.service'].state == 'running')}}"
+        - name: "stop perun-auditlogger service"
+          ansible.builtin.service:
+            name: perun-auditlogger
+            state: stopped
+          when: ansible_facts['services']['perun-auditlogger'] is defined
+        - name: "stop tomcat service"
+          ansible.builtin.service:
+            name: "{{ tomcat_service }}"
+            state: stopped
+
+    - name: "for Dockerized Perun stop services using PostgreSQL server"
+      when: dockerized
+      block:
+        - name: "detect containers"
+          loop:
+            - perun_apache
+            - perun_rpc
+            - perun_ldapc
+            - perun_auditlogger
+          docker_container_info:
+            name: "{{ item }}"
+          register: perun_containers_before
+        - name: "stop perun containers"
+          loop: "{{ perun_containers_before['results'] }}"
+          loop_control:
+            loop_var: pc
+            label: "{{ pc['item'] }}"
+          when: pc.exists and pc.container.State.Status=='running'
+          docker_container:
+            name: "{{ pc['item'] }}"
+            state: stopped
+            container_default_behavior: no_defaults
+
+    - name: "update of postgres packages"
+      block:
+        - name: "Unhold packages from upgrading"
+          dpkg_selections:
+            name: "{{ item }}"
+            selection: install
+          loop: "{{ psql_packages }}"
+        - name: "upgrade packages"
+          apt:
+            name: "{{ psql_packages }}"
+            state: latest
+        - name: "Hold packages from upgrading"
+          dpkg_selections:
+            name: "{{ item }}"
+            selection: hold
+          loop: "{{ psql_packages }}"
+
+    - name: "for non-Docker Perun start services again"
+      when: nondockerized
+      block:
+        - name: "start tomcat service"
+          ansible.builtin.service:
+            name: "{{ tomcat_service }}"
+            state: started
+        - name: "start perun-ldapc"
+          when: ansible_facts['services']['perun-ldapc.service'] is defined and ldapc_should_run
+          ansible.builtin.service:
+            name: perun-ldapc
+            state: started
+        - name: "start perun-auditlogger"
+          when: ansible_facts['services']['perun-auditlogger.service'] is defined and auditlogger_should_run
+          ansible.builtin.service:
+            name: perun-auditlogger
+            state: started
+
+    - name: "for Dockerized Perun start services again"
+      when: dockerized
+      block:
+        - name: "start perun containers if they were running before"
+          loop: "{{ perun_containers_before['results'] }}"
+          loop_control:
+            loop_var: pc
+            label: "{{ pc['item'] }}"
+          when: pc.exists and pc.container.State.Status=='running'
+          docker_container:
+            name: "{{ pc['item'] }}"
+            state: started
+            container_default_behavior: no_defaults

@@ -71,6 +71,26 @@ perun_ngui_pwdreset_api_url: https://{{perun_api_hostname}}/ba/rpc/
 #perun_email: support@example.org
 #perun_root_email_address: admin@example.org
 
+# configure following for mails to work using your smtp relay
+# and check other vars defaults in cesnet.perun_docker_server roles
+
+# we default to using postfix
+perun_smtp_use_postfix: true
+perun_smtp_relay: relay.example.org
+perun_smtp_relay_port: 25
+perun_postfix_testing_email: "john@example.org"
+
+# for using Sendmail
+#perun_smtp_use_sendmail: true
+#perun_sendmail_config: |
+#  dnl # define outgoing relay
+#  define(`SMART_HOST', relay.example.org)dnl
+
+# for using Msmtp
+#perun_smtp_use_msmtp: true
+#perun_smtp_relay: relay.example.org
+#perun_smtp_relay_port: 25
+
 # Check and re-define all "perun_firewall_*" like vars to your network env.
 
 # We assume you already have ROOT access on the machine, otherwise you can't install Perun.
