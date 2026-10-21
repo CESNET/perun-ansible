@@ -11,9 +11,9 @@
       - docker-ce-cli
       - containerd.io
     packages_version:
-      - "docker-ce=5:29.9.1-1~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
-      - "docker-ce-cli=5:29.9.1-1~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
-      - "containerd.io=2.4.2-2~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
+      - "docker-ce=5:29.9.2-1~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
+      - "docker-ce-cli=5:29.9.2-1~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
+      - "containerd.io=2.4.2-3~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
 
   pre_tasks:
     - name: "Debian required"
