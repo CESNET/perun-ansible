@@ -1,0 +1,71 @@
+---
+# Role for upgrading Docker packages that are not upgraded by unattended-updates.
+
+- name: "Upgrade Docker Debian packages"
+  hosts:
+    - perun_docker_servers
+  remote_user: root
+  vars:
+    packages:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    packages_version:
+      - "docker-ce=5:29.9.1-1~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
+      - "docker-ce-cli=5:29.9.1-1~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
+      - "containerd.io=2.4.2-2~debian.{{ ansible_facts['distribution_major_version'] }}~{{ ansible_facts['distribution_release'] }}"
+
+  pre_tasks:
+    - name: "Debian required"
+      assert:
+        that:
+          - ansible_facts['distribution'] == "Debian"
+        fail_msg: "Only Debian is supported"
+  tasks:
+    - name: "get package facts"
+      package_facts:
+        manager: "apt"
+
+    - name: "check for installed packages"
+      fail:
+        msg: "package {{ item }} is not installed"
+      when: ansible_facts['packages'][item] is not defined
+      loop: "{{ packages }}"
+
+    - name: "update cache"
+      apt:
+        update_cache: yes
+
+    - name: "unhold packages"
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: install
+      loop: "{{ packages }}"
+
+    - name: "upgrade packages"
+      apt:
+        state: present
+        name: "{{ packages_version }}"
+
+    - name: "hold packages from upgrading"
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop: "{{ packages }}"
+
+    - name: "remove unnecessary plugins"
+      apt:
+        name:
+          - docker-compose-plugin
+          - docker-buildx-plugin
+          - docker-ce-rootless-extras
+        allow_change_held_packages: true
+        state: absent
+
+    - name: "get package facts"
+      package_facts:
+        manager: "apt"
+
+    - debug:
+        msg: "{{ item }}: {{ ansible_facts['packages'][item][0].version }}"
+      loop: "{{ packages }}"

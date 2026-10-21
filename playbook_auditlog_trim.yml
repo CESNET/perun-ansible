@@ -1,0 +1,147 @@
+#
+# Playbook for trimming auditer_log table.
+#
+# Set the cutoff_timestamp variable to timestamp after which audit log messages should be kept.
+#
+- name: "exports rows from db table auditer_log and deletes them"
+  hosts:
+    - perun_docker_servers
+  remote_user: root
+  vars:
+    # get messages per months: 'SELECT EXTRACT(YEAR FROM created_at) AS year, EXTRACT(MONTH FROM created_at) AS month, count(*) FROM perun.auditer_log GROUP BY 1,2 ORDER BY 1,2;'
+    cutoff_timestamp: '2026-06-01'
+    dump_format: text
+    dump_filename: "auditer_log_{{ cutoff_timestamp }}.{{ dump_format }}"
+
+  pre_tasks:
+    - name: "cutoff time is {{ cutoff_timestamp }}"
+      debug:
+        msg: "cutoff time is {{ cutoff_timestamp }}"
+
+    - assert:
+        that:
+          - ansible_facts['distribution']=='Debian'
+
+    - name: "find postgresql version and install repack package and its database extension"
+      block:
+        - name: "get package facts"
+          package_facts:
+            manager: "apt"
+        - name: "find installed postgresql version"
+          when: "'postgresql-'+item in ansible_facts.packages"
+          set_fact:
+            postgresql_version: "{{ item }}"
+          loop: [ '14', '15', '16', '17', '18' ]
+        - name: "assert postgres version is found"
+          assert:
+            that:
+              - postgresql_version is defined
+        - debug:
+            msg: "found postgresql-{{ postgresql_version }}"
+        - name: "install postgresql-{{ postgresql_version }}-repack package"
+          apt:
+            name: "postgresql-{{ postgresql_version }}-repack"
+            state: present
+        - name: "install pg_repack extension into database perun"
+          become: yes
+          become_user: postgres
+          postgresql_ext:
+            login_db: perun
+            name: pg_repack
+            state: present
+        - name: "check repack version"
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            login_db: perun
+            query: "SELECT default_version,installed_version FROM pg_available_extensions WHERE name='pg_repack'"
+          register: repack
+        - name: "drop old installed repack extension version {{ repack.query_result[0].installed_version }}"
+          when: repack.query_result[0].default_version != repack.query_result[0].installed_version
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            login_db: perun
+            query: "DROP EXTENSION pg_repack CASCADE"
+        - name: "install repack extension version {{ repack.query_result[0].default_version }}"
+          when: repack.query_result[0].default_version != repack.query_result[0].installed_version
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            login_db: perun
+            query: "CREATE EXTENSION pg_repack"
+
+    - name: "stop for database replicas"
+      block:
+        - name: "detect replica servers"
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            login_db: postgres
+            query: "select pg_is_in_recovery()"
+          register: pg_replica
+        - name: "stop for replicas"
+          assert:
+            that: not pg_replica.query_result[0].pg_is_in_recovery
+
+    - name: "install zstd compression utility"
+      apt:
+        name: zstd
+        state: present
+
+  tasks:
+    - name: "export and delete old auditlog messages"
+      block:
+        - name: "count auditlog messages before the cutoff time"
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            session_role: perun
+            login_db: perun
+            query: "select count(*) from perun.auditer_log where created_at < '{{ cutoff_timestamp }}'::timestamp"
+          register: old_rows_count
+
+        - name: "stop when no old rows found"
+          assert:
+            that: old_rows_count.query_result[0].count > 0
+            fail_msg: "no old rows found, aborting"
+            success_msg: "found {{ old_rows_count.query_result[0].count }} old rows"
+
+        - name: "export rows and compress them to /var/lib/postgresql/{{ dump_filename }}.zst"
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            login_db: perun
+            # see https://www.postgresql.org/docs/current/sql-copy.html
+            query: >-
+              COPY ( select * from perun.auditer_log where created_at < '{{ cutoff_timestamp }}'::timestamp )
+              TO PROGRAM 'zstdmt -10 -o /var/lib/postgresql/{{ dump_filename }}.zst' WITH (FORMAT {{ dump_format }})
+          register: export_rows
+
+        - debug:
+            msg: "exported {{ export_rows.rowcount }} rows"
+
+        - name: "delete exported rows from the database"
+          become: yes
+          become_user: postgres
+          postgresql_query:
+            session_role: perun
+            login_db: perun
+            query: "delete from perun.auditer_log where created_at < '{{ cutoff_timestamp }}'::timestamp"
+          register: old_rows_delete
+
+        - debug:
+            msg: "deleted {{ old_rows_delete.rowcount }} rows"
+
+    - name: "reclaim freed disk space"
+      block:
+        # see https://reorg.github.io/pg_repack/#details
+        - name: "repack database (reclaims disk space)"
+          become: yes
+          become_user: postgres
+          ansible.builtin.command:
+            cmd: pg_repack -t perun.auditer_log -U postgres -d perun
+          register: repack
+        - debug:
+            var: repack
+
