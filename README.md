@@ -21,7 +21,7 @@ not be public, because they contain secrets like passwords. This repo serves as 
 file [group_vars/all/vars.yml](group_vars/all/vars.yml)
 
 A simple playbook like the [playbook_perun.yml](playbook_perun.yml) that just calls 
-the role [cesnet.perun_docker_server](cesnet_roles/cesnet.perun_docker_server) is all that is needed
+the role [cesnet.perun_docker_server](https://github.com/CESNET/ansible-role-perun-docker-server/tree/main) is all that is needed
 for deploying and managing a single instance or multiple instances of Perun Identity and Access Management System.
 
 ![Perun Deployment Flow Diagram](docs/Perun_deployment_flow.png)
@@ -53,7 +53,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
 
 ## Requirements
 
- - 64-bit Debian system (version 12)
+ - 64-bit Debian system (stable or oldstable version)
  - Requires at least 8GB free disk space
  - Ideally dedicated 2 CPUs and at least 4GB RAM
 
@@ -61,7 +61,7 @@ scripts to the directory /etc/perun/&lt;service&gt;.d/
 
 - First you need to install Ansible to your system, which will be used to install Perun to remote server (or localhost).
 - Install Ansible following the guide [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- **The required version of Ansible (12) is defined in the role [cesnet.perun_docker_server](cesnet_roles/cesnet.perun_docker_server/tasks/main.yml)!**
+- **The required version of Ansible is defined in the role [cesnet.perun_docker_server](https://github.com/CESNET/ansible-role-perun-docker-server/tree/main)!**
 - **You must be able to log into the remote server**, thus your public SSH key must be placed in the file /root/.ssh/authorized_keys on the remote server.
 - **SSH and Python must be installed on both sides of communication.**
 
