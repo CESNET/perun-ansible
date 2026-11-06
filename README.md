@@ -13,8 +13,8 @@ This repository shows how to install and maintain an instance or multiple instan
 Ansible roles are public in the repo https://github.com/CESNET/perun-ansible-roles. 
 
 Docker images are also public in 
-the container image repository at gitlab-registry.cesnet.cz where they are created using CI tools from the non-public repo
-https://gitlab.cesnet.cz/712/deployment/idm/perun_idm_docker. 
+the container image repository at `hub.cerit.io/perunidm` where they are 
+created using CI tools from the non-public repo.
 
 Files and variables describing a deployed machine should 
 not be public, because they contain secrets like passwords. This repo serves as such place, all settings are in the 
