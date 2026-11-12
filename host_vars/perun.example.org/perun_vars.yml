@@ -93,6 +93,24 @@ perun_postfix_testing_email: "john@example.org"
 
 # Check and re-define all "perun_firewall_*" like vars to your network env.
 
+#
+# PROTECT your /ba/ (basic-auth) endpoints in apache with custom IP filters !!
+#
+
+# IF machine is behind NAT, you need to manually add its public IP addresses
+# This variable is also extended with perun_net docker network gateways just before updating apache sites templates.
+#perun_apache_basicAuth_host_ip_ranges: "{{ []
+#  + ([ansible_facts.default_ipv4.address] if (ansible_facts.default_ipv4.address is defined) else [])
+#  + ([ansible_facts.default_ipv6.address] if (ansible_facts.default_ipv6.address is defined) else [])
+#  + ['1.1.1.1'] }}"
+#perun_apache_basicAuth_common_ip_filter:
+#  perun: "{{ (my_vpn_range + perun_apache_basicAuth_host_ip_ranges) | join(' ') }} "
+#  perun-engine: "{{ (my_vpn_range + perun_apache_basicAuth_host_ip_ranges) | join(' ') }}"
+#  nagios: "1.1.1.1 {{ my_vpn_range | join(' ') }}"
+#perun_apache_basicAuth_additional_ip_filter:
+#  your_custom_account: "1.1.1.1/32"
+
+
 # We assume you already have ROOT access on the machine, otherwise you can't install Perun.
 #
 # If you don't wish to create any other users or manage root access for them, keep following vars empty.
